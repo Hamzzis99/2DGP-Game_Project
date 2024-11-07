@@ -1,14 +1,17 @@
-#미사용 파일 오로지 마리오 좌표값 구하는데만 사용했음.
+#미사용 파일 오로지 마리오 좌표값 구하는데만 사용하는중
 
 from pico2d import *
 
 open_canvas()
 
 # 스프라이트 시트 로드
-sprite_sheet = load_image('characters.png')
+sprite_sheet = load_image('character.png')
 
 # 초기 스프라이트 좌표와 크기 설정
-sprite_x, sprite_y = 290 ,342  # 스프라이트의 시작 좌표
+sprite_x, sprite_y = 355 ,342  # 스프라이트의 시작 좌표
+
+#점프 좌표 355
+
 sprite_width, sprite_height = 16, 16  # 기존 크기
 scale_factor = 2  # 크기를 키우는 배율
 

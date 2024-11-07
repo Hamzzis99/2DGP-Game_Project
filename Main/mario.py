@@ -121,3 +121,52 @@ class Run:
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
                 frame_width * 3, frame_height * 3
             )
+
+
+class Jump:
+    @staticmethod
+    def enter(mario, e):
+        if right_down(e) or left_up(e):
+            mario.dir = 1
+            mario.face_dir = 1
+        elif left_down(e) or right_up(e):
+            mario.dir = -1
+            mario.face_dir = -1
+
+        mario.frame = 0
+
+        # Run 상태에서 사용할 프레임 x 좌표 리스트
+        mario.run_frame_x_positions = [290, 304, 321]
+
+    @staticmethod
+    def exit(mario, e):
+        pass
+
+    @staticmethod
+    def do(mario):
+        mario.x += mario.dir * 5
+        mario.frame = (mario.frame + 1) % 3  # 총 3개의 프레임 사용
+
+    @staticmethod
+    def draw(mario):
+        frame_width = 16
+        frame_height = 16
+        frame_y = 342  # y 좌표는 동일
+
+        # 현재 프레임의 x 좌표 선택
+        frame_x = mario.run_frame_x_positions[mario.frame]
+
+        # 캐릭터를 두 배로 키워서 그립니다.
+        if mario.face_dir == -1:
+            # 좌우 반전하여 그리기
+            mario.image.clip_composite_draw(
+                frame_x, frame_y, frame_width, frame_height,
+                0, 'h',  # 각도, 반전 옵션 ('h'는 좌우 반전)
+                mario.x, mario.y,
+                frame_width * 3, frame_height * 3
+            )
+        else:
+            mario.image.clip_draw(
+                frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
+                frame_width * 3, frame_height * 3
+            )
