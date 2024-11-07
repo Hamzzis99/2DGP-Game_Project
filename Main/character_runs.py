@@ -10,13 +10,13 @@ def main():
     character = load_image('character.png')
 
     # 애니메이션 프레임 설정
-    frame_x_positions = [290, 304, 321]
-    frame_y_position = 342
-    frame_width = 16  # 소스 이미지의 프레임 너비 (고정)
-    frame_height = 16  # 소스 이미지의 프레임 높이 (고정)
+    frame_x_positions = [336, 353, 321]
+    frame_y_position = 340
+    frame_width = 18  # 소스 이미지의 프레임 너비 (고정)
+    frame_height = 20  # 소스 이미지의 프레임 높이 (고정)
 
     # 캐릭터의 크기 두 배로 설정
-    scale = 2
+    scale = 4
     display_width = frame_width * scale
     display_height = frame_height * scale
 
@@ -41,7 +41,7 @@ def main():
         update_canvas()
 
         # 프레임 업데이트 (0, 1, 2 반복)
-        frame = (frame + 1) % 3
+        frame = (frame + 1) % 2
 
         # 캐릭터 이동
         x += 10  # 이동 속도 조절 (10 픽셀씩 이동)
