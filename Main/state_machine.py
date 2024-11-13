@@ -24,38 +24,38 @@ def left_up(e):
 
 
 class StateMachine:
-    def __init__(self, obj):
-        self.obj = obj  # 어떤 객체를 위한 상태 머신인지 알려줌
-        # 상태 이벤트를 보관할 리스트
-        self.event_q = []
+    def __init__(self, o):
+        self.o = o
+        self.event_que = []
 
     def start(self, state):
-        self.cur_state = state  # 시작 상태를 받아서 현재 상태로 설정
-        self.cur_state.enter(self.obj, ('START', 0))
+        self.cur_state = state
+
         print(f'Enter into {state}')
-
-    def update(self):
-        self.cur_state.do(self.obj)  # 현재 상태의 do() 함수 실행
-        # 이벤트가 있는지 확인
-        if self.event_q:
-            e = self.event_q.pop(0)
-            for check_event, next_state in self.transitions[self.cur_state].items():
-                if check_event(e):
-                    print(f'Exit From {self.cur_state}')
-                    self.cur_state.exit(self.obj, e)
-                    self.cur_state = next_state
-                    print(f'Enter into {next_state}')
-                    self.cur_state.enter(self.obj, e)  # 상태 변환의 이유를 명확히 알려줌
-                    return  # 이벤트에 따른 상태 변환 완료
-            # 이 시점으로 왔다는 것은 이벤트에 따른 전환 실패
-            print(f'        WARNING: {e} not handled at state {self.cur_state}')
-
-    def draw(self):
-        self.cur_state.draw(self.obj)
+        self.cur_state.enter(self.o, ('START', 0))
 
     def add_event(self, e):
-        print(f'    DEBUG: add event {e}')
-        self.event_q.append(e)
+        # print(f'    DEBUG: New event {e} added to event Que')
+        self.event_que.append(e)
 
     def set_transitions(self, transitions):
         self.transitions = transitions
+
+    def update(self):
+        self.cur_state.do(self.o)
+        if self.event_que:
+            event = self.event_que.pop(0)
+            self.handle_event(event)
+
+    def draw(self):
+        self.cur_state.draw(self.o)
+
+    def handle_event(self, e):
+        for event, next_state in self.transitions[self.cur_state].items():
+            if event(e):
+                print(f'Exit from {self.cur_state}')
+                self.cur_state.exit(self.o, e)
+                self.cur_state = next_state
+                print(f'Enter into {self.cur_state}')
+                self.cur_state.enter(self.o, e)
+                return

@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, draw_rectangle
 
 from state_machine import StateMachine, right_down, left_down, right_up, left_up, start_event
 
@@ -24,7 +24,7 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 # Boy Action Speed
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 8
+FRAMES_PER_ACTION = 3
 
 class Mario:
     def __init__(self):
@@ -52,7 +52,6 @@ class Mario:
 
     def draw(self):
         self.state_machine.draw()
-
 
 class Idle:
     @staticmethod
