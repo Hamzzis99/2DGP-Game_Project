@@ -1,8 +1,9 @@
-#mario.py
 from pico2d import load_image, draw_rectangle
-import time
 import game_framework
-from state_machine import StateMachine, right_down, left_down, right_up, left_up, start_event, s_up, s_down
+from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down
+
+# 전역 변수 선언
+global_y = 90  # 캐릭터의 초기 Y 좌표
 
 x_coords = [290, 304, 321]
 y_coord = 342
@@ -18,17 +19,17 @@ FRAMES_PER_ACTION = 3
 
 class Mario:
     def __init__(self):
-        self.x, self.y = 400, 90
+        global global_y
+        self.x, self.y = 400, global_y
         self.face_dir = 1
         self.image = load_image('character.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
-            Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, s_down: Jump},  # s_down 추가
+            Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, s_down: Jump},
             Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, s_down: Jump},
-            Jump: {right_up: Idle, left_up: Idle}  # 필요에 따라 다른 상태로의 전환 추가 가능
+            Jump: {right_up: Idle, left_up: Idle}
         })
-
 
     def update(self):
         self.state_machine.update()
@@ -41,11 +42,7 @@ class Mario:
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        # fill here
-        # 네개의 값, x1, y1, x2, y2
-        #return self.x - 20, self.y - 50, self.x + 20, self.y + 50  # 4개의 값으로 구성된 한개의 튜플
-        return self.x - 25, self.y + 30, self.x + 25, self.y -30 # 4개의 값으로 구성된 한개의 튜플
-        pass
+        return self.x - 25, self.y + 30, self.x + 25, self.y - 30
 
     def handle_collision(self, group, other):
         pass
@@ -55,10 +52,10 @@ class Idle:
     def enter(mario, e):
         mario.dir = 0
         mario.frame = 0
-        if e is not None:  # e가 None이 아닌 경우에만 조건 체크
+        if e is not None:
             if left_up(e) or right_down(e):
                 mario.face_dir = -1
-            elif right_up(e) or left_down(e) or start_event(e):
+            elif right_up(e) or left_down(e) or s_down(e):
                 mario.face_dir = 1
 
     @staticmethod
@@ -90,10 +87,10 @@ class Run:
     @staticmethod
     def enter(mario, e):
         if right_down(e) or left_up(e):
-            mario.dir, mario.face_dir, mario.action = 1, 1, 1
+            mario.dir, mario.face_dir = 1, 1
         elif left_down(e) or right_up(e):
-            mario.dir, mario.face_dir, mario.action = -1, -1, 0
-        mario.run_frame_x_positions = [290, 304, 321]  # x 좌표 배열
+            mario.dir, mario.face_dir = -1, -1
+        mario.run_frame_x_positions = [290, 304, 321]
 
     @staticmethod
     def exit(mario, e):
@@ -101,7 +98,6 @@ class Run:
 
     @staticmethod
     def do(mario):
-        # 애니메이션 프레임 업데이트 (모듈러 연산을 통해 반복)
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(mario.run_frame_x_positions)
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
 
@@ -109,8 +105,8 @@ class Run:
     def draw(mario):
         frame_width = 16
         frame_height = 16
-        frame_y = 342  # y 좌표는 고정
-        frame_x = mario.run_frame_x_positions[int(mario.frame)]  # 정수 변환 후 x 좌표 선택
+        frame_y = 342
+        frame_x = mario.run_frame_x_positions[int(mario.frame)]
         if mario.face_dir == -1:
             mario.image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
@@ -122,40 +118,40 @@ class Run:
                 frame_width * 3, frame_height * 3
             )
 
-
-
 class Jump:
-    JUMP_VELOCITY = 200  # 초기 점프 속도 (픽셀/초)
-    GRAVITY = -300  # 중력 (픽셀/초^2)
+    JUMP_VELOCITY = 200
+    GRAVITY = -300
 
     @staticmethod
     def enter(mario, e):
-        mario.jump_speed = Jump.JUMP_VELOCITY  # 초기 속도 설정
-        mario.jump_frame_x_positions = [336, 353, 321]  # 애니메이션 프레임 설정
-        mario.frame = 0  # 애니메이션 초기화
+        global global_y
+        mario.jump_speed = Jump.JUMP_VELOCITY
+        mario.jump_frame_x_positions = [336, 353, 321]
+        mario.frame = 0
+        mario.y = global_y
 
     @staticmethod
     def exit(mario, e):
-        mario.jump_speed = 0  # 점프가 끝나면 속도 초기화
-        mario.dir = 0  # 점프가 끝나면 방향 초기화
+        global global_y
+        global_y = mario.y
+        mario.jump_speed = 0
+        mario.dir = 0
 
     @staticmethod
     def do(mario):
-        # 중력을 적용하여 Y축 위치와 속도 갱신
+        global global_y
         mario.y += mario.jump_speed * game_framework.frame_time
         mario.jump_speed += Jump.GRAVITY * game_framework.frame_time
+        global_y = mario.y
 
-        # 점프가 일정 높이에서 종료되도록 설정 (바닥에 도달 시)
-        if mario.y <= 90:  # 초기 Y 좌표로 복귀
+        if mario.y <= 90:
             mario.y = 90
             mario.state_machine.cur_state = Idle
             mario.state_machine.cur_state.enter(mario, None)
 
-        # 방향키 입력이 있으면 X축 이동 처리
         if mario.dir != 0:
             mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
 
-        # 애니메이션 프레임 업데이트 (점프 애니메이션 유지)
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
 
     @staticmethod
@@ -174,21 +170,3 @@ class Jump:
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
                 frame_width * 3, frame_height * 3
             )
-
-    @staticmethod
-    def handle_event(mario, e):
-        # 방향키 입력 처리
-        if right_down(e):
-            mario.dir = 1
-            mario.face_dir = 1  # 방향 유지
-        elif left_down(e):
-            mario.dir = -1
-            mario.face_dir = -1  # 방향 유지
-        elif right_up(e) or left_up(e):
-            mario.dir = 0  # 방향키를 떼면 멈춤
-
-
-
-
-
-
