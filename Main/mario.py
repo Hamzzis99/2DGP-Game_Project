@@ -1,3 +1,4 @@
+#mario.py
 from pico2d import load_image, draw_rectangle
 import time
 import game_framework
@@ -136,6 +137,7 @@ class Jump:
     @staticmethod
     def exit(mario, e):
         mario.jump_speed = 0  # 점프가 끝나면 속도 초기화
+        mario.dir = 0  # 점프가 끝나면 방향 초기화
 
     @staticmethod
     def do(mario):
@@ -149,7 +151,11 @@ class Jump:
             mario.state_machine.cur_state = Idle
             mario.state_machine.cur_state.enter(mario, None)
 
-        # 애니메이션 프레임 업데이트
+        # 방향키 입력이 있으면 X축 이동 처리
+        if mario.dir != 0:
+            mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
+
+        # 애니메이션 프레임 업데이트 (점프 애니메이션 유지)
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
 
     @staticmethod
@@ -168,4 +174,21 @@ class Jump:
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
                 frame_width * 3, frame_height * 3
             )
+
+    @staticmethod
+    def handle_event(mario, e):
+        # 방향키 입력 처리
+        if right_down(e):
+            mario.dir = 1
+            mario.face_dir = 1  # 방향 유지
+        elif left_down(e):
+            mario.dir = -1
+            mario.face_dir = -1  # 방향 유지
+        elif right_up(e) or left_up(e):
+            mario.dir = 0  # 방향키를 떼면 멈춤
+
+
+
+
+
 

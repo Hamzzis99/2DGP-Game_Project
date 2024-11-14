@@ -1,3 +1,4 @@
+#state_machine.py
 # 이벤트 체크 함수를 정의
 # 상태 이벤트 e = (종류, 실제값) 튜플로 정의
 from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_s

@@ -1,4 +1,6 @@
+# character_runs.py 사용하지 않는 것. 캐릭터 좌표 노가다 전용 파일
 from pico2d import *
+
 
 
 def main():

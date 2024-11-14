@@ -1,8 +1,9 @@
+#control_mario (구 코드) 쓰지 않을 코드입니다.
 from pico2d import *
 
 from mario import Mario
 from grass import Grass
-#쓰지 않을 코드입니다.
+
 
 # Game object class here
 
