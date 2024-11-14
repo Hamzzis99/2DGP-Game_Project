@@ -9,7 +9,7 @@ from mario import Mario
 # boy = None
 
 def handle_events():
-    global mario  # mario 변수를 사용하기 위해 global 선언
+    global mario
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -17,7 +17,7 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         else:
-            mario.handle_event(event)  # 인스턴스를 통해 메서드 호출
+            mario.handle_event(event)  # 마리오 인스턴스를 통해 이벤트 처리
 
 def init():
     global mario
