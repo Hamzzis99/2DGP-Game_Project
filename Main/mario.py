@@ -124,25 +124,33 @@ class Run:
 
 
 class Jump:
+    JUMP_VELOCITY = 200  # 초기 점프 속도 (픽셀/초)
+    GRAVITY = -300  # 중력 (픽셀/초^2)
+
     @staticmethod
     def enter(mario, e):
-        mario.start_jump_time = time.time()  # 애니메이션 시작 시간 기록
-        mario.jump_frame_x_positions = [336, 353, 321]  # 애니메이션 프레임 위치 설정
+        mario.jump_speed = Jump.JUMP_VELOCITY  # 초기 속도 설정
+        mario.jump_frame_x_positions = [336, 353, 321]  # 애니메이션 프레임 설정
         mario.frame = 0  # 애니메이션 초기화
 
     @staticmethod
     def exit(mario, e):
-        pass
+        mario.jump_speed = 0  # 점프가 끝나면 속도 초기화
 
     @staticmethod
     def do(mario):
-        # 1초 동안 애니메이션 실행
-        if time.time() - mario.start_jump_time > 1:
-            mario.state_machine.cur_state = Idle  # 1초 후 원래 상태로 복귀
+        # 중력을 적용하여 Y축 위치와 속도 갱신
+        mario.y += mario.jump_speed * game_framework.frame_time
+        mario.jump_speed += Jump.GRAVITY * game_framework.frame_time
+
+        # 점프가 일정 높이에서 종료되도록 설정 (바닥에 도달 시)
+        if mario.y <= 90:  # 초기 Y 좌표로 복귀
+            mario.y = 90
+            mario.state_machine.cur_state = Idle
             mario.state_machine.cur_state.enter(mario, None)
-        else:
-            # 애니메이션 프레임 업데이트
-            mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
+
+        # 애니메이션 프레임 업데이트
+        mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
 
     @staticmethod
     def draw(mario):
@@ -160,3 +168,4 @@ class Jump:
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
                 frame_width * 3, frame_height * 3
             )
+
