@@ -213,7 +213,7 @@ class Mario:
     def draw(self):
         self.state_machine.draw()
         # 충돌 박스 그리기 (디버깅용)
-        # draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         return self.x - 25, self.y + 30, self.x + 25, self.y - 30

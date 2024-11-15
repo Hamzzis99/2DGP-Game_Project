@@ -12,9 +12,9 @@ def main():
     character = load_image('character.png')
 
     # 애니메이션 프레임 설정
-    frame_x_positions = [336, 353, 321]
-    frame_y_position = 340
-    frame_width = 18  # 소스 이미지의 프레임 너비 (고정)
+    frame_x_positions = [296, 315]
+    frame_y_position = 196
+    frame_width = 16  # 소스 이미지의 프레임 너비 (고정)
     frame_height = 20  # 소스 이미지의 프레임 높이 (고정)
 
     # 캐릭터의 크기 두 배로 설정

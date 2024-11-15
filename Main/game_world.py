@@ -1,5 +1,5 @@
 # game_world.py
-world = [[] for _ in range(4)]
+world = [[] for _ in range(5)]
 collision_pairs = { } # key: [ [], [] ]
 
 # group : 'boy:ball', 'boy:zombie'
