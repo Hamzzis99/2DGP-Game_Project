@@ -51,11 +51,13 @@ def run(start_mode):
         stack[-1].update()
         stack[-1].draw()
         frame_time = time.time() - current_time
-        frame_rate = 1.0 / frame_time
+        # 프레임 타임 제한 (예: 0.05초)
+        frame_time = min(frame_time, 0.05)
+        frame_rate = 1.0 / frame_time if frame_time > 0 else 0
         current_time += frame_time
-        #print(f'Frame Time: {frame_time}, Frame Rate: {frame_rate}')
+        # print(f'Frame Time: {frame_time:.5f}, Frame Rate: {frame_rate:.2f}')  # 주석 처리됨
 
-    # repeatedly delete the top of the stack
+    # 스택에 남아있는 모든 모드의 finish 함수 실행
     while (len(stack) > 0):
         stack[-1].finish()
         stack.pop()
