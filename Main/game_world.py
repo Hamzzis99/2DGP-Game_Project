@@ -1,9 +1,9 @@
-#game_world.py
+# game_world.py
 world = [[] for _ in range(4)]
-collision_pairs = { } #key: [ [], [] ]
+collision_pairs = { } # key: [ [], [] ]
 
 # group : 'boy:ball', 'boy:zombie'
-def add_collision_pair(group, a, b): #소년과 좀비가 a하고 b를 나타내는 객체.
+def add_collision_pair(group, a, b): # 소년과 좀비가 a하고 b를 나타내는 객체.
     if group not in collision_pairs:
         collision_pairs[group] = [ [], [] ] # 초기화
     if a:
@@ -66,7 +66,7 @@ def collide(a, b):
     return True
 
 
-#범용적으로 이용하기 위해 충돌시스템은 이렇게 만들어야 한다....
+# 범용적으로 이용하기 위해 충돌시스템은 이렇게 만들어야 한다....
 def handle_collisions():
     for group, pairs in collision_pairs.items():
         for a in pairs[0]:

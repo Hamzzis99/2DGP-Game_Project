@@ -1,4 +1,4 @@
-#play_mode.py
+# play_mode.py
 from pico2d import *
 import game_framework
 
@@ -30,8 +30,8 @@ def init():
     game_world.add_object(mario, 1)
 
 
-#def colide(boy, buit()all):
-    #pass
+# def colide(boy, builtall):
+    # pass
 
 
 def finish():
