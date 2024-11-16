@@ -4,6 +4,7 @@ from pico2d import load_image, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
 import game_framework
 import game_world
+from config import MarioConfig
 from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down
 
 # 상수 정의
@@ -178,7 +179,7 @@ class Jump:
 # 마리오 클래스 정의
 class Mario:
     def __init__(self):
-        self.x, self.y = 400, 70  # 초기 위치
+        self.x, self.y = MarioConfig.START_X, MarioConfig.START_Y  # 초기 위치
         self.face_dir = 1         # 방향: 1(오른쪽), -1(왼쪽)
         self.dir = 0              # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
         self.image = load_image('character.png')
