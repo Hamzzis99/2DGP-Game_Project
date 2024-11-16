@@ -1,6 +1,9 @@
+# mario.py
+
 from pico2d import load_image, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
 import game_framework
+import game_world
 from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down
 
 # 상수 정의
@@ -175,7 +178,7 @@ class Jump:
 # 마리오 클래스 정의
 class Mario:
     def __init__(self):
-        self.x, self.y = 400, 90  # 초기 위치
+        self.x, self.y = 400, 70  # 초기 위치
         self.face_dir = 1         # 방향: 1(오른쪽), -1(왼쪽)
         self.dir = 0              # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
         self.image = load_image('character.png')
@@ -216,7 +219,15 @@ class Mario:
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return self.x - 25, self.y + 30, self.x + 25, self.y - 30
+        return self.x - 25, self.y - 30, self.x + 25, self.y + 30
 
-    def handle_collision(self, group, other):
-        pass
+    def handle_collision(self, group, other, hit_position):
+        if group == 'mario:koomba_top':
+            print("마리오가 굼바를 밟았습니다. 굼바를 제거하고 점프합니다.")
+            game_world.remove_object(other)  # 굼바 제거
+            self.jump_speed = Jump.JUMP_VELOCITY  # 점프 속도 설정
+            self.is_jumping = True
+            self.state_machine.set_state(Jump)  # 점프 상태로 변경
+        elif group == 'mario:koomba_bottom':
+            print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
+            game_framework.quit()

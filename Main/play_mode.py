@@ -1,14 +1,11 @@
 # play_mode.py
+
 from pico2d import *
 import game_framework
-
 import game_world
-from game_world import add_collision_pair
 from grass import Grass
 from koomba import Koomba
 from mario import Mario
-
-# boy = None
 
 def handle_events():
     global mario
@@ -30,29 +27,28 @@ def init():
     mario = Mario()
     game_world.add_object(mario, 1)
 
+    koombas = [Koomba() for _ in range(5)]
+    game_world.add_objects(koombas, 1)
 
-    koomba = [Koomba() for _ in range(5)]
-    game_world.add_objects(koomba, 1)
-
-# def colide(boy, builtall):
-    # pass
-
+    # 충돌 쌍 등록
+    for koomba in koombas:
+        # 마리오와 굼바의 Top 히트박스 충돌 쌍
+        game_world.add_collision_pair('mario:koomba_top', mario, koomba)
+        # 마리오와 굼바의 Bottom 히트박스 충돌 쌍
+        game_world.add_collision_pair('mario:koomba_bottom', mario, koomba)
 
 def finish():
     game_world.clear()
     pass
 
 def update():
-    game_world.update() # 객체들의 위치가 다 결정됐다. 따라서 이어서 충돌 검사를 하면 됨.
-    # fill here
-    game_world.handle_collisions()
-
+    game_world.update()  # 객체들의 위치 업데이트
+    game_world.handle_collisions()  # 충돌 처리
 
 def draw():
     clear_canvas()
     game_world.render()
     update_canvas()
-
 
 def pause():
     pass

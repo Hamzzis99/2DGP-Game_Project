@@ -8,7 +8,7 @@ open_canvas()
 sprite_sheet = load_image('character.png')
 
 # 초기 스프라이트 좌표와 크기 설정
-sprite_x, sprite_y = 296 ,196  # 스프라이트의 시작 좌표
+sprite_x, sprite_y = 277 ,196  # 스프라이트의 시작 좌표
 
 #점프 시작? 336
 #점프 좌표 355

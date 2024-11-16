@@ -1,9 +1,9 @@
 # game_world.py
+
 world = [[] for _ in range(5)]
 collision_pairs = { } # key: [ [], [] ]
 
-# group : 'boy:ball', 'boy:zombie'
-def add_collision_pair(group, a, b): # 소년과 좀비가 a하고 b를 나타내는 객체.
+def add_collision_pair(group, a, b):
     if group not in collision_pairs:
         collision_pairs[group] = [ [], [] ] # 초기화
     if a:
@@ -18,19 +18,16 @@ def remove_collision_object(o):
         if o in pairs[1]:
             pairs[1].remove(o)
 
-
 def add_object(o, depth = 0):
     world[depth].append(o)
 
 def add_objects(ol, depth = 0):
     world[depth] += ol
 
-
 def update():
     for layer in world:
         for o in layer:
             o.update()
-
 
 def render():
     for layer in world:
@@ -46,14 +43,10 @@ def remove_object(o):
             return
     raise ValueError('Cannot delete non existing object')
 
-
 def clear():
     for layer in world:
         layer.clear()
 
-
-
-# fill here
 def collide(a, b):
     la, ba, ra, ta = a.get_bb()
     lb, bb, rb, tb = b.get_bb()
@@ -65,14 +58,34 @@ def collide(a, b):
 
     return True
 
+def collide_hitboxes(box_a, box_b):
+    la, ba, ra, ta = box_a
+    lb, bb, rb, tb = box_b
 
-# 범용적으로 이용하기 위해 충돌시스템은 이렇게 만들어야 한다....
+    if la > rb: return False
+    if ra < lb : return False
+    if ta < bb: return False
+    if ba > tb: return False
+
+    return True
+
 def handle_collisions():
     for group, pairs in collision_pairs.items():
         for a in pairs[0]:
             for b in pairs[1]:
-                if collide(a, b):
-                    a.handle_collision(group, b)
-                    b.handle_collision(group, a)
-
+                if group == 'mario:koomba_top':
+                    # 마리오의 히트박스와 굼바의 상단 히트박스를 사용하여 충돌 검사
+                    if collide_hitboxes(a.get_bb(), b.get_top_bb()):
+                        a.handle_collision(group, b, 'top')
+                        b.handle_collision(group, a, 'top')
+                elif group == 'mario:koomba_bottom':
+                    # 마리오의 히트박스와 굼바의 하단 히트박스를 사용하여 충돌 검사
+                    if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
+                        a.handle_collision(group, b, 'bottom')
+                        b.handle_collision(group, a, 'bottom')
+                else:
+                    # 기본적으로 전체 히트박스를 사용
+                    if collide(a, b):
+                        a.handle_collision(group, b, 'unknown')
+                        b.handle_collision(group, a, 'unknown')
     return None
