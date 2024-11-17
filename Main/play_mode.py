@@ -10,8 +10,10 @@ from brick import Brick
 from random_box import Random_box
 from utils.camera import Camera
 from config import MarioConfig
+from dashboard import Dashboard  # Dashboard 클래스 임포트
 
 camera = None  # 전역 카메라 객체
+dashboard = None  # 전역 대시보드 객체
 
 def handle_events():
     global mario
@@ -25,7 +27,7 @@ def handle_events():
             mario.handle_event(event)  # 마리오 인스턴스를 통해 이벤트 처리
 
 def init():
-    global mario, camera
+    global mario, camera, dashboard
 
     grass = Grass()
     game_world.add_object(grass, 0)
@@ -82,6 +84,9 @@ def init():
     # 카메라 초기화 (화면 크기: 800x600, 월드 크기: 1600x600)
     camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)
 
+    # Dashboard 초기화
+    dashboard = Dashboard()
+
 def finish():
     game_world.clear()
     pass
@@ -90,10 +95,12 @@ def update():
     game_world.update()  # 객체들의 위치 업데이트
     game_world.handle_collisions()  # 충돌 처리
     camera.update(mario)  # 카메라 위치 업데이트
+    dashboard.update()  # 대시보드 상태 업데이트
 
 def draw():
     clear_canvas()
     game_world.render_with_camera(camera)  # 카메라를 고려하여 렌더링
+    dashboard.draw(camera)  # 대시보드 그리기
     update_canvas()
 
 def pause():
