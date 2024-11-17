@@ -1,4 +1,4 @@
-#coin.py
+# coin.py
 
 from pico2d import load_image, draw_rectangle
 import game_framework
@@ -16,16 +16,16 @@ class Coin:
         self.sprite_y = 112     # 코인의 스프라이트 y 좌표
         self.width = 16         # 스프라이트 너비
         self.height = 16        # 스프라이트 높이
-        self.scale = 3          # 이미지 확대 배율
-        self.velocity_y = 200   # 코인의 상승 속도 (픽셀/초)
-        self.lifetime = 1.0     # 코인의 존재 시간 (초) - 증가시켰습니다
+        self.scale = 1.5        # 이미지 확대 배율 변경 (3 -> 1.5)
+        self.velocity_y = 100   # 코인의 상승 속도 (픽셀/초) - 스케일에 맞게 조정
+        self.lifetime = 1.0     # 코인의 존재 시간 (초)
         self.timer = self.lifetime
         self.frame = 0          # 애니메이션 프레임 인덱스
         self.total_frames = len(self.sprite_x_positions)
         self.frame_time = 0.0   # 프레임 시간 누적
 
         # 애니메이션 속도 설정
-        self.time_per_action = 0.25  # 한 사이클에 걸리는 시간 (초) - 더 빠르게 설정했습니다
+        self.time_per_action = 0.25  # 한 사이클에 걸리는 시간 (초)
         self.action_per_time = 1.0 / self.time_per_action
         self.frames_per_action = self.total_frames
 
@@ -52,12 +52,16 @@ class Coin:
             sprite_x, adjusted_sprite_y, self.width, self.height,
             self.x, self.y, self.width * self.scale, self.height * self.scale
         )
+        # 충돌 박스 그리기 (디버깅용)
+        draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return (self.x - (self.width * self.scale) / 2,
-                self.y - (self.height * self.scale) / 2,
-                self.x + (self.width * self.scale) / 2,
-                self.y + (self.height * self.scale) / 2)
+        half_width = (self.width * self.scale) / 2
+        half_height = (self.height * self.scale) / 2
+        return (self.x - half_width,
+                self.y - half_height,
+                self.x + half_width,
+                self.y + half_height)
 
     def handle_collision(self, group, other, hit_position):
         pass  # 코인은 충돌 처리가 필요 없음
