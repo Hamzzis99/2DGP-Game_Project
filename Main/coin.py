@@ -1,3 +1,5 @@
+#coin.py
+
 from pico2d import load_image, draw_rectangle
 import game_framework
 import game_world

@@ -1,5 +1,5 @@
 # config.py
 
 class MarioConfig:
-    START_X = 0
-    START_Y = 80  # Grass 위에 서도록 설정
+    START_X = 400
+    START_Y = 91  # 시작 Y 위치 (Grass 위)

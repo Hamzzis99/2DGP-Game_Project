@@ -10,7 +10,6 @@ class Grass:
 
     def draw(self):
         self.image.draw(400, 30)
-        self.image.draw(1200, 30)
 
     def get_bb(self):
         # Grass의 충돌 박스 설정 (이미지 크기에 따라 조정 필요)
