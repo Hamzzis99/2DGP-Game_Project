@@ -99,6 +99,21 @@ def handle_collisions():
                     # 마리오의 히트박스와 Brick의 오른쪽 히트박스를 사용하여 충돌 검사
                     if collide_hitboxes(a.get_bb(), b.get_right_bb()):
                         a.handle_collision(group, b, 'brick_right')
+                elif group == 'mario:random_box_top':
+                    if collide_hitboxes(a.get_bb(), b.get_top_bb()):
+                        a.handle_collision(group, b, 'random_box_top')
+                elif group == 'mario:random_box_bottom':
+                    if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
+                        a.handle_collision(group, b, 'random_box_bottom')
+                        b.handle_collision(group, a, 'random_box_bottom')  # Random_box의 handle_collision 호출
+
+                elif group == 'mario:random_box_left':
+                    if collide_hitboxes(a.get_bb(), b.get_left_bb()):
+                        a.handle_collision(group, b, 'random_box_left')
+                elif group == 'mario:random_box_right':
+                    if collide_hitboxes(a.get_bb(), b.get_right_bb()):
+                        a.handle_collision(group, b, 'random_box_right')
+
                 elif group == 'mario:grass':
                     # 마리오와 Grass의 충돌 검사
                     if collide(a, b):

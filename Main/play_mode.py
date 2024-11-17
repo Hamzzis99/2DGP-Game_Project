@@ -6,7 +6,8 @@ import game_world
 from grass import Grass
 from koomba import Koomba
 from mario import Mario
-from brick import Brick  # 수정된 Brick 클래스
+from brick import Brick
+from random_box import Random_box
 
 def handle_events():
     global mario
@@ -41,6 +42,12 @@ def init():
     ]
     game_world.add_objects(bricks, 1)
 
+    # Random Box 추가
+    random_boxes = [
+        Random_box(0, 150),
+        Random_box(50, 150)
+    ]
+    game_world.add_objects(random_boxes, 1)
     # 충돌 쌍 등록
     for koomba in koombas:
         # 마리오와 굼바의 Top 히트박스 충돌 쌍
@@ -57,6 +64,12 @@ def init():
         game_world.add_collision_pair('mario:brick_left', mario, brick)
         # 마리오와 Brick의 오른쪽 충돌 쌍 등록
         game_world.add_collision_pair('mario:brick_right', mario, brick)
+
+    for random_box in random_boxes:
+        game_world.add_collision_pair('mario:random_box_top', mario, random_box)
+        game_world.add_collision_pair('mario:random_box_bottom', mario, random_box)
+        game_world.add_collision_pair('mario:random_box_left', mario, random_box)
+        game_world.add_collision_pair('mario:random_box_right', mario, random_box)
 
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)
