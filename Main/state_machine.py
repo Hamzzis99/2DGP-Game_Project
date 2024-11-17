@@ -1,4 +1,5 @@
 # state_machine.py
+
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_s
 
 # 이벤트 헬퍼 함수들
@@ -49,6 +50,9 @@ class StateMachine:
 
     def draw(self):
         self.cur_state.draw(self.o)
+
+    def draw_with_camera(self, camera):
+        self.cur_state.draw_with_camera(self.o, camera)
 
     def handle_event(self, e):
         for event, next_state in self.transitions.get(self.cur_state, {}).items():

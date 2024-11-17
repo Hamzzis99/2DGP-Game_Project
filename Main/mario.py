@@ -6,6 +6,8 @@ import game_framework
 import game_world
 from config import MarioConfig
 from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down
+from game_object import GameObject
+from utils.camera import Camera
 
 # 상수 정의
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
@@ -19,8 +21,7 @@ FRAMES_PER_ACTION = 3
 
 GRAVITY = -700  # 중력 가속도 (픽셀/초^2)
 
-
-# 상태 클래스 정의
+# 상태 클래스 정의 (Idle, Run, Jump 등)
 class Idle:
     @staticmethod
     def enter(mario, e):
@@ -59,6 +60,23 @@ class Idle:
                 frame_width * 3, frame_height * 3
             )
 
+    @staticmethod
+    def draw_with_camera(mario, camera: Camera):
+        frame_width = 16
+        frame_height = 16
+        frame_x = 276
+        frame_y = 342
+        screen_x, screen_y = camera.apply(mario.x, mario.y)
+        if mario.face_dir == -1:
+            mario.image.clip_composite_draw(
+                frame_x, frame_y, frame_width, frame_height, 0, 'h',
+                screen_x, screen_y, frame_width * 3, frame_height * 3
+            )
+        else:
+            mario.image.clip_draw(
+                frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
+                frame_width * 3, frame_height * 3
+            )
 
 class Run:
     @staticmethod
@@ -82,7 +100,7 @@ class Run:
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(
             mario.run_frame_x_positions)
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
-        mario.x = max(0, min(800, mario.x))  # 화면 경계 내로 클램프
+        mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))  # 월드 경계 내로 클램프
 
     @staticmethod
     def draw(mario):
@@ -101,6 +119,23 @@ class Run:
                 frame_width * 3, frame_height * 3
             )
 
+    @staticmethod
+    def draw_with_camera(mario, camera: Camera):
+        frame_width = 16
+        frame_height = 16
+        frame_y = 342
+        frame_x = mario.run_frame_x_positions[int(mario.frame)]
+        screen_x, screen_y = camera.apply(mario.x, mario.y)
+        if mario.face_dir == -1:
+            mario.image.clip_composite_draw(
+                frame_x, frame_y, frame_width, frame_height, 0, 'h',
+                screen_x, screen_y, frame_width * 3, frame_height * 3
+            )
+        else:
+            mario.image.clip_draw(
+                frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
+                frame_width * 3, frame_height * 3
+            )
 
 class Jump:
     JUMP_VELOCITY = 350  # 점프 초기 속도
@@ -139,7 +174,7 @@ class Jump:
             mario.dir = 0
 
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
-        mario.x = max(0, min(800, mario.x))  # 화면 경계 내로 클램프
+        mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))  # 월드 경계 내로 클램프
 
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
 
@@ -160,9 +195,26 @@ class Jump:
                 frame_width * 3, frame_height * 3
             )
 
+    @staticmethod
+    def draw_with_camera(mario, camera: Camera):
+        frame_width = 16
+        frame_height = 16
+        frame_y = 342
+        frame_x = mario.jump_frame_x_positions[int(mario.frame)]
+        screen_x, screen_y = camera.apply(mario.x, mario.y)
+        if mario.face_dir == -1:
+            mario.image.clip_composite_draw(
+                frame_x, frame_y, frame_width, frame_height, 0, 'h',
+                screen_x, screen_y, frame_width * 3, frame_height * 3
+            )
+        else:
+            mario.image.clip_draw(
+                frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
+                frame_width * 3, frame_height * 3
+            )
 
 # 마리오 클래스 정의
-class Mario:
+class Mario(GameObject):
     def __init__(self):
         self.x, self.y = MarioConfig.START_X, MarioConfig.START_Y  # 초기 위치
         self.face_dir = 1  # 방향: 1(오른쪽), -1(왼쪽)
@@ -186,6 +238,7 @@ class Mario:
         self.velocity_y = 0  # 수직 속도 추가
 
     def update(self):
+        frame_time = game_framework.frame_time
         self.state_machine.update()
 
         # 중력 적용
@@ -213,12 +266,21 @@ class Mario:
         # 충돌 박스 그리기 (디버깅용)
         draw_rectangle(*self.get_bb())
 
+    def draw_with_camera(self, camera: Camera):
+        self.state_machine.draw_with_camera(camera)
+        # 충돌 박스 그리기 (디버깅용)
+        draw_rectangle(*self.get_bb_offset(camera))
+
     def get_bb(self):
         width = 16 * 3  # 이미지의 폭 * 스케일
         height = 16 * 3  # 이미지의 높이 * 스케일
         half_width = width / 2
         half_height = height / 2
         return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
+
+    def get_bb_offset(self, camera: Camera):
+        left, bottom, right, top = self.get_bb()
+        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
         if group == 'mario:koomba_top':
@@ -231,7 +293,7 @@ class Mario:
             print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
             game_framework.quit()
 
-        elif group == 'mario:brick_top' or group == 'mario:random_box_top' or group == 'mario:grass':
+        elif group in ['mario:brick_top', 'mario:random_box_top', 'mario:grass']:
             print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
             if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
@@ -251,7 +313,7 @@ class Mario:
                     self.dir = 0
                     self.state_machine.set_state(Idle)
 
-        elif group == 'mario:brick_bottom' or group == 'mario:random_box_bottom':
+        elif group in ['mario:brick_bottom', 'mario:random_box_bottom']:
             print(f"마리오가 {group} 하단과 충돌했습니다.")
             if self.velocity_y > 0:  # 마리오가 위로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
@@ -259,7 +321,7 @@ class Mario:
                 self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 bottom 위치에 맞춤
                 self.velocity_y = 0  # 수직 속도 초기화
 
-        elif group == 'mario:brick_left' or group == 'mario:random_box_left':
+        elif group in ['mario:brick_left', 'mario:random_box_left']:
             print(f"마리오가 {group} 왼쪽과 충돌했습니다.")
             if self.dir > 0:  # 마리오가 오른쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
@@ -267,7 +329,7 @@ class Mario:
                 self.x = obj_bb[0] - (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 left 위치에 맞춤
                 self.dir = 0  # 이동 방향 초기화
 
-        elif group == 'mario:brick_right' or group == 'mario:random_box_right':
+        elif group in ['mario:brick_right', 'mario:random_box_right']:
             print(f"마리오가 {group} 오른쪽과 충돌했습니다.")
             if self.dir < 0:  # 마리오가 왼쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()

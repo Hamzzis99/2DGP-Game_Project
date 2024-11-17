@@ -1,11 +1,11 @@
 # game_world.py
 
-world = [[] for _ in range(5)]
-collision_pairs = {}  # key: [[], []]
+world = [[] for _ in range(5)]  # 레이어 0부터 4까지
+collision_pairs = {}
 
 def add_collision_pair(group, a, b):
     if group not in collision_pairs:
-        collision_pairs[group] = [[], []]  # 초기화
+        collision_pairs[group] = [[], []]
     if a:
         collision_pairs[group][0].append(a)
     if b:
@@ -19,9 +19,13 @@ def remove_collision_object(o):
             pairs[1].remove(o)
 
 def add_object(o, depth=0):
+    if depth < 0 or depth >= len(world):
+        raise ValueError(f'Depth {depth} is out of bounds')
     world[depth].append(o)
 
 def add_objects(ol, depth=0):
+    if depth < 0 or depth >= len(world):
+        raise ValueError(f'Depth {depth} is out of bounds')
     world[depth] += ol
 
 def update():
@@ -34,12 +38,20 @@ def render():
         for o in layer:
             o.draw()
 
+def render_with_camera(camera):
+    for layer in world:
+        for o in layer:
+            if hasattr(o, 'draw_with_camera'):
+                o.draw_with_camera(camera)
+            else:
+                o.draw()
+
 def remove_object(o):
     for layer in world:
         if o in layer:
             layer.remove(o)
             remove_collision_object(o)
-            del o  # 메모리 삭제
+            del o
             return
     raise ValueError('Cannot delete non-existing object')
 
@@ -74,29 +86,23 @@ def handle_collisions():
         for a in pairs[0]:
             for b in pairs[1]:
                 if group == 'mario:koomba_top':
-                    # 마리오의 히트박스와 굼바의 상단 히트박스를 사용하여 충돌 검사
                     if collide_hitboxes(a.get_bb(), b.get_top_bb()):
                         a.handle_collision(group, b, 'top')
                         b.handle_collision(group, a, 'top')
                 elif group == 'mario:koomba_bottom':
-                    # 마리오의 히트박스와 굼바의 하단 히트박스를 사용하여 충돌 검사
                     if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
                         a.handle_collision(group, b, 'bottom')
                         b.handle_collision(group, a, 'bottom')
                 elif group == 'mario:brick_top':
-                    # 마리오의 히트박스와 Brick의 상단 히트박스를 사용하여 충돌 검사
                     if collide_hitboxes(a.get_bb(), b.get_top_bb()):
                         a.handle_collision(group, b, 'brick_top')
                 elif group == 'mario:brick_bottom':
-                    # 마리오의 히트박스와 Brick의 하단 히트박스를 사용하여 충돌 검사
                     if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
                         a.handle_collision(group, b, 'brick_bottom')
                 elif group == 'mario:brick_left':
-                    # 마리오의 히트박스와 Brick의 왼쪽 히트박스를 사용하여 충돌 검사
                     if collide_hitboxes(a.get_bb(), b.get_left_bb()):
                         a.handle_collision(group, b, 'brick_left')
                 elif group == 'mario:brick_right':
-                    # 마리오의 히트박스와 Brick의 오른쪽 히트박스를 사용하여 충돌 검사
                     if collide_hitboxes(a.get_bb(), b.get_right_bb()):
                         a.handle_collision(group, b, 'brick_right')
                 elif group == 'mario:random_box_top':
@@ -105,22 +111,17 @@ def handle_collisions():
                 elif group == 'mario:random_box_bottom':
                     if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
                         a.handle_collision(group, b, 'random_box_bottom')
-                        b.handle_collision(group, a, 'random_box_bottom')  # Random_box의 handle_collision 호출
-
+                        b.handle_collision(group, a, 'random_box_bottom')
                 elif group == 'mario:random_box_left':
                     if collide_hitboxes(a.get_bb(), b.get_left_bb()):
                         a.handle_collision(group, b, 'random_box_left')
                 elif group == 'mario:random_box_right':
                     if collide_hitboxes(a.get_bb(), b.get_right_bb()):
                         a.handle_collision(group, b, 'random_box_right')
-
                 elif group == 'mario:grass':
-                    # 마리오와 Grass의 충돌 검사
                     if collide(a, b):
                         a.handle_collision(group, b, 'grass')
                 else:
-                    # 기본적으로 전체 히트박스를 사용
                     if collide(a, b):
                         a.handle_collision(group, b, 'unknown')
                         b.handle_collision(group, a, 'unknown')
-    return None

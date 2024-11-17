@@ -8,6 +8,10 @@ from koomba import Koomba
 from mario import Mario
 from brick import Brick
 from random_box import Random_box
+from utils.camera import Camera
+from config import MarioConfig
+
+camera = None  # 전역 카메라 객체
 
 def handle_events():
     global mario
@@ -21,7 +25,7 @@ def handle_events():
             mario.handle_event(event)  # 마리오 인스턴스를 통해 이벤트 처리
 
 def init():
-    global mario
+    global mario, camera
 
     grass = Grass()
     game_world.add_object(grass, 0)
@@ -34,20 +38,21 @@ def init():
 
     # 벽돌 추가 (32x32 픽셀로 스프라이트 크기 두 배로 확장됨)
     bricks = [
-        Brick(300, 150),
-        Brick(350, 150),
-        Brick(400, 150),
-        Brick(450, 150),
-        Brick(500, 150)
+        Brick(300, 100),
+        Brick(350, 100),
+        Brick(400, 100),
+        Brick(450, 100),
+        Brick(500, 100)
     ]
     game_world.add_objects(bricks, 1)
 
     # Random Box 추가
     random_boxes = [
-        Random_box(0, 150),
-        Random_box(50, 150)
+        Random_box(600, 150),
+        Random_box(650, 150)
     ]
     game_world.add_objects(random_boxes, 1)
+
     # 충돌 쌍 등록
     for koomba in koombas:
         # 마리오와 굼바의 Top 히트박스 충돌 쌍
@@ -74,6 +79,9 @@ def init():
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)
 
+    # 카메라 초기화 (화면 크기: 800x600, 월드 크기: 1600x600)
+    camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)
+
 def finish():
     game_world.clear()
     pass
@@ -81,10 +89,11 @@ def finish():
 def update():
     game_world.update()  # 객체들의 위치 업데이트
     game_world.handle_collisions()  # 충돌 처리
+    camera.update(mario)  # 카메라 위치 업데이트
 
 def draw():
     clear_canvas()
-    game_world.render()
+    game_world.render_with_camera(camera)  # 카메라를 고려하여 렌더링
     update_canvas()
 
 def pause():

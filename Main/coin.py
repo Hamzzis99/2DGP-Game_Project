@@ -3,8 +3,10 @@
 from pico2d import load_image, draw_rectangle
 import game_framework
 import game_world
+from game_object import GameObject  # GameObject 베이스 클래스 임포트
+from utils.camera import Camera      # Camera 클래스 임포트
 
-class Coin:
+class Coin(GameObject):
     image = None  # 클래스 변수로 이미지 로드 공유
 
     def __init__(self, x, y):
@@ -30,17 +32,20 @@ class Coin:
         self.frames_per_action = self.total_frames
 
     def update(self):
+        frame_time = game_framework.frame_time  # 전역 frame_time 사용
+
         # 위로 상승
-        self.y += self.velocity_y * game_framework.frame_time
+        self.y += self.velocity_y * frame_time
+
         # 존재 시간 감소
-        self.timer -= game_framework.frame_time
+        self.timer -= frame_time
         if self.timer <= 0:
             # 게임 월드에서 제거
             game_world.remove_object(self)
             return
 
         # 애니메이션 프레임 업데이트
-        self.frame_time += game_framework.frame_time
+        self.frame_time += frame_time
         frame_progress = self.frame_time / self.time_per_action
         self.frame = int(frame_progress * self.total_frames) % self.total_frames
 
@@ -55,6 +60,19 @@ class Coin:
         # 충돌 박스 그리기 (디버깅용)
         draw_rectangle(*self.get_bb())
 
+    def draw_with_camera(self, camera: Camera):
+        screen_x, screen_y = camera.apply(self.x, self.y)  # 카메라 적용 위치 계산
+
+        adjusted_sprite_y = Coin.image.h - self.sprite_y - self.height
+        sprite_x = self.sprite_x_positions[self.frame]
+
+        Coin.image.clip_draw(
+            sprite_x, adjusted_sprite_y, self.width, self.height,
+            screen_x, screen_y, self.width * self.scale, self.height * self.scale
+        )
+        # 충돌 박스 그리기 (디버깅용)
+        draw_rectangle(*self.get_bb_offset(camera))
+
     def get_bb(self):
         half_width = (self.width * self.scale) / 2
         half_height = (self.height * self.scale) / 2
@@ -62,6 +80,10 @@ class Coin:
                 self.y - half_height,
                 self.x + half_width,
                 self.y + half_height)
+
+    def get_bb_offset(self, camera: Camera):
+        left, bottom, right, top = self.get_bb()
+        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
         pass  # 코인은 충돌 처리가 필요 없음

@@ -1,10 +1,13 @@
 # random_box.py
+
 from pico2d import load_image, draw_rectangle
+from game_object import GameObject
+from utils.camera import Camera
 import game_world
 from coin import Coin
 import game_framework
 
-class Random_box:
+class Random_box(GameObject):
     image = None  # 클래스 변수로 이미지 로드 공유
 
     def __init__(self, x, y):
@@ -15,7 +18,7 @@ class Random_box:
         self.sprite_y = 80  # 스프라이트 시트 내 y 좌표 (고정)
         self.width = 16      # 원본 스프라이트 너비
         self.height = 16     # 원본 스프라이트 높이
-        self.scale = 1.5     # 이미지 확대 배율 변경 (3 -> 1.5)
+        self.scale = 1.5     # 이미지 확대 배율 변경 (1.5로 조정)
         self.changed = False # 상태 변화 여부
 
         # 애니메이션 관련 변수
@@ -56,6 +59,24 @@ class Random_box:
         draw_rectangle(*self.get_left_bb())
         draw_rectangle(*self.get_right_bb())
 
+    def draw_with_camera(self, camera: Camera):
+        adjusted_sprite_y = Random_box.image.h - self.sprite_y - self.height
+        if not self.changed:
+            sprite_x = self.sprite_x_positions[self.frame]
+        else:
+            sprite_x = 0  # 상태 변경 후에는 첫 번째 프레임 고정
+        screen_x, screen_y = camera.apply(self.x, self.y)
+        Random_box.image.clip_draw(
+            sprite_x, adjusted_sprite_y, self.width, self.height,
+            screen_x, screen_y, self.width * self.scale, self.height * self.scale
+        )
+        # 충돌 박스 그리기 (디버깅용)
+        draw_rectangle(*self.get_bb_offset(camera))
+        draw_rectangle(*self.get_top_bb_offset(camera))
+        draw_rectangle(*self.get_bottom_bb_offset(camera))
+        draw_rectangle(*self.get_left_bb_offset(camera))
+        draw_rectangle(*self.get_right_bb_offset(camera))
+
     # 히트박스 메서드들
     def get_bb(self):
         # 전체 Random_box의 충돌 박스
@@ -63,11 +84,19 @@ class Random_box:
         half_height = (self.height * self.scale) / 2
         return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
 
+    def get_bb_offset(self, camera: Camera):
+        left, bottom, right, top = self.get_bb()
+        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
+
     def get_top_bb(self):
         # Random_box 상단의 충돌 박스 (좌우로 1픽셀씩 줄이고 y 범위도 축소)
         half_width = (self.width * self.scale) / 2 - 1
         return self.x - half_width, self.y + (self.height * self.scale) / 2 - 2, \
                self.x + half_width, self.y + (self.height * self.scale) / 2 + 2
+
+    def get_top_bb_offset(self, camera: Camera):
+        left, bottom, right, top = self.get_top_bb()
+        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def get_bottom_bb(self):
         # Random_box 하단의 충돌 박스 (좌우로 1픽셀씩 줄이고 y 범위도 축소)
@@ -75,17 +104,29 @@ class Random_box:
         return self.x - half_width, self.y - (self.height * self.scale) / 2 - 2, \
                self.x + half_width, self.y - (self.height * self.scale) / 2 + 2
 
+    def get_bottom_bb_offset(self, camera: Camera):
+        left, bottom, right, top = self.get_bottom_bb()
+        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
+
     def get_left_bb(self):
         # Random_box 왼쪽의 충돌 박스 (위아래로 1픽셀씩 줄임)
         half_width = (self.width * self.scale) / 2
         half_height = (self.height * self.scale) / 2 - 1  # 상하로 1픽셀씩 줄임
         return self.x - half_width - 1, self.y - half_height, self.x - half_width, self.y + half_height
 
+    def get_left_bb_offset(self, camera: Camera):
+        left, bottom, right, top = self.get_left_bb()
+        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
+
     def get_right_bb(self):
         # Random_box 오른쪽의 충돌 박스 (위아래로 1픽셀씩 줄임)
         half_width = (self.width * self.scale) / 2
         half_height = (self.height * self.scale) / 2 - 1  # 상하로 1픽셀씩 줄임
         return self.x + half_width, self.y - half_height, self.x + half_width + 1, self.y + half_height
+
+    def get_right_bb_offset(self, camera: Camera):
+        left, bottom, right, top = self.get_right_bb()
+        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
         if group == 'mario:random_box_bottom' and not self.changed:
