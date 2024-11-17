@@ -59,24 +59,29 @@ class Random_box:
         return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
 
     def get_top_bb(self):
-        # Random_box 상단의 충돌 박스 (상단 약간 확장)
-        half_width = (self.width * 3) / 2
-        return self.x - half_width, self.y + (self.height * 3) / 2, self.x + half_width, self.y + (self.height * 3) / 2 + 4
+        # Random_box 상단의 충돌 박스 (좌우로 1픽셀씩 줄임)
+        half_width = (self.width * self.scale) / 2 - 1
+        return self.x - half_width, self.y + (self.height * self.scale) / 2 - 4, self.x + half_width, self.y + (
+                    self.height * self.scale) / 2 + 4
 
     def get_bottom_bb(self):
-        # Random_box 하단의 충돌 박스 (하단 약간 확장)
-        half_width = (self.width * 3) / 2
-        return self.x - half_width, self.y - (self.height * 3) / 2 - 4, self.x + half_width, self.y - (self.height * 3) / 2
+        # Random_box 하단의 충돌 박스 (좌우로 1픽셀씩 줄임)
+        half_width = (self.width * self.scale) / 2 - 1
+        return self.x - half_width, self.y - (self.height * self.scale) / 2 - 4, self.x + half_width, self.y - (
+                    self.height * self.scale) / 2 + 4
 
     def get_left_bb(self):
-        # Random_box 왼쪽의 충돌 박스 (왼쪽 약간 확장)
-        half_height = (self.height * 3) / 2
-        return self.x - (self.width * 3) / 2 - 4, self.y - half_height, self.x - (self.width * 3) / 2, self.y + half_height
+        # Random_box 왼쪽의 충돌 박스 (위아래 약간 줄임)
+        half_width = (self.width * self.scale) / 2
+        half_height = (self.height * self.scale) / 2 - 1  # 상하로 1픽셀씩 줄임
+        return self.x - half_width - 4, self.y - half_height, self.x - half_width, self.y + half_height
 
     def get_right_bb(self):
-        # Random_box 오른쪽의 충돌 박스 (오른쪽 약간 확장)
-        half_height = (self.height * 3) / 2
-        return self.x + (self.width * 3) / 2, self.y - half_height, self.x + (self.width * 3) / 2 + 4, self.y + half_height
+        # Random_box 오른쪽의 충돌 박스 (위아래 약간 줄임)
+        half_width = (self.width * self.scale) / 2
+        half_height = (self.height * self.scale) / 2 - 1  # 상하로 1픽셀씩 줄임
+        return self.x + half_width, self.y - half_height, self.x + half_width + 4, self.y + half_height
+
 
     def handle_collision(self, group, other, hit_position):
         if group == 'mario:random_box_bottom' and not self.changed:

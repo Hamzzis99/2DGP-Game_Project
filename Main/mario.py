@@ -17,6 +17,9 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 3
 
+GRAVITY = -700  # 중력 가속도 (픽셀/초^2)
+
+
 # 상태 클래스 정의
 class Idle:
     @staticmethod
@@ -24,11 +27,10 @@ class Idle:
         mario.dir = 0
         mario.frame = 0
         if e is not None and isinstance(e, tuple):
-            if left_down(e) or right_down(e):
-                if left_down(e):
-                    mario.face_dir = -1
-                elif right_down(e):
-                    mario.face_dir = 1
+            if left_down(e):
+                mario.face_dir = -1
+            elif right_down(e):
+                mario.face_dir = 1
         print("Idle 상태: 진입")  # 디버깅용
 
     @staticmethod
@@ -38,7 +40,7 @@ class Idle:
 
     @staticmethod
     def do(mario):
-        pass
+        pass  # 수평 이동 없음
 
     @staticmethod
     def draw(mario):
@@ -57,10 +59,10 @@ class Idle:
                 frame_width * 3, frame_height * 3
             )
 
+
 class Run:
     @staticmethod
     def enter(mario, e):
-        # 현재 눌려 있는 키에 따라 방향 설정
         if SDLK_LEFT in mario.pressed_keys and SDLK_RIGHT not in mario.pressed_keys:
             mario.dir, mario.face_dir = -1, -1
         elif SDLK_RIGHT in mario.pressed_keys and SDLK_LEFT not in mario.pressed_keys:
@@ -77,7 +79,8 @@ class Run:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(mario.run_frame_x_positions)
+        mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(
+            mario.run_frame_x_positions)
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
         mario.x = max(0, min(800, mario.x))  # 화면 경계 내로 클램프
 
@@ -98,17 +101,17 @@ class Run:
                 frame_width * 3, frame_height * 3
             )
 
+
 class Jump:
-    JUMP_VELOCITY = 350  # 점프 속도
-    GRAVITY = -700       # 중력 가속도
+    JUMP_VELOCITY = 350  # 점프 초기 속도
 
     @staticmethod
     def enter(mario, e):
         if e is not None and isinstance(e, tuple):
             if s_down(e):
-                mario.jump_speed = Jump.JUMP_VELOCITY
-                mario.is_jumping = True
+                mario.velocity_y = Jump.JUMP_VELOCITY
                 print("Jump 상태: 점프 시작")  # 디버깅용
+            # 방향 키 처리
             if left_down(e):
                 mario.dir = -1
                 mario.face_dir = -1
@@ -121,18 +124,11 @@ class Jump:
 
     @staticmethod
     def exit(mario, e):
-        mario.jump_speed = 0
-        mario.is_jumping = False
         print("Jump 상태: 점프 종료")  # 디버깅용
 
     @staticmethod
     def do(mario):
-        # 점프 물리 적용
-        mario.y += mario.jump_speed * game_framework.frame_time
-        mario.jump_speed += Jump.GRAVITY * game_framework.frame_time
-        #print(f"Jump.do: y={mario.y}, jump_speed={mario.jump_speed}")  # 디버깅용
-
-        # 현재 눌려 있는 키에 따라 방향 설정
+        # 수평 이동 처리
         if SDLK_LEFT in mario.pressed_keys and SDLK_RIGHT not in mario.pressed_keys:
             mario.dir = -1
             mario.face_dir = -1
@@ -142,12 +138,8 @@ class Jump:
         else:
             mario.dir = 0
 
-        # 좌우 이동
-        if mario.dir != 0:
-            mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
-            mario.x = max(0, min(800, mario.x))  # 화면 경계 내로 클램프
-
-        # y축 제한을 제거하여 충돌 처리에 맡김
+        mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
+        mario.x = max(0, min(800, mario.x))  # 화면 경계 내로 클램프
 
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
 
@@ -168,12 +160,13 @@ class Jump:
                 frame_width * 3, frame_height * 3
             )
 
+
 # 마리오 클래스 정의
 class Mario:
     def __init__(self):
         self.x, self.y = MarioConfig.START_X, MarioConfig.START_Y  # 초기 위치
-        self.face_dir = 1         # 방향: 1(오른쪽), -1(왼쪽)
-        self.dir = 0              # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
+        self.face_dir = 1  # 방향: 1(오른쪽), -1(왼쪽)
+        self.dir = 0  # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
         self.image = load_image('character.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
@@ -185,16 +178,24 @@ class Mario:
                 left_down: Jump,
                 right_up: Jump,
                 left_up: Jump,
-                s_down: Jump  # 이중 점프 방지
+                # s_down 이벤트는 점프 상태에서 추가 점프를 방지하기 위해 생략
             }
         })
         self.pressed_keys = set()  # 현재 눌려 있는 키
-        self.frame = 0             # 애니메이션 프레임
-        self.is_jumping = False    # 점프 상태 플래그
-        self.jump_speed = 0        # 점프 중 수직 속도
+        self.frame = 0  # 애니메이션 프레임
+        self.velocity_y = 0  # 수직 속도 추가
 
     def update(self):
         self.state_machine.update()
+
+        # 중력 적용
+        self.velocity_y += GRAVITY * game_framework.frame_time
+        self.y += self.velocity_y * game_framework.frame_time
+
+        # 바닥 이하로 내려가지 않도록 위치 제한
+        if self.y < 0:
+            self.y = 0
+            self.velocity_y = 0
 
     def handle_event(self, event):
         if event.type == SDL_KEYDOWN:
@@ -213,26 +214,30 @@ class Mario:
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return self.x - 25, self.y - 30, self.x + 25, self.y + 30
+        width = 16 * 3  # 이미지의 폭 * 스케일
+        height = 16 * 3  # 이미지의 높이 * 스케일
+        half_width = width / 2
+        half_height = height / 2
+        return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
 
     def handle_collision(self, group, other, hit_position):
         if group == 'mario:koomba_top':
             print("마리오가 굼바를 밟았습니다. 굼바를 제거하고 점프합니다.")
             game_world.remove_object(other)  # 굼바 제거
-            self.jump_speed = Jump.JUMP_VELOCITY  # 점프 속도 설정
-            self.is_jumping = True
+            self.velocity_y = Jump.JUMP_VELOCITY  # 점프 속도 설정
             self.state_machine.set_state(Jump)  # 점프 상태로 변경
+
         elif group == 'mario:koomba_bottom':
             print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
             game_framework.quit()
-        elif group == 'mario:brick_top':
-            print("마리오가 Brick 상단과 충돌했습니다. Brick 위에 착지합니다.")
-            if self.jump_speed < 0:  # Mario가 아래로 이동 중일 때만 충돌 처리
+
+        elif group == 'mario:brick_top' or group == 'mario:random_box_top' or group == 'mario:grass':
+            print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
+            if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
-                brick_bb = other.get_top_bb()
-                self.y = brick_bb[3] + (mario_bb[3] - mario_bb[1]) / 2  # Brick의 top 위치에 맞춤
-                self.is_jumping = False
-                self.jump_speed = 0
+                obj_bb = other.get_bb()
+                self.y = obj_bb[3] + (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 top 위치에 맞춤
+                self.velocity_y = 0  # 수직 속도 0으로 설정
                 # 현재 눌려 있는 키에 따라 상태 설정
                 if SDLK_LEFT in self.pressed_keys and SDLK_RIGHT not in self.pressed_keys:
                     self.dir = -1
@@ -245,91 +250,30 @@ class Mario:
                 else:
                     self.dir = 0
                     self.state_machine.set_state(Idle)
-        elif group == 'mario:brick_bottom':
-            print("마리오가 Brick 하단과 충돌했습니다.")
-            if self.jump_speed > 0:  # Mario가 위로 이동 중일 때만 충돌 처리
+
+        elif group == 'mario:brick_bottom' or group == 'mario:random_box_bottom':
+            print(f"마리오가 {group} 하단과 충돌했습니다.")
+            if self.velocity_y > 0:  # 마리오가 위로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
-                brick_bb = other.get_bottom_bb()
-                self.y = brick_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # Brick의 bottom 위치에 맞춤
-                self.jump_speed = 0  # 점프 속도 초기화
-        elif group == 'mario:brick_left':
-            print("마리오가 Brick 왼쪽과 충돌했습니다.")
-            # Mario가 오른쪽으로 이동 중일 때만 충돌 처리
-            if self.dir > 0:
+                obj_bb = other.get_bb()
+                self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 bottom 위치에 맞춤
+                self.velocity_y = 0  # 수직 속도 초기화
+
+        elif group == 'mario:brick_left' or group == 'mario:random_box_left':
+            print(f"마리오가 {group} 왼쪽과 충돌했습니다.")
+            if self.dir > 0:  # 마리오가 오른쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
-                brick_bb = other.get_left_bb()
-                self.x = brick_bb[0] - (mario_bb[2] - mario_bb[0]) / 2  # Brick의 left 위치에 맞춤
-                self.dir = 0  # 이동 방향 초기화
-        elif group == 'mario:brick_right':
-            print("마리오가 Brick 오른쪽과 충돌했습니다.")
-            # Mario가 왼쪽으로 이동 중일 때만 충돌 처리
-            if self.dir < 0:
-                mario_bb = self.get_bb()
-                brick_bb = other.get_right_bb()
-                self.x = brick_bb[2] + (mario_bb[2] - mario_bb[0]) / 2  # Brick의 right 위치에 맞춤
+                obj_bb = other.get_bb()
+                self.x = obj_bb[0] - (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 left 위치에 맞춤
                 self.dir = 0  # 이동 방향 초기화
 
-        elif group == 'mario:random_box_top':
-            print("마리오가 Random Box 상단과 충돌했습니다. Random Box 위에 착지합니다.")
-            if self.jump_speed < 0:  # Mario가 아래로 이동 중일 때만 충돌 처리
+        elif group == 'mario:brick_right' or group == 'mario:random_box_right':
+            print(f"마리오가 {group} 오른쪽과 충돌했습니다.")
+            if self.dir < 0:  # 마리오가 왼쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
-                box_bb = other.get_top_bb()
-                self.y = box_bb[3] + (mario_bb[3] - mario_bb[1]) / 2  # Random Box의 top 위치에 맞춤
-                self.is_jumping = False
-                self.jump_speed = 0
-                # 현재 눌려 있는 키에 따라 상태 설정
-                if SDLK_LEFT in self.pressed_keys and SDLK_RIGHT not in self.pressed_keys:
-                    self.dir = -1
-                    self.face_dir = -1
-                    self.state_machine.set_state(Run)
-                elif SDLK_RIGHT in self.pressed_keys and SDLK_LEFT not in self.pressed_keys:
-                    self.dir = 1
-                    self.face_dir = 1
-                    self.state_machine.set_state(Run)
-                else:
-                    self.dir = 0
-                    self.state_machine.set_state(Idle)
-        elif group == 'mario:random_box_bottom':
-            print("마리오가 Random Box 하단과 충돌했습니다.")
-            if self.jump_speed > 0:  # Mario가 위로 이동 중일 때만 충돌 처리
-                mario_bb = self.get_bb()
-                box_bb = other.get_bottom_bb()
-                self.y = box_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # Random Box의 bottom 위치에 맞춤
-                self.jump_speed = 0  # 점프 속도 초기화
-        elif group == 'mario:random_box_left':
-            print("마리오가 Random Box 왼쪽과 충돌했습니다.")
-            if self.dir > 0:  # Mario가 오른쪽으로 이동 중일 때만 충돌 처리
-                mario_bb = self.get_bb()
-                box_bb = other.get_left_bb()
-                self.x = box_bb[0] - (mario_bb[2] - mario_bb[0]) / 2  # Random Box의 left 위치에 맞춤
-                self.dir = 0  # 이동 방향 초기화
-        elif group == 'mario:random_box_right':
-            print("마리오가 Random Box 오른쪽과 충돌했습니다.")
-            if self.dir < 0:  # Mario가 왼쪽으로 이동 중일 때만 충돌 처리
-                mario_bb = self.get_bb()
-                box_bb = other.get_right_bb()
-                self.x = box_bb[2] + (mario_bb[2] - mario_bb[0]) / 2  # Random Box의 right 위치에 맞춤
+                obj_bb = other.get_bb()
+                self.x = obj_bb[2] + (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 right 위치에 맞춤
                 self.dir = 0  # 이동 방향 초기화
 
-        elif group == 'mario:grass':
-            print("마리오가 Grass와 충돌했습니다. Grass 위에 착지합니다.")
-            mario_bb = self.get_bb()
-            grass_bb = other.get_bb()
-            self.y = grass_bb[3] + (mario_bb[3] - mario_bb[1]) / 2  # Grass의 top 위치에 맞춤
-            self.is_jumping = False
-            self.jump_speed = 0
-            # 현재 눌려 있는 키에 따라 상태 설정
-            if SDLK_LEFT in self.pressed_keys and SDLK_RIGHT not in self.pressed_keys:
-                self.dir = -1
-                self.face_dir = -1
-                self.state_machine.set_state(Run)
-            elif SDLK_RIGHT in self.pressed_keys and SDLK_LEFT not in self.pressed_keys:
-                self.dir = 1
-                self.face_dir = 1
-                self.state_machine.set_state(Run)
-            else:
-                self.dir = 0
-                self.state_machine.set_state(Idle)
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가
-
