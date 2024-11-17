@@ -13,9 +13,7 @@ class Spritesheet:
     def image_at(self, x, y, scalingfactor, xTileSize=8, yTileSize=8):
         # flip을 빈 문자열로 설정 (수평/수직 반전 없음)
         flip = ''  # 반전하지 않도록 빈 문자열로 설정
-        return self.sheet.clip_composite_draw(x * xTileSize, y * yTileSize, xTileSize, yTileSize,
-                                              0, 0, xTileSize * scalingfactor, yTileSize * scalingfactor, flip)
-
+        self.sheet.clip_composite_draw(x, y, xTileSize, yTileSize, 0, 0, xTileSize * scalingfactor, yTileSize * scalingfactor, flip)
 
 class Font:
     def __init__(self, filePath, char_width=8, char_height=8):
@@ -46,12 +44,21 @@ class Font:
                     index += 1
         return positions
 
-    def draw(self, text, x, y, camera, scaling_factor=2):
+    def draw(self, text, x, y, camera=None, scaling_factor=2):
+        # HUD 요소일 경우 카메라 오프셋을 적용하지 않음
+        if camera:
+            screen_x = x - camera.camera_x
+            screen_y = y - camera.camera_y
+        else:
+            screen_x = x
+            screen_y = y
+        # 디버그 출력
+        print(f"Drawing text '{text}' at ({screen_x}, {screen_y})")
         for char in text:
             if char in self.char_positions:
                 x1, y1, x2, y2 = self.char_positions[char]
                 # 스프라이트 좌표 변환
-                self.spritesheet.sheet.clip_draw(x1, y1, x2 - x1, y2 - y1, x, y)
-                x += self.char_width * scaling_factor  # 문자 간격
+                self.spritesheet.sheet.clip_draw(x1, y1, x2 - x1, y2 - y1, screen_x, screen_y)
+                screen_x += self.char_width * scaling_factor  # 문자 간격
             else:
                 print(f"Character '{char}' is not supported and will be ignored.")

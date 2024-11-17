@@ -9,11 +9,12 @@ from mario import Mario
 from brick import Brick
 from random_box import Random_box
 from utils.camera import Camera
-from config import MarioConfig
+from config import MarioConfig  # MarioConfig 임포트
 from dashboard import Dashboard  # Dashboard 클래스 임포트
 
 camera = None  # 전역 카메라 객체
 dashboard = None  # 전역 대시보드 객체
+game_time = None  # 게임 시간 (초)
 
 def handle_events():
     global mario
@@ -27,7 +28,7 @@ def handle_events():
             mario.handle_event(event)  # 마리오 인스턴스를 통해 이벤트 처리
 
 def init():
-    global mario, camera, dashboard
+    global mario, camera, dashboard, game_time
 
     grass = Grass()
     game_world.add_object(grass, 0)
@@ -57,9 +58,9 @@ def init():
 
     # 충돌 쌍 등록
     for koomba in koombas:
-        # 마리오와 굼바의 Top 히트박스 충돌 쌍
+        # 마리오와 굼바의 Top 히트박스 충돌 쌍 등록
         game_world.add_collision_pair('mario:koomba_top', mario, koomba)
-        # 마리오와 굼바의 Bottom 히트박스 충돌 쌍
+        # 마리오와 굼바의 Bottom 히트박스 충돌 쌍 등록
         game_world.add_collision_pair('mario:koomba_bottom', mario, koomba)
 
     for brick in bricks:
@@ -87,15 +88,36 @@ def init():
     # Dashboard 초기화
     dashboard = Dashboard()
 
+    # 게임 시간 초기화 (config.py에서 설정한 값 사용)
+    game_time = MarioConfig.GAME_TIME_LIMIT
+
 def finish():
     game_world.clear()
     pass
 
 def update():
+    global game_time
+
     game_world.update()  # 객체들의 위치 업데이트
     game_world.handle_collisions()  # 충돌 처리
     camera.update(mario)  # 카메라 위치 업데이트
-    dashboard.update()  # 대시보드 상태 업데이트
+
+    # 게임 시간 업데이트
+    game_time -= game_framework.frame_time
+    if game_time <= 0:
+        game_time = 0
+        dashboard.set_time(int(game_time))
+        dashboard.update()
+        print("Time is up! Game Over.")
+        game_framework.quit()
+
+    # 대시보드에 현재 게임 시간 설정
+    dashboard.set_time(int(game_time))  # 정수로 전달
+
+    # 대시보드 업데이트
+    dashboard.update()
+
+    print(f"Game Time: {game_time}")  # 디버그 출력
 
 def draw():
     clear_canvas()

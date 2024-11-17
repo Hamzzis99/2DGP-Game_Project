@@ -1,7 +1,11 @@
 # config.py
 
 class MarioConfig:
-    START_X = 400
-    START_Y = 91  # 시작 Y 위치 (Grass 위)
-    WORLD_WIDTH = 1600  # 월드의 너비
-    WORLD_HEIGHT = 600  # 월드의 높이 (예: 화면 높이와 동일)
+    WORLD_WIDTH = 1600
+    WORLD_HEIGHT = 600
+    START_X = 100
+    START_Y = 100
+    # 기타 설정 변수들...
+
+    # 게임 시간 제한 (초 단위)
+    GAME_TIME_LIMIT = 5  # 기본값: 300초 (5분)
