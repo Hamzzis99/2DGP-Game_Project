@@ -52,13 +52,20 @@ class Font:
         else:
             screen_x = x
             screen_y = y
-        # 디버그 출력
-        #print(f"Drawing text '{text}' at ({screen_x}, {screen_y})")
+
         for char in text:
             if char in self.char_positions:
                 x1, y1, x2, y2 = self.char_positions[char]
-                # 스프라이트 좌표 변환
-                self.spritesheet.sheet.clip_draw(x1, y1, x2 - x1, y2 - y1, screen_x, screen_y)
-                screen_x += self.char_width * scaling_factor  # 문자 간격
-            #else:
-                #print(f"Character '{char}' is not supported and will be ignored.")
+                width = x2 - x1
+                height = y2 - y1
+                # 스프라이트 크기를 scaling_factor를 사용하여 확대
+                self.spritesheet.sheet.clip_composite_draw(
+                    x1, y1, width, height,  # 원본 좌표와 크기
+                    0, '',  # 회전 각도와 반전 설정 (여기서 flip 인자는 빈 문자열로 설정됨)
+                    screen_x, screen_y,  # 출력 위치
+                    width * scaling_factor, height * scaling_factor  # 가로 및 세로 크기 조정 비율
+                )
+                # 문자 간격 조정
+                screen_x += (self.char_width * scaling_factor)  # 문자 간격을 조정하여 글자가 더 잘 맞도록 설정
+
+

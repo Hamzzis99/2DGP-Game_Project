@@ -26,7 +26,7 @@ class Turtle(GameObject):
 
     def load_images(self):
         if Turtle.image is None:
-            Turtle.image = load_image('character.png')  # 스프라이트 시트 로드
+            Turtle.image = load_image('img/character.png')  # 스프라이트 시트 로드
 
         # 애니메이션 프레임 좌표 설정
         self.normal_frame_x_positions = [293, 312]

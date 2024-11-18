@@ -23,7 +23,7 @@ class Koomba(GameObject):
 
     def load_images(self):
         if Koomba.image is None:
-            Koomba.image = load_image('character.png')  # 스프라이트 시트 로드
+            Koomba.image = load_image('img/character.png')  # 스프라이트 시트 로드
 
         # 애니메이션 프레임 좌표 설정
         self.frame_x_positions = [296, 315]
@@ -126,7 +126,7 @@ class Koomba(GameObject):
 
     def get_top_bb(self):
         # Top 히트박스: 굼바의 머리 부분
-        return self.x - 13, self.y + 10, self.x + 13, self.y + 25  # (left, bottom, right, top)
+        return self.x - 15, self.y + 10, self.x + 15, self.y + 25  # (left, bottom, right, top)
 
     def get_top_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_top_bb()

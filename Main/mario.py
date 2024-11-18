@@ -219,7 +219,7 @@ class Mario(GameObject):
         self.x, self.y = MarioConfig.START_X, MarioConfig.START_Y  # 초기 위치
         self.face_dir = 1  # 방향: 1(오른쪽), -1(왼쪽)
         self.dir = 0  # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
-        self.image = load_image('character.png')
+        self.image = load_image('img/character.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({

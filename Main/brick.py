@@ -10,11 +10,11 @@ class Brick(GameObject):
     def __init__(self, x, y):
         if Brick.image is None:
             # 스프라이트 시트 'Items.png'에서 (0, 240) 위치의 (16x16) 크기 스프라이트를 불러옵니다.
-            Brick.image = load_image('Items.png')
+            Brick.image = load_image('img/tiles.png')
         self.x = x
         self.y = y
         self.sprite_x = 0      # 스프라이트 시트 내 x 좌표
-        self.sprite_y = 240    # 스프라이트 시트 내 y 좌표
+        self.sprite_y = 432    # 스프라이트 시트 내 y 좌표
         self.width = 16        # 스프라이트 너비
         self.height = 16       # 스프라이트 높이
         self.scale = 1.5       # 이미지 확대 배율 변경 (1.5로 조정)

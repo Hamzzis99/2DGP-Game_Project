@@ -12,17 +12,19 @@ class Random_box(GameObject):
 
     def __init__(self, x, y):
         if Random_box.image is None:
-            Random_box.image = load_image('Items.png')  # Items 이미지 로드
+            Random_box.image = load_image('img/tiles.png')  # Items 이미지 로드
         self.x = x
         self.y = y
-        self.sprite_y = 80  # 스프라이트 시트 내 y 좌표 (고정)
+        #self.sprite_y = 80  # 스프라이트 시트 내 y 좌표 (고정)
+        self.sprite_y = 0  # 스프라이트 시트 내 y 좌표 (고정)
         self.width = 16      # 원본 스프라이트 너비
         self.height = 16     # 원본 스프라이트 높이
         self.scale = 1.5     # 이미지 확대 배율 변경 (1.5로 조정)
         self.changed = False # 상태 변화 여부
 
         # 애니메이션 관련 변수
-        self.sprite_x_positions = [0, 16, 32, 48]  # 애니메이션 프레임 x 좌표들
+        #self.sprite_x_positions = [0, 16, 32, 48]  # 애니메이션 프레임 x 좌표들
+        self.sprite_x_positions = [384, 400, 416]  # 애니메이션 프레임 x 좌표들
         self.frame = 0
         self.total_frames = len(self.sprite_x_positions)
         self.frame_time = 0.0
@@ -64,7 +66,7 @@ class Random_box(GameObject):
         if not self.changed:
             sprite_x = self.sprite_x_positions[self.frame]
         else:
-            sprite_x = 0  # 상태 변경 후에는 첫 번째 프레임 고정
+            sprite_x = 432  # 상태 변경 후에는 첫 번째 프레임 고정
         screen_x, screen_y = camera.apply(self.x, self.y)
         Random_box.image.clip_draw(
             sprite_x, adjusted_sprite_y, self.width, self.height,
