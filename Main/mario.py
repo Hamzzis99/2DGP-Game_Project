@@ -223,6 +223,8 @@ class Mario(GameObject):
         self.image = load_image('img/character.png')
         self.jump_sound = load_wav('sound/jump.ogg')
         self.jump_sound.set_volume(32)  # 필요에 따라 볼륨 조절
+        self.brick_sound = load_wav('sound/brick.ogg')
+        self.brick_sound.set_volume(32)  # 필요에 따라 볼륨 조절
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
@@ -299,8 +301,8 @@ class Mario(GameObject):
             game_framework.quit()
         elif group == 'mario:turtle':
             print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
-
             game_framework.quit()  # 게임 종료
+
         elif group in ['mario:brick_top', 'mario:random_box_top', 'mario:grass']:
             #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
             if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
@@ -324,6 +326,7 @@ class Mario(GameObject):
         elif group in ['mario:brick_bottom', 'mario:random_box_bottom']:
             #print(f"마리오가 {group} 하단과 충돌했습니다.")
             if self.velocity_y > 0:  # 마리오가 위로 이동 중일 때만 충돌 처리
+                self.brick_sound.play()  # 점프 사운드 재생
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
                 self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 bottom 위치에 맞춤

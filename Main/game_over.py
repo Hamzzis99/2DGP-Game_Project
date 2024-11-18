@@ -1,4 +1,5 @@
 import pico2d
+import game_framework
 from pico2d import load_wav
 from font import Font
 
@@ -22,6 +23,14 @@ def main():
     y_position = screen_height // 2  # y 좌표는 화면 중앙
 
     font.draw(text, x_position, y_position, scaling_factor=scaling_factor)
+
+    # 아래에 텍스트 추가 (살짝 오른쪽으로 이동)
+    sub_text = "2DGP-PROJECT K.G.H"
+    sub_text_width = len(sub_text) * font.char_width * scaling_factor
+    sub_x_position = (screen_width - sub_text_width) // 2  # 약간 오른쪽으로 이동 (+20)
+    sub_y_position = y_position - (font.char_height * scaling_factor * 2)  # "GAME OVER" 아래에 위치하도록 설정
+    font.draw(sub_text, sub_x_position, sub_y_position, scaling_factor=scaling_factor)
+
     pico2d.update_canvas()  # 캔버스 업데이트 (화면에 출력)
 
     # Game over 사운드 재생

@@ -47,8 +47,8 @@ class Koomba(GameObject):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
         if self.stomped:
             self.stomp_timer -= frame_time
-            self.stomp_sound.play()
             print(f"Koomba stomped. Timer: {self.stomp_timer}")
+            self.stomp_sound.play()
             if self.stomp_timer <= 0:
                 self.alive = False
                 game_world.remove_object(self)
