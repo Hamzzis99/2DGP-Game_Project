@@ -11,8 +11,8 @@ def main():
     grass = load_image('grass.png')
     character = load_image('character.png')
     # 스프라이트의 시작 좌표 거북이 좌표 : 1(293, 169), 2(312, 169)
-    # 애니메이션 프레임 설정
-    frame_x_positions = [293, 312]
+    # 애니메이션 프레임 쓰러진 거북이 설정1(160,169), 2(141,169)
+    frame_x_positions = [160, 141]
     frame_y_position = 169
     frame_width = 20  # 소스 이미지의 프레임 너비 (고정)
     frame_height = 29  # 소스 이미지의 프레임 높이 (고정)

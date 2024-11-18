@@ -12,3 +12,8 @@ class MarioConfig:
 
     # 배경음악 설정
     GAME_MUSIC_VOLUME = 64  # 볼륨 조절 (0-128)
+
+
+class TurtleConfig:
+    TURTLE_TRANSFORM_INTERVAL = 10.0  # seconds (50초마다 변신)
+    TURTLE_TRANSFORM_DURATION = 5.0    # seconds (5초간 변신 상태)
