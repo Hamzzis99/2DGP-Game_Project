@@ -42,7 +42,7 @@ class BGMManager:
         self.current_music = self.music_tracks[name]
         self.current_music.set_volume(volume)
         try:
-            self.current_music.play()  # repeat_play() 대신 play() 사용
+            self.current_music.play(-1)  # 무한 반복을 위해 loops=-1 설정
             print(f"[BGMManager] '{name}' 음악을 재생합니다. 볼륨: {volume}")
         except Exception as e:
             print(f"[BGMManager] 음악 재생 중 에러 발생: {e}")

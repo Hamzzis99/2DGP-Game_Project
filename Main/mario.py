@@ -254,11 +254,11 @@ class Mario(GameObject):
         if event.type == SDL_KEYDOWN:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.add(event.key)
-                print("Mario: Left key pressed")  # 디버깅용
+                print(f"Key Down: {event.key}")  # 디버깅용
         elif event.type == SDL_KEYUP:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.discard(event.key)
-                print("Mario: Right key pressed")  # 디버깅용
+                print(f"Key Up: {event.key}")  # 디버깅용
         self.state_machine.add_event(('INPUT', event))
 
     def draw(self):

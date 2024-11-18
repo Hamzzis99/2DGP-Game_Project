@@ -11,24 +11,34 @@ from random_box import Random_box
 from utils.camera import Camera
 from config import MarioConfig  # MarioConfig 임포트
 from dashboard import Dashboard  # Dashboard 클래스 임포트
+from bgm import BGMManager  # bgm.py에서 BGMManager 임포트
 
+# 전역 변수 선언
 camera = None  # 전역 카메라 객체
 dashboard = None  # 전역 대시보드 객체
 game_time = None  # 게임 시간 (초)
+bgm_manager = None  # 배경음악 관리자 객체
+
 
 def handle_events():
     global mario
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
+            print("Quit event detected")
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            print("Escape key pressed")
             game_framework.quit()
-        else:
-            mario.handle_event(event)  # 마리오 인스턴스를 통해 이벤트 처리
+        elif event.type in (SDL_KEYDOWN, SDL_KEYUP):
+            print(f"Key Event: {event.type}, Key: {event.key}")  # 디버깅 출력
+            mario.handle_event(event)  # 키 이벤트만 마리오에게 전달
+
 
 def init():
-    global mario, camera, dashboard, game_time
+    global mario, camera, dashboard, game_time, bgm_manager
+
+    print("Initializing game...")  # 디버깅 출력
 
     grass = Grass()
     game_world.add_object(grass, 0)
@@ -82,18 +92,25 @@ def init():
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)
 
-    # 카메라 초기화 (화면 크기: 800x600, 월드 크기: 1600x600)
     camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)
-
-    # Dashboard 초기화
     dashboard = Dashboard()
-
-    # 게임 시간 초기화 (config.py에서 설정한 값 사용)
     game_time = MarioConfig.GAME_TIME_LIMIT
 
+    # 배경음악 관리자 초기화
+    bgm_manager = BGMManager()
+    print("Loading background music...")  # 디버깅 출력
+    bgm_manager.load_music('main_theme', 'resources/chetahman2.mp3')  # 변환된 파일 경로
+    bgm_manager.play('main_theme', MarioConfig.GAME_MUSIC_VOLUME)
+    print("Background music started.")  # 디버깅 출력
+
+
 def finish():
+    global bgm_manager
+    if bgm_manager:
+        bgm_manager.stop()
     game_world.clear()
-    pass
+    print("Game finished and music stopped.")  # 디버깅 출력
+
 
 def update():
     global game_time
@@ -119,14 +136,17 @@ def update():
 
     print(f"Game Time: {game_time}")  # 디버그 출력
 
+
 def draw():
     clear_canvas()
     game_world.render_with_camera(camera)  # 카메라를 고려하여 렌더링
     dashboard.draw(camera)  # 대시보드 그리기
     update_canvas()
 
+
 def pause():
     pass
+
 
 def resume():
     pass
