@@ -284,8 +284,10 @@ class Mario(GameObject):
 
     def handle_collision(self, group, other, hit_position):
         if group == 'mario:koomba_top':
-            print("마리오가 굼바를 밟았습니다. 굼바를 제거하고 점프합니다.")
-            game_world.remove_object(other)  # 굼바 제거
+            print("마리오가 굼바를 밟았습니다. 굼바를 납작하게 하고 점프합니다.")
+            other.stomped = True  # 굼바를 납작하게 설정
+            other.stomp_timer = 0.4  # 1초 후 제거
+            #game_world.remove_object(other)  # 굼바 제거
             self.velocity_y = Jump.JUMP_VELOCITY  # 점프 속도 설정
             self.state_machine.set_state(Jump)  # 점프 상태로 변경
 

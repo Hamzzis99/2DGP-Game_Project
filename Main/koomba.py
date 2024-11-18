@@ -45,6 +45,7 @@ class Koomba(GameObject):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
         if self.stomped:
             self.stomp_timer -= frame_time
+            print(f"Koomba stomped. Timer: {self.stomp_timer}")
             if self.stomp_timer <= 0:
                 self.alive = False
                 game_world.remove_object(self)
@@ -69,47 +70,6 @@ class Koomba(GameObject):
         # 위치 클램프
         self.x = clamp(600, self.x, 800)
 
-    def draw(self):
-        if not self.alive:
-            return  # 살아있지 않으면 그리지 않음
-
-        if self.stomped:
-            # 납작해진 굼바 이미지 그리기
-            stomped_frame_x = 335  # 납작해진 굼바의 스프라이트 x 좌표
-            stomped_frame_y = 196  # 납작해진 굼바의 스프라이트 y 좌표
-            frame_width = 16
-            frame_height = 16
-            dest_width, dest_height = 32, 32  # 화면에 그릴 크기
-
-            Koomba.image.clip_draw(
-                stomped_frame_x, stomped_frame_y, frame_width, frame_height,
-                self.x, self.y, dest_width, dest_height
-            )
-        else:
-            # 현재 프레임 인덱스 (0 또는 1)
-            frame_x = self.frame_x_positions[self.frame]
-            frame_y = self.frame_y_position
-
-            # 그릴 크기 설정
-            dest_width, dest_height = 32, 32  # 화면에 그릴 크기
-
-            if self.dir < 0:
-                # 왼쪽으로 이동 중이면 프레임을 수평 반전하여 그립니다.
-                Koomba.image.clip_composite_draw(
-                    frame_x, frame_y, self.frame_width, self.frame_height, 0, 'h',
-                    self.x, self.y, dest_width, dest_height
-                )
-            else:
-                # 오른쪽으로 이동 중이면 프레임을 그대로 그립니다.
-                Koomba.image.clip_draw(
-                    frame_x, frame_y, self.frame_width, self.frame_height,
-                    self.x, self.y, dest_width, dest_height
-                )
-
-        # 디버깅용 충돌 박스 그리기 활성화
-        draw_rectangle(*self.get_top_bb())
-        draw_rectangle(*self.get_bottom_bb())
-
     def draw_with_camera(self, camera: Camera):
         if not self.alive:
             return  # 살아있지 않으면 그리지 않음
@@ -118,7 +78,7 @@ class Koomba(GameObject):
 
         if self.stomped:
             # 납작해진 굼바 이미지 그리기
-            stomped_frame_x = 335  # 납작해진 굼바의 스프라이트 x 좌표
+            stomped_frame_x = 276  # 납작해진 굼바의 스프라이트 x 좌표
             stomped_frame_y = 196  # 납작해진 굼바의 스프라이트 y 좌표
             frame_width = 16
             frame_height = 16

@@ -5,12 +5,12 @@ from pico2d import *
 open_canvas()
 
 # 스프라이트 시트 로드
-sprite_sheet = load_image('Items.png')
+sprite_sheet = load_image('character.png')
 
 # 초기 스프라이트 좌표와 크기 설정
 #sprite_x, sprite_y = 0 ,224  # 스프라이트의 시작 좌표
 #sprite_x, sprite_y = 0 ,208  # 스프라이트의 시작 좌표
-sprite_x, sprite_y = 0 ,20  # 스프라이트의 시작 좌표
+sprite_x, sprite_y = 276 ,196  # 스프라이트의 시작 좌표
 #점프 시작? 336
 #점프 좌표 355
 
