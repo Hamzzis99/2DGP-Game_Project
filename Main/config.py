@@ -9,3 +9,6 @@ class MarioConfig:
 
     # 게임 시간 제한 (초 단위)
     GAME_TIME_LIMIT = 300  # 기본값: 300초 (5분)
+
+    # 배경음악 설정
+    GAME_MUSIC_VOLUME = 64  # 볼륨 조절 (0-128)

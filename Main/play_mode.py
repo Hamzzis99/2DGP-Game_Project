@@ -16,7 +16,6 @@ camera = None  # 전역 카메라 객체
 dashboard = None  # 전역 대시보드 객체
 game_time = None  # 게임 시간 (초)
 
-
 def handle_events():
     global mario
     events = get_events()
@@ -27,7 +26,6 @@ def handle_events():
             game_framework.quit()
         else:
             mario.handle_event(event)  # 마리오 인스턴스를 통해 이벤트 처리
-
 
 def init():
     global mario, camera, dashboard, game_time
@@ -93,11 +91,9 @@ def init():
     # 게임 시간 초기화 (config.py에서 설정한 값 사용)
     game_time = MarioConfig.GAME_TIME_LIMIT
 
-
 def finish():
     game_world.clear()
     pass
-
 
 def update():
     global game_time
@@ -110,9 +106,9 @@ def update():
     game_time -= game_framework.frame_time
     if game_time <= 0:
         game_time = 0
-        dashboard.set_time(int(game_time))  # 시간 설정
+        dashboard.set_time(int(game_time))
         dashboard.update()
-        print("시간이 다 되었습니다. 게임을 종료합니다.")
+        print("Time is up! Game Over.")
         game_framework.quit()
 
     # 대시보드에 현재 게임 시간 설정
@@ -123,22 +119,14 @@ def update():
 
     print(f"Game Time: {game_time}")  # 디버그 출력
 
-
 def draw():
     clear_canvas()
     game_world.render_with_camera(camera)  # 카메라를 고려하여 렌더링
     dashboard.draw(camera)  # 대시보드 그리기
-
-    if game_time <= 0:
-        # "TIME UP" 메시지 표시
-        dashboard.font.draw("TIME UP!", 400, 300, None, scaling_factor=4)  # 중앙에 크게 표시
-
     update_canvas()
-
 
 def pause():
     pass
-
 
 def resume():
     pass

@@ -18,7 +18,7 @@ class Dashboard:
         pass
 
     def draw(self, camera):
-        print(f"Dashboard.draw(): Time={self.time}, Points={self.points}, Coins={self.coins}")
+        #print(f"Dashboard.draw(): Time={self.time}, Points={self.points}, Coins={self.coins}")
         # 화면에 텍스트를 그리는 코드
         self.font.draw("MARIO", 50, 550, None)  # HUD는 camera 없이 그리기
         self.font.draw(self.pointString(), 50, 530, None)

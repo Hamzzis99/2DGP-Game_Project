@@ -53,12 +53,12 @@ class Font:
             screen_x = x
             screen_y = y
         # 디버그 출력
-        print(f"Drawing text '{text}' at ({screen_x}, {screen_y})")
+        #print(f"Drawing text '{text}' at ({screen_x}, {screen_y})")
         for char in text:
             if char in self.char_positions:
                 x1, y1, x2, y2 = self.char_positions[char]
                 # 스프라이트 좌표 변환
                 self.spritesheet.sheet.clip_draw(x1, y1, x2 - x1, y2 - y1, screen_x, screen_y)
                 screen_x += self.char_width * scaling_factor  # 문자 간격
-            else:
-                print(f"Character '{char}' is not supported and will be ignored.")
+            #else:
+                #print(f"Character '{char}' is not supported and will be ignored.")

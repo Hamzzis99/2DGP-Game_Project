@@ -254,11 +254,11 @@ class Mario(GameObject):
         if event.type == SDL_KEYDOWN:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.add(event.key)
-                print(f"Key Down: {event.key}")  # 디버깅용
+                print("Mario: Left key pressed")  # 디버깅용
         elif event.type == SDL_KEYUP:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.discard(event.key)
-                print(f"Key Up: {event.key}")  # 디버깅용
+                print("Mario: Right key pressed")  # 디버깅용
         self.state_machine.add_event(('INPUT', event))
 
     def draw(self):
@@ -284,7 +284,7 @@ class Mario(GameObject):
 
     def handle_collision(self, group, other, hit_position):
         if group == 'mario:koomba_top':
-            print("마리오가 굼바를 밟았습니다. 굼바를 납작하게 하고 점프합니다.")
+            #print("마리오가 굼바를 밟았습니다. 굼바를 납작하게 하고 점프합니다.")
             other.stomped = True  # 굼바를 납작하게 설정
             other.stomp_timer = 0.4  # 1초 후 제거
             #game_world.remove_object(other)  # 굼바 제거
@@ -292,11 +292,11 @@ class Mario(GameObject):
             self.state_machine.set_state(Jump)  # 점프 상태로 변경
 
         elif group == 'mario:koomba_bottom':
-            print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
+            #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
             game_framework.quit()
 
         elif group in ['mario:brick_top', 'mario:random_box_top', 'mario:grass']:
-            print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
+            #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
             if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
@@ -316,7 +316,7 @@ class Mario(GameObject):
                     self.state_machine.set_state(Idle)
 
         elif group in ['mario:brick_bottom', 'mario:random_box_bottom']:
-            print(f"마리오가 {group} 하단과 충돌했습니다.")
+            #print(f"마리오가 {group} 하단과 충돌했습니다.")
             if self.velocity_y > 0:  # 마리오가 위로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
@@ -324,7 +324,7 @@ class Mario(GameObject):
                 self.velocity_y = 0  # 수직 속도 초기화
 
         elif group in ['mario:brick_left', 'mario:random_box_left']:
-            print(f"마리오가 {group} 왼쪽과 충돌했습니다.")
+            #print(f"마리오가 {group} 왼쪽과 충돌했습니다.")
             if self.dir > 0:  # 마리오가 오른쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
@@ -332,7 +332,7 @@ class Mario(GameObject):
                 self.dir = 0  # 이동 방향 초기화
 
         elif group in ['mario:brick_right', 'mario:random_box_right']:
-            print(f"마리오가 {group} 오른쪽과 충돌했습니다.")
+            #print(f"마리오가 {group} 오른쪽과 충돌했습니다.")
             if self.dir < 0:  # 마리오가 왼쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
