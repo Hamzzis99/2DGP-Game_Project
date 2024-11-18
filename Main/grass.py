@@ -6,7 +6,7 @@ from utils.camera import Camera
 
 class Grass(GameObject):
     def __init__(self):
-        self.image = load_image('img/grass.png')
+        self.image = load_image('grass.png')
         self.x = 800  # 중앙 위치로 조정 (화면 너비의 절반)
         self.y = 30
         self.width = 1600  # 바닥의 너비

@@ -5,7 +5,7 @@ from font import Font  # font.py에 포함된 Font 클래스 임포트
 
 class Dashboard:
     def __init__(self):
-        self.font = Font("font.png", char_width=8, char_height=8)  # Font 객체 생성 (font.png 파일 사용)
+        self.font = Font("img/font.png", char_width=8, char_height=8)  # Font 객체 생성 (font.png 파일 사용)
         self.state = "menu"
         self.levelName = "1-1"
         self.points = 0
