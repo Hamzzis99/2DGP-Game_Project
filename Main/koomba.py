@@ -1,5 +1,5 @@
 # koomba.py
-from pico2d import load_image, draw_rectangle, clamp
+from pico2d import load_image, draw_rectangle, clamp, load_wav
 from game_object import GameObject
 from utils.camera import Camera
 import random
@@ -40,11 +40,14 @@ class Koomba(GameObject):
         self.stomped = False  # 굼바가 밟혔는지 여부
         self.stomp_timer = 0  # 밟힌 후 경과 시간
         self.frame_time = 0  # 애니메이션 시간
+        self.stomp_sound = load_wav('sound/koomba.ogg')  # 사운드 파일 로드
+        self.stomp_sound.set_volume(20)  # 필요에 따라 볼륨 설정
 
     def update(self):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
         if self.stomped:
             self.stomp_timer -= frame_time
+            self.stomp_sound.play()
             print(f"Koomba stomped. Timer: {self.stomp_timer}")
             if self.stomp_timer <= 0:
                 self.alive = False

@@ -1,6 +1,6 @@
 # mario.py
 
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image, draw_rectangle, load_wav
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
 import game_framework
 import game_world
@@ -145,6 +145,7 @@ class Jump:
         if e is not None and isinstance(e, tuple):
             if s_down(e):
                 mario.velocity_y = Jump.JUMP_VELOCITY
+                mario.jump_sound.play()  # 점프 사운드 재생
                 print("Jump 상태: 점프 시작")  # 디버깅용
             # 방향 키 처리
             if left_down(e):
@@ -220,6 +221,8 @@ class Mario(GameObject):
         self.face_dir = 1  # 방향: 1(오른쪽), -1(왼쪽)
         self.dir = 0  # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
         self.image = load_image('img/character.png')
+        self.jump_sound = load_wav('sound/jump.ogg')
+        self.jump_sound.set_volume(32)  # 필요에 따라 볼륨 조절
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
@@ -286,7 +289,7 @@ class Mario(GameObject):
         if group == 'mario:koomba_top':
             #print("마리오가 굼바를 밟았습니다. 굼바를 납작하게 하고 점프합니다.")
             other.stomped = True  # 굼바를 납작하게 설정
-            other.stomp_timer = 0.4  # 1초 후 제거
+            other.stomp_timer = 0.3  # 1초 후 제거
             #game_world.remove_object(other)  # 굼바 제거
             self.velocity_y = Jump.JUMP_VELOCITY  # 점프 속도 설정
             self.state_machine.set_state(Jump)  # 점프 상태로 변경

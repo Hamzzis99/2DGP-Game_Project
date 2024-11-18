@@ -1,6 +1,6 @@
 # coin.py
 
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image, draw_rectangle, load_wav
 import game_framework
 import game_world
 from game_object import GameObject  # GameObject 베이스 클래스 임포트
@@ -8,10 +8,15 @@ from utils.camera import Camera      # Camera 클래스 임포트
 
 class Coin(GameObject):
     image = None  # 클래스 변수로 이미지 로드 공유
+    coin_sound = None  # 사운드 공유를 위해 클래스 변수로 초기화
 
     def __init__(self, x, y):
         if Coin.image is None:
             Coin.image = load_image('Items.png')  # Items 이미지 로드
+        if Coin.coin_sound is None:
+            Coin.coin_sound = load_wav('sound/coin.ogg')  # 코인 사운드 로드
+            Coin.coin_sound.set_volume(20)  # 필요에 따라 볼륨 설정
+
         self.x = x
         self.y = y
         self.sprite_x_positions = [0, 16, 32, 48]  # 코인의 애니메이션 프레임 x 좌표들
@@ -30,6 +35,9 @@ class Coin(GameObject):
         self.time_per_action = 0.25  # 한 사이클에 걸리는 시간 (초)
         self.action_per_time = 1.0 / self.time_per_action
         self.frames_per_action = self.total_frames
+
+        # 코인 사운드 재생
+        Coin.coin_sound.play()
 
     def update(self):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용

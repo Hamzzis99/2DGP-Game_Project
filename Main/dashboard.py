@@ -21,6 +21,8 @@ class Dashboard:
         scaling_factor = 2  # 글자 크기를 키우고 싶다면 이 값을 변경 (예: 3배로 확대)
         self.font.draw("MARIO", 60, 550, None, scaling_factor)  # HUD는 카메라 없이 그리기
         self.font.draw(self.pointString(), 50, 530, None, scaling_factor)
+        self.font.draw("LIFE", 220, 550, None, scaling_factor)
+        self.font.draw("x{}".format(self.mariolife()), 225, 530, None, scaling_factor)
         self.font.draw("WORLD", 380, 550, None, scaling_factor)
         self.font.draw(str(self.levelName), 395, 530, None, scaling_factor)
         self.font.draw("TIME", 710, 550, None, scaling_factor)
@@ -29,7 +31,7 @@ class Dashboard:
     def set_time(self, time):
         self.time = time
 
-    def coinString(self):
+    def mariolife(self):
         return "{:02d}".format(self.coins)
 
     def pointString(self):
