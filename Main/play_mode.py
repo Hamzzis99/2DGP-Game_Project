@@ -5,6 +5,7 @@ import game_framework
 import game_world
 from grass import Grass
 from koomba import Koomba
+from boss_turtle import Turtle  # Turtle 클래스 임포트
 from mario import Mario
 from brick import Brick
 from random_box import Random_box
@@ -49,6 +50,10 @@ def init():
     koombas = [Koomba() for _ in range(5)]
     game_world.add_objects(koombas, 1)
 
+    # Turtle 추가
+    turtlers = [Turtle() for _ in range(3)]  # 원하는 개수만큼 Turtle 생성
+    game_world.add_objects(turtlers, 1)  # 레이어 1에 추가
+
     # 벽돌 추가 (32x32 픽셀로 스프라이트 크기 두 배로 확장됨)
     bricks = [
         Brick(300, 100),
@@ -73,6 +78,10 @@ def init():
         # 마리오와 굼바의 Bottom 히트박스 충돌 쌍 등록
         game_world.add_collision_pair('mario:koomba_bottom', mario, koomba)
 
+    for turtle in turtlers:
+        # 마리오와 Turtle의 충돌 쌍 등록
+        game_world.add_collision_pair('mario:turtle', mario, turtle)
+
     for brick in bricks:
         # 마리오와 Brick의 상단 충돌 쌍 등록
         game_world.add_collision_pair('mario:brick_top', mario, brick)
@@ -88,6 +97,7 @@ def init():
         game_world.add_collision_pair('mario:random_box_bottom', mario, random_box)
         game_world.add_collision_pair('mario:random_box_left', mario, random_box)
         game_world.add_collision_pair('mario:random_box_right', mario, random_box)
+
 
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)

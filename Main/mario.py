@@ -294,7 +294,10 @@ class Mario(GameObject):
         elif group == 'mario:koomba_bottom':
             #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
             game_framework.quit()
+        elif group == 'mario:turtle':
+            print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
 
+            game_framework.quit()  # 게임 종료
         elif group in ['mario:brick_top', 'mario:random_box_top', 'mario:grass']:
             #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
             if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
