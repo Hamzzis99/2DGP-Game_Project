@@ -241,6 +241,8 @@ class Mario(GameObject):
         self.pressed_keys = set()  # 현재 눌려 있는 키
         self.frame = 0  # 애니메이션 프레임
         self.velocity_y = 0  # 수직 속도 추가
+        self.dashboard = None  # Dashboard 참조 추가
+
 
     def update(self):
         frame_time = game_framework.frame_time
@@ -347,6 +349,10 @@ class Mario(GameObject):
                 obj_bb = other.get_bb()
                 self.x = obj_bb[2] + (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 right 위치에 맞춤
                 self.dir = 0  # 이동 방향 초기화
+        elif group == 'mario:coin':
+            self.points += 100  # 또는 원하는 점수
+            game_world.remove_object(other)  # 코인 제거
+            print("코인을 수집했습니다!")
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가

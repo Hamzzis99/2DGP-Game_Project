@@ -10,7 +10,7 @@ sprite_sheet = load_image('gun_mario.png')
 # 초기 스프라이트 좌표와 크기 설정
 #sprite_x, sprite_y = 0 ,224  # 스프라이트의 시작 좌표
 #sprite_x, sprite_y = 0 ,208  # 스프라이트의 시작 좌표
-sprite_x, sprite_y = 173 ,476  # 스프라이트의 시작 좌표 거북이 좌표 : 1(293, 169), 2(312, 169)
+sprite_x, sprite_y = 68 ,476  # 스프라이트의 시작 좌표 거북이 좌표 : 1(293, 169), 2(312, 169)
                                 #쓰러진 거북이 패턴 -> 1(160,169), 2(141,169)
 
                                 #Gun_mario IDLE : 26, 276
