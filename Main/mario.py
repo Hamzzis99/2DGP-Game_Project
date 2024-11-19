@@ -250,6 +250,7 @@ class Mario(GameObject):
         self.frame = 0  # 애니메이션 프레임
         self.velocity_y = 0  # 수직 속도 추가
         self.dashboard = None  # Dashboard 참조 추가
+        self.points =0 #추후 넣을 Dashboard 포인트
 
 
     def update(self):
@@ -313,7 +314,7 @@ class Mario(GameObject):
             print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
             game_framework.quit()  # 게임 종료
 
-        elif group in ['mario:brick_top', 'mario:random_box_top', 'mario:grass']:
+        elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
             #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
             if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
@@ -333,7 +334,7 @@ class Mario(GameObject):
                     self.dir = 0
                     self.state_machine.set_state(Idle)
 
-        elif group in ['mario:brick_bottom', 'mario:random_box_bottom']:
+        elif group in ['mario:brick_bottom', 'mario:random_box_bottom', 'mario:gun_box_bottom']:
             #print(f"마리오가 {group} 하단과 충돌했습니다.")
             if self.velocity_y > 0:  # 마리오가 위로 이동 중일 때만 충돌 처리
                 self.brick_sound.play()  # 점프 사운드 재생
@@ -342,7 +343,7 @@ class Mario(GameObject):
                 self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 bottom 위치에 맞춤
                 self.velocity_y = 0  # 수직 속도 초기화
 
-        elif group in ['mario:brick_left', 'mario:random_box_left']:
+        elif group in ['mario:brick_left', 'mario:random_box_left', 'mario:gun_box_left']:
             #print(f"마리오가 {group} 왼쪽과 충돌했습니다.")
             if self.dir > 0:  # 마리오가 오른쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
@@ -350,7 +351,7 @@ class Mario(GameObject):
                 self.x = obj_bb[0] - (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 left 위치에 맞춤
                 self.dir = 0  # 이동 방향 초기화
 
-        elif group in ['mario:brick_right', 'mario:random_box_right']:
+        elif group in ['mario:brick_right', 'mario:random_box_right', 'mario:gun_box_right']:
             #print(f"마리오가 {group} 오른쪽과 충돌했습니다.")
             if self.dir < 0:  # 마리오가 왼쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()

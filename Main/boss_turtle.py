@@ -55,24 +55,24 @@ class Turtle(GameObject):
 
         if self.state == 'normal':
             self.timer -= frame_time
-            print(f"Turtle normal. Timer: {self.timer:.2f}s")
+            #print(f"Turtle normal. Timer: {self.timer:.2f}s")
             if self.timer <= 0:
                 self.state = 'transform1'
                 self.frame_x_positions = self.transform1_frame_x_positions
                 self.frame_y_position = self.transform1_frame_y_position
                 self.dir = 0  # 제자리 멈춤
                 self.timer = TurtleConfig.TURTLE_TRANSFORM_DURATION  # 5초 동안 변신
-                print("Turtle entered transform1 state.")
+                #print("Turtle entered transform1 state.")
 
         elif self.state == 'transform1':
             self.timer -= frame_time
-            print(f"Turtle transform1. Timer: {self.timer:.2f}s")
+            #print(f"Turtle transform1. Timer: {self.timer:.2f}s")
             if self.timer <= 0:
                 self.state = 'transform2'
                 self.frame_x_positions = self.transform2_frame_x_positions
                 self.frame_y_position = self.transform2_frame_y_position
                 self.timer = 0.0  # transform2는 즉시 다음 상태로 전환
-                print("Turtle entered transform2 state.")
+                #print("Turtle entered transform2 state.")
 
         elif self.state == 'transform2':
             # transform2 상태에서는 바로 normal 상태로 돌아감
@@ -81,7 +81,7 @@ class Turtle(GameObject):
             self.frame_y_position = self.normal_frame_y_position
             self.dir = random.choice([-1, 1])  # 이동 방향 재설정
             self.timer = TurtleConfig.TURTLE_TRANSFORM_INTERVAL  # 다음 변신을 위한 타이머 리셋
-            print("Turtle reverted to normal state.")
+            #print("Turtle reverted to normal state.")
 
         # 상태가 'transform1' 또는 'transform2'일 때는 이동 및 애니메이션을 하지 않음
         if self.state in ['transform1', 'transform2']:

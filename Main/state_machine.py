@@ -58,10 +58,10 @@ class StateMachine:
         for event, next_state in self.transitions.get(self.cur_state, {}).items():
             if event(e):
                 if next_state != self.cur_state:
-                    print(f'Exit from {self.cur_state.__name__}')
+                    #print(f'Exit from {self.cur_state.__name__}')
                     self.cur_state.exit(self.o, e)
                     self.cur_state = next_state
-                    print(f'Enter into {self.cur_state.__name__}')
+                    #print(f'Enter into {self.cur_state.__name__}')
                     self.cur_state.enter(self.o, e)
                 else:
                     # 같은 상태로의 전환인 경우, 현재 상태의 handle_event 호출
@@ -71,8 +71,8 @@ class StateMachine:
 
     def set_state(self, new_state):
         if new_state != self.cur_state:
-            print(f'Exit from {self.cur_state.__name__}')
+            #print(f'Exit from {self.cur_state.__name__}')
             self.cur_state.exit(self.o, None)
             self.cur_state = new_state
-            print(f'Enter into {self.cur_state.__name__}')
+            #print(f'Enter into {self.cur_state.__name__}')
             self.cur_state.enter(self.o, None)

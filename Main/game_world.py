@@ -123,6 +123,19 @@ def handle_collisions():
                 elif group == 'mario:random_box_right':
                     if collide_hitboxes(a.get_bb(), b.get_right_bb()):
                         a.handle_collision(group, b, 'random_box_right')
+                elif group == 'mario:gun_box_top':  # [추가]
+                    if collide_hitboxes(a.get_bb(), b.get_top_bb()):
+                        a.handle_collision(group, b, 'gun_box_top')
+                elif group == 'mario:gun_box_bottom':  # [추가]
+                    if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
+                        a.handle_collision(group, b, 'gun_box_bottom')
+                        b.handle_collision(group, a, 'gun_box_bottom')
+                elif group == 'mario:gun_box_left':  # [추가]
+                    if collide_hitboxes(a.get_bb(), b.get_left_bb()):
+                        a.handle_collision(group, b, 'gun_box_left')
+                elif group == 'mario:gun_box_right':  # [추가]
+                    if collide_hitboxes(a.get_bb(), b.get_right_bb()):
+                        a.handle_collision(group, b, 'gun_box_right')
                 elif group == 'mario:grass':
                     if collide(a, b):
                         a.handle_collision(group, b, 'grass')
