@@ -1,7 +1,7 @@
 # dashboard.py
 
 import pico2d
-from font import Font  # font.py에 포함된 Font 클래스 임포트
+from utils.font import Font  # font.py에 포함된 Font 클래스 임포트
 
 class Dashboard:
     def __init__(self):

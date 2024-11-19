@@ -1,6 +1,8 @@
 import game_framework
 from pico2d import load_image, load_wav, clear_canvas, update_canvas, get_events, get_time, get_canvas_width, get_canvas_height
-from font import Font
+
+import logo_mode
+from utils.font import Font
 
 def init():
     global font, sound, background, running, logo_start_time
@@ -23,7 +25,7 @@ def update():
     global logo_start_time
     if get_time() - logo_start_time >= 10.0:
         logo_start_time = get_time()
-        game_framework.quit()
+        game_framework.change_mode(logo_mode)
 
 def draw():
     clear_canvas()
