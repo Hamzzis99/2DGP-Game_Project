@@ -8,6 +8,7 @@ from config import MarioConfig
 from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down
 from game_object import GameObject
 from utils.camera import Camera
+import game_over
 
 # 상수 정의
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
@@ -308,11 +309,13 @@ class Mario(GameObject):
             self.state_machine.set_state(Jump)  # 점프 상태로 변경
 
         elif group == 'mario:koomba_bottom':
-            #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
-            game_framework.quit()
+            print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
+            #game_framework.quit()
+            game_framework.change_mode(game_over)
         elif group == 'mario:turtle':
             print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
-            game_framework.quit()  # 게임 종료
+            #game_framework.quit()  # 게임 종료
+            game_framework.change_mode(game_over)  # 게임 오버 화면으로 전환
 
         elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
             #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
