@@ -4,17 +4,19 @@ import game_framework
 import play_mode  # play_mode로 전환하기 위해 import
 
 def init():
-    global image, running, logo_start_time
+    global image, running, logo_start_time, sound
     image = load_image('img/tuk_credit.png')
-    sound = load_wav('resources/game_over-yoshi-island2.mp3')
-    sound.set_volume(20)  # 필요 시 볼륨 조정
+    sound = load_wav('sound/select.mp3')
+    sound.set_volume(60)  # 필요 시 볼륨 조정
     sound.play()  # 사운드 재생
+
     running = True
     logo_start_time = get_time()
 
 def finish():
     global image
     del image
+    #del sound #아니 이거 왜 안 돼??? 삭제 해야하잖아
 
 def update():
     global logo_start_time
