@@ -25,7 +25,7 @@ def finish():
 
 def update():
     global logo_start_time
-    if get_time() - logo_start_time >= 10.0:
+    if get_time() - logo_start_time >= 1.0: #원래는 10
         logo_start_time = get_time()
         game_framework.change_mode(logo_mode)
 

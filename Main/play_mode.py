@@ -9,7 +9,7 @@ import game_world
 from grass import Grass
 from koomba import Koomba
 from boss_turtle import Turtle  # Turtle 클래스 임포트
-from mario import Mario
+from mario import Mario, reset_mario
 from brick import Brick
 from random_box import Random_box
 from gun_box import Gun_box  # Gun_box 임포트
@@ -45,7 +45,9 @@ def handle_events():
 def init():
     global mario, camera, dashboard, game_time, bgm_manager
 
-    print("Initializing game...")  # 디버깅 출력
+    if 'mario' in globals():
+        reset_mario(mario)
+        clear_canvas()
 
     grass = Grass()
     game_world.add_object(grass, 0)
@@ -137,7 +139,8 @@ def finish():
     if bgm_manager:
         bgm_manager.stop()
     game_world.clear()
-    print("Game finished and music stopped.")  # 디버깅 출력
+    init()  # play_mode 초기화 임시 로직 추후 변경예정
+    print("게임이 종료되면서 코드실행?")  # 디버깅 출력
 
 
 def update():
@@ -172,7 +175,7 @@ def update():
     # 대시보드 업데이트
     dashboard.update()
 
-    #print(f"Game Time: {game_time}")  # 디버그 출력
+    print(f"Game Time: {game_time}")  # 디버그 출력
 
 
 def draw():

@@ -33,11 +33,11 @@ class Idle:
                 mario.face_dir = -1
             elif right_down(e):
                 mario.face_dir = 1
-        print("Idle 상태: 진입")  # 디버깅용
+        #print("Idle 상태: 진입")  # 디버깅용
 
     @staticmethod
     def exit(mario, e):
-        print("Idle 상태: 종료")  # 디버깅용
+        #print("Idle 상태: 종료")  # 디버깅용
         pass
 
     @staticmethod
@@ -93,11 +93,11 @@ class Run:
         # 애니메이션 프레임 초기화
         mario.run_frame_x_positions = [290, 304, 321]
         mario.frame = 0
-        print("Run 상태: 진입")  # 디버깅용
+        #print("Run 상태: 진입")  # 디버깅용
 
     @staticmethod
     def exit(mario, e):
-        print("Run 상태: 종료")  # 디버깅용
+        #print("Run 상태: 종료")  # 디버깅용
         pass
 
     @staticmethod
@@ -155,7 +155,7 @@ class Jump:
             if s_down(e):
                 mario.velocity_y = Jump.JUMP_VELOCITY
                 mario.jump_sound.play()  # 점프 사운드 재생
-                print("Jump 상태: 점프 시작")  # 디버깅용
+                #print("Jump 상태: 점프 시작")  # 디버깅용
             # 방향 키 처리
             if left_down(e):
                 mario.dir = -1
@@ -165,11 +165,12 @@ class Jump:
                 mario.face_dir = 1
         mario.jump_frame_x_positions = [336, 353, 321]
         mario.frame = 0
-        print("Jump 상태: enter 메소드 호출")  # 디버깅용
+        #print("Jump 상태: enter 메소드 호출")  # 디버깅용
 
     @staticmethod
     def exit(mario, e):
-        print("Jump 상태: 점프 종료")  # 디버깅용
+        #print("Jump 상태: 점프 종료")  # 디버깅용
+        pass
 
     @staticmethod
     def do(mario):
@@ -271,11 +272,11 @@ class Mario(GameObject):
         if event.type == SDL_KEYDOWN:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.add(event.key)
-                print(f"Key Down: {event.key}")  # 디버깅용
+                #print(f"Key Down: {event.key}")  # 디버깅용
         elif event.type == SDL_KEYUP:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.discard(event.key)
-                print(f"Key Up: {event.key}")  # 디버깅용
+                #print(f"Key Up: {event.key}")  # 디버깅용
         self.state_machine.add_event(('INPUT', event))
 
     def draw(self):
@@ -309,11 +310,11 @@ class Mario(GameObject):
             self.state_machine.set_state(Jump)  # 점프 상태로 변경
 
         elif group == 'mario:koomba_bottom':
-            print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
+            #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
             #game_framework.quit()
             game_framework.change_mode(game_over)
         elif group == 'mario:turtle':
-            print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
+            #print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
             #game_framework.quit()  # 게임 종료
             game_framework.change_mode(game_over)  # 게임 오버 화면으로 전환
 
@@ -368,3 +369,24 @@ class Mario(GameObject):
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가
+
+def reset_mario(mario):
+    mario.x = MarioConfig.START_X
+    mario.y = MarioConfig.START_Y
+    mario.face_dir = 1
+    mario.dir = 0
+    mario.velocity_y = 0
+    mario.state_machine.set_state(Idle)  # 기본 상태로 변경
+    mario.pressed_keys.clear()  # 눌려 있는 키 초기화
+    mario.frame = 0
+def reset_game():
+    global mario
+    game_world.remove_object(mario)  # 기존 마리오 객체 제거
+    mario = Mario()  # 새로운 마리오 객체 생성
+    game_world.add_object(mario, 1)
+def init():
+    global mario, running
+    # 마리오 객체 초기화 코드 추가
+    reset_mario(mario)  # 또는 reset_game() 호출
+    running = True
+
