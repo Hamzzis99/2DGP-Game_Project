@@ -1,3 +1,5 @@
+#logo_mode.py
+
 from pico2d import get_time, load_image, clear_canvas, update_canvas, get_events, SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE, \
     load_wav
 import game_framework
@@ -21,6 +23,7 @@ def finish():
 def update():
     global logo_start_time
     if get_time() - logo_start_time >= 5.0:  # 5초 후에 play_mode로 전환
+        play_mode.init()  # play_mode 초기화 임시 로직 추후 변경예정
         game_framework.change_mode(play_mode)
 
 def draw():
