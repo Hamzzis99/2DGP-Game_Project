@@ -81,13 +81,17 @@ class Idle:
 class Run:
     @staticmethod
     def enter(mario, e):
-        if SDLK_LEFT in mario.pressed_keys and SDLK_RIGHT not in mario.pressed_keys:
-            mario.dir, mario.face_dir = -1, -1
-        elif SDLK_RIGHT in mario.pressed_keys and SDLK_LEFT not in mario.pressed_keys:
-            mario.dir, mario.face_dir = 1, 1
+        # 헬퍼 함수를 사용하여 이벤트에 따라 방향 설정
+        if right_down(e) or left_up(e):  # 오른쪽으로 RUN
+            mario.dir, mario.face_dir, mario.action = 1, 1, 1
+        elif left_down(e) or right_up(e):  # 왼쪽으로 RUN
+            mario.dir, mario.face_dir, mario.action = -1, -1, 0
         else:
-            mario.dir = 0
+            mario.dir = 0  # 이동하지 않음
+
+        # 애니메이션 프레임 초기화
         mario.run_frame_x_positions = [290, 304, 321]
+        mario.frame = 0
         print("Run 상태: 진입")  # 디버깅용
 
     @staticmethod
@@ -97,10 +101,13 @@ class Run:
 
     @staticmethod
     def do(mario):
+        # 애니메이션 프레임 업데이트
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(
             mario.run_frame_x_positions)
+        # 마리오 이동
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
-        mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))  # 월드 경계 내로 클램프
+        # 월드 경계 내로 위치 클램프
+        mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))
 
     @staticmethod
     def draw(mario):
@@ -136,6 +143,7 @@ class Run:
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
                 frame_width * 3, frame_height * 3
             )
+
 
 class Jump:
     JUMP_VELOCITY = 350  # 점프 초기 속도
