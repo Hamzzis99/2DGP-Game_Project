@@ -12,7 +12,7 @@ class Coin(GameObject):
 
     def __init__(self, x, y):
         if Coin.image is None:
-            Coin.image = load_image('Items.png')  # Items 이미지 로드
+            Coin.image = load_image('img/Items.png')  # Items 이미지 로드
         if Coin.coin_sound is None:
             Coin.coin_sound = load_wav('sound/coin.ogg')  # 코인 사운드 로드
             Coin.coin_sound.set_volume(20)  # 필요에 따라 볼륨 설정
