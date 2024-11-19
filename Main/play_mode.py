@@ -47,7 +47,7 @@ def init():
 
     if 'mario' in globals():
         reset_mario(mario)
-        clear_canvas()
+        game_world.clear()
 
     grass = Grass()
     game_world.add_object(grass, 0)
