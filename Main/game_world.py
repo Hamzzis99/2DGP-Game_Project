@@ -59,6 +59,13 @@ def clear():
     for layer in world:
         layer.clear()
 
+def reset():
+    """게임 월드를 완전히 초기화합니다."""
+    clear()  # 모든 게임 객체 제거
+    global collision_pairs
+    collision_pairs = {}  # 모든 충돌 쌍 초기화
+    print("game_world가 완전히 초기화되었습니다.")
+
 def collide(a, b):
     la, ba, ra, ta = a.get_bb()
     lb, bb, rb, tb = b.get_bb()

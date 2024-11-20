@@ -142,9 +142,8 @@ def finish():
     global bgm_manager
     if bgm_manager:
         bgm_manager.stop()
-    game_world.clear()
-    init()  # play_mode 초기화 임시 로직 추후 변경예정
-    print("게임이 종료되면서 코드실행?")  # 디버깅 출력
+    game_world.reset()  # game_world 완전 초기화
+    print("play_mode의 finish()가 호출되었습니다.")  # 디버깅 출력
 
 
 def update():
@@ -154,13 +153,13 @@ def update():
     game_world.handle_collisions() # 충돌 처리
     camera.update(mario)           # 카메라 위치 업데이트
 
-
     # Mario의 dead 상태 확인
     if mario.dead and not mario_dead:
         mario_dead = True
-        print("Mario is dead. Triggering game over.")
-        # 게임 오버로 전환
-        game_framework.change_mode(game_over)
+        print("Mario is dead. Stopping music and triggering game over.")
+        if bgm_manager:
+            bgm_manager.stop()  # 배경음악 명시적으로 중지
+        game_framework.change_mode(game_over)  # 게임 오버로 전환
 
     # 추가할 객체 처리
     for obj in objects_to_add:
@@ -179,7 +178,9 @@ def update():
         dashboard.set_time(int(game_time))
         dashboard.update()
         print("Time is up! Game Over.")
-        game_framework.quit()
+        if bgm_manager:
+            bgm_manager.stop()  # 배경음악 중지
+        game_framework.change_mode(game_over)
 
     # 대시보드에 현재 게임 시간 설정
     dashboard.set_time(int(game_time))  # 정수로 전달
@@ -187,13 +188,13 @@ def update():
     # 대시보드 업데이트
     dashboard.update()
 
-    print(f"Game Time: {game_time}")  # 디버그 출력
+    #print(f"Game Time: {game_time}")  # 디버그 출력
 
+    # 아래 중복된 조건문 제거
+    # if mario_dead:
+    #     print("mario_dead flag is True. Changing mode to game_over.")
+    #     game_framework.change_mode(game_over)
 
-    # 만약 mario_dead이 True라면 game_over로 전환
-    if mario_dead:
-        print("mario_dead flag is True. Changing mode to game_over.")
-        game_framework.change_mode(game_over)
 
 def draw():
     clear_canvas()
