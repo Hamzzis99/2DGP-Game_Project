@@ -1,4 +1,4 @@
-# star.py
+# items/star.py
 
 from pico2d import load_image, load_wav
 import game_world
@@ -15,13 +15,13 @@ class Star(GameObject):
         if Star.image is None:
             Star.image = load_image('img/Items.png')  # Items 이미지 로드
 
-        # 스타 생성 시 소리 로드 및 재생 (powerup.ogg)
+        # 스타 생성 시 소리 로드 및 재생 (upgradebox.ogg)
         if Star.create_sound is None:
             Star.create_sound = load_wav('sound/upgradebox.ogg')  # Star 생성 시 소리 로드
             Star.create_sound.set_volume(20)  # 필요에 따라 볼륨 설정
         Star.create_sound.play()  # Star 생성 시 소리 재생
 
-        # 스타 수집 시 소리 로드 (upgradebox.ogg)
+        # 스타 수집 시 소리 로드 (powerup.ogg)
         if Star.collect_sound is None:
             Star.collect_sound = load_wav('sound/powerup.ogg')  # Star 수집 사운드 로드
             Star.collect_sound.set_volume(20)  # 필요에 따라 볼륨 설정
@@ -77,8 +77,5 @@ class Star(GameObject):
         )
 
     def handle_collision(self, group, other, hit_position):
-        if group == 'mario:star':
-            # 마리오가 스타를 수집함
-            Star.collect_sound.play()  # 스타 수집 시 소리 재생
-            game_world.remove_object(self)  # 스타 제거
-            # print("스타를 수집했습니다!")  # 디버깅용 출력 제거
+        # 충돌 처리 로직이 이제 mario.py로 통합되었으므로, 여기는 pass로 설정
+        pass

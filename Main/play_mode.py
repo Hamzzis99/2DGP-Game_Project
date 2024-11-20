@@ -10,7 +10,7 @@ from mario import Mario, reset_mario
 from props.brick import Brick
 from props.random_box import Random_box
 from props.gun_box import Gun_box
-from star import Star
+from items.star import Star
 from items.coin import Coin
 from utils.camera import Camera
 from utils.config import MarioConfig

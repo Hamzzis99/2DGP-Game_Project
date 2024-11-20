@@ -4,12 +4,14 @@ from pico2d import load_image, draw_rectangle, load_wav
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
 import game_framework
 import game_world
+import play_mode
+from items.coin import Coin
+from items.star import Star
 from utils.config import MarioConfig
 from utils.dashboard import Dashboard
 from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down, Dead
 from game_object import GameObject
 from utils.camera import Camera
-import game_over
 from utils.score_text import ScoreText
 
 # 상수 정의
@@ -347,7 +349,7 @@ class Mario(GameObject):
             print("Mario has collided with Turtle. Transitioning to Dead state.")
 
         elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
-            #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
+            # 마리오가 객체의 상단과 충돌
             if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
@@ -367,16 +369,45 @@ class Mario(GameObject):
                     self.state_machine.set_state(Idle)
 
         elif group in ['mario:brick_bottom', 'mario:random_box_bottom', 'mario:gun_box_bottom']:
-            #print(f"마리오가 {group} 하단과 충돌했습니다.")
+            # 마리오가 객체의 하단과 충돌
             if self.velocity_y > 0:  # 마리오가 위로 이동 중일 때만 충돌 처리
-                self.brick_sound.play()  # 점프 사운드 재생
-                mario_bb = self.get_bb()
-                obj_bb = other.get_bb()
-                self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 bottom 위치에 맞춤
-                self.velocity_y = 0  # 수직 속도 초기화
+                if group == 'mario:random_box_bottom' and not other.changed:
+                    print("Random Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 코인을 생성합니다.")
+                    other.changed = True
+
+                    # 코인 생성
+                    coin = Coin(other.x, other.y + (other.height * other.scale))  # 박스 위에 생성
+                    game_world.add_object(coin, 1)
+                    self.dashboard.increment_score(1000)
+                    print("마리오에게 1000점이 추가되었습니다!")  # 디버깅 출력
+
+                    # ScoreText 생성 및 게임 월드에 추가
+                    score_text = ScoreText(self.x, self.y + 50, "+1000")  # 마리오 위에 위치
+                    game_world.add_object(score_text, 2)  # 레이어 2에 추가
+                    print("ScoreText 추가됨: +1000")  # 디버깅 출력
+
+                elif group == 'mario:gun_box_bottom' and not other.changed:
+                    print("Gun Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 스타를 생성합니다.")
+                    other.changed = True
+
+                    # 스타 생성
+                    star = Star(
+                        other.x,
+                        other.y + (other.height * other.scale)
+                    )  # 박스 위에 생성
+                    # 대신 game_world.add_object을 play_mode.py에서 처리하기 위해 objects_to_add에 추가
+                    play_mode.objects_to_add.append(star)
+
+                else:
+                    # 일반적인 충돌 처리
+                    self.brick_sound.play()  # 점프 사운드 재생
+                    mario_bb = self.get_bb()
+                    obj_bb = other.get_bb()
+                    self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 bottom 위치에 맞춤
+                    self.velocity_y = 0  # 수직 속도 초기화
 
         elif group in ['mario:brick_left', 'mario:random_box_left', 'mario:gun_box_left']:
-            #print(f"마리오가 {group} 왼쪽과 충돌했습니다.")
+            # 마리오가 객체의 왼쪽과 충돌
             if self.dir > 0:  # 마리오가 오른쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
@@ -384,7 +415,7 @@ class Mario(GameObject):
                 self.dir = 0  # 이동 방향 초기화
 
         elif group in ['mario:brick_right', 'mario:random_box_right', 'mario:gun_box_right']:
-            #print(f"마리오가 {group} 오른쪽과 충돌했습니다.")
+            # 마리오가 객체의 오른쪽과 충돌
             if self.dir < 0:  # 마리오가 왼쪽으로 이동 중일 때만 충돌 처리
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
@@ -392,6 +423,7 @@ class Mario(GameObject):
                 self.dir = 0  # 이동 방향 초기화
 
         elif group == 'mario:coin':
+            # 마리오가 코인을 수집함
             self.dashboard.increment_score(1000)  # 점수 1000점 추가
             game_world.remove_object(other)  # 코인 제거
             print("코인을 수집했습니다!")  # 디버깅 출력
@@ -400,6 +432,12 @@ class Mario(GameObject):
             score_text = ScoreText(self.x, self.y + 50, "+1000")  # 마리오 위에 위치
             game_world.add_object(score_text, 2)  # 레이어 2에 추가
             print("ScoreText 추가됨: +1000")  # 디버깅 출력
+
+        elif group == 'mario:star':
+            # 마리오가 스타를 수집함
+            Star.collect_sound.play()  # 스타 수집 시 소리 재생
+            game_world.remove_object(other)  # 스타 제거
+            print("스타를 수집했습니다!")  # 디버깅 출력
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가

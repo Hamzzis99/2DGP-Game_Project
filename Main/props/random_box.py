@@ -130,17 +130,4 @@ class Random_box(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
-        if group == 'mario:random_box_bottom' and not self.changed:
-            print("Random Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 코인을 생성합니다.")
-            self.changed = True
-
-            # 코인 생성
-            coin = Coin(self.x, self.y + (self.height * self.scale))  # 박스 위에 생성
-            game_world.add_object(coin, 1)
-            other.dashboard.increment_score(1000)
-            print("마리오에게 1000점이 추가되었습니다!")  # 디버깅 출력
-
-            # ScoreText 생성 및 게임 월드에 추가
-            score_text = ScoreText(other.x, other.y + 50, "+1000")  # 마리오 위에 위치
-            game_world.add_object(score_text, 2)  # 레이어 2에 추가
-            print("ScoreText 추가됨: +1000")  # 디버깅 출력
+        pass

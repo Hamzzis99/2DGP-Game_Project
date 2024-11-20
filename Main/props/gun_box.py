@@ -3,12 +3,9 @@
 from pico2d import load_image, draw_rectangle
 from game_object import GameObject
 from utils.camera import Camera
-from star import Star  # Star 클래스 임포트
-import game_world
 import game_framework
 
 # play_mode의 objects_to_add 리스트를 import
-import play_mode
 
 class Gun_box(GameObject):
     image = None  # 클래스 변수로 이미지 로드 공유
@@ -170,16 +167,5 @@ class Gun_box(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
-        if group == 'mario:gun_box_bottom' and not self.changed:
-            print("Gun Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 스타를 생성합니다.")
-            self.changed = True
-
-            # 스타 생성
-            star = Star(
-                self.x,
-                self.y + (self.height * self.scale)
-            )  # 박스 위에 생성
-            # 대신 game_world.add_object을 play_mode.py에서 처리하기 위해 objects_to_add에 추가
-            play_mode.objects_to_add.append(star)
-
-            # 충돌 쌍 등록 필요 없음 (스타는 사라지지 않으므로)
+        # 충돌 처리 로직이 이제 mario.py로 통합되었으므로, 여기는 pass로 설정
+        pass
