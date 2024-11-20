@@ -251,6 +251,7 @@ class Mario(GameObject):
         self.pressed_keys = set()  # 현재 눌려 있는 키
         self.frame = 0  # 애니메이션 프레임
         self.velocity_y = 0  # 수직 속도 추가
+        self.dead = False  # Mario의 사망 상태 추가
         self.dashboard = None  # Dashboard 참조 추가
         self.points =0 #추후 넣을 Dashboard 포인트
 
@@ -312,11 +313,13 @@ class Mario(GameObject):
         elif group == 'mario:koomba_bottom':
             #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
             #game_framework.quit()
-            game_framework.change_mode(game_over)
+            #game_framework.change_mode(game_over)
+            self.dead = True
         elif group == 'mario:turtle':
             #print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
             #game_framework.quit()  # 게임 종료
-            game_framework.change_mode(game_over)  # 게임 오버 화면으로 전환
+            #game_framework.change_mode(game_over)  # 게임 오버 화면으로 전환
+            self.dead = True
 
         elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
             #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")

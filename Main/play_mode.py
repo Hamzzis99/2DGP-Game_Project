@@ -1,7 +1,9 @@
 # play_mode.py
+import game_over
 
 # 1. 최상단에 objects_to_add 리스트 정의
 objects_to_add = []
+mario_dead = False
 
 from pico2d import *
 import game_framework
@@ -43,7 +45,9 @@ def handle_events():
 
 
 def init():
-    global mario, camera, dashboard, game_time, bgm_manager
+    global mario, camera, dashboard, game_time, bgm_manager, mario_dead
+
+    mario_dead = False  # 초기화 시 dead 플래그 초기화
 
     if 'mario' in globals():
         reset_mario(mario)
@@ -144,11 +148,19 @@ def finish():
 
 
 def update():
-    global game_time, objects_to_add
+    global game_time, objects_to_add, mario_dead
 
     game_world.update()            # 객체들의 위치 업데이트
     game_world.handle_collisions() # 충돌 처리
     camera.update(mario)           # 카메라 위치 업데이트
+
+
+    # Mario의 dead 상태 확인
+    if mario.dead and not mario_dead:
+        mario_dead = True
+        print("Mario is dead. Triggering game over.")
+        # 게임 오버로 전환
+        game_framework.change_mode(game_over)
 
     # 추가할 객체 처리
     for obj in objects_to_add:
@@ -177,6 +189,11 @@ def update():
 
     print(f"Game Time: {game_time}")  # 디버그 출력
 
+
+    # 만약 mario_dead이 True라면 game_over로 전환
+    if mario_dead:
+        print("mario_dead flag is True. Changing mode to game_over.")
+        game_framework.change_mode(game_over)
 
 def draw():
     clear_canvas()
