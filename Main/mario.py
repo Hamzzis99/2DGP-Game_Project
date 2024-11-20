@@ -309,7 +309,7 @@ class Mario(GameObject):
                 self.dashboard.increment_score(100)  # 점수 100점 추가
                 self.velocity_y = Jump.JUMP_VELOCITY  # Mario 점프 속도 설정
                 self.state_machine.set_state(Jump)  # Mario 상태를 Jump로 변경
-                print(f"Score increased by 100. Total Score: {self.dashboard.points}")  #
+                print(f"Score increased by 100. Total Score: {self.dashboard.points}")  # 디버깅 출력
 
         elif group == 'mario:koomba_bottom':
             #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")

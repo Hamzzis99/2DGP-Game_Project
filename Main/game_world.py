@@ -78,6 +78,8 @@ def collide(a, b):
     return True
 
 def collide_hitboxes(box_a, box_b):
+    if not box_a or not box_b:
+        return False  # 하나라도 빈 튜플일 경우 충돌하지 않음
     la, ba, ra, ta = box_a
     lb, bb, rb, tb = box_b
 
@@ -88,6 +90,7 @@ def collide_hitboxes(box_a, box_b):
 
     return True
 
+
 def handle_collisions():
     for group, pairs in collision_pairs.items():
         for a in pairs[0]:
@@ -95,11 +98,11 @@ def handle_collisions():
                 if group == 'mario:koomba_top':
                     if collide_hitboxes(a.get_bb(), b.get_top_bb()):
                         a.handle_collision(group, b, 'top')
-                        b.handle_collision(group, a, 'top')
+                        #b.handle_collision(group, a, 'top')
                 elif group == 'mario:koomba_bottom':
                     if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
                         a.handle_collision(group, b, 'bottom')
-                        b.handle_collision(group, a, 'bottom')
+                        #b.handle_collision(group, a, 'bottom')
                 elif group == 'mario:turtle':
                     # Mario와 Turtle 간의 충돌 처리
                     if collide_hitboxes(a.get_bb(), b.get_bb()):

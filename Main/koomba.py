@@ -38,7 +38,7 @@ class Koomba(GameObject):
         self.dir = random.choice([-1, 1])  # 이동 방향: -1(왼쪽), 1(오른쪽)
         self.alive = True  # 살아있는 상태
         self.stomped = False  # 굼바가 밟혔는지 여부
-        self.stomp_timer = 10  # 밟힌 후 0.3초 후 제거
+        self.stomp_timer = 0.3  # 밟힌 후 0.3초 후 제거 10초 테스트 디버깅
         self.frame_time = 0  # 애니메이션 시간
         self.stomp_sound = load_wav('sound/koomba.ogg')  # 사운드 파일 로드
         self.stomp_sound.set_volume(20)  # 필요에 따라 볼륨 설정
@@ -115,8 +115,9 @@ class Koomba(GameObject):
                 )
 
         # 디버깅용 충돌 박스 그리기 활성화
-        draw_rectangle(*self.get_top_bb_offset(camera))
-        draw_rectangle(*self.get_bottom_bb_offset(camera))
+        if not self.stomped:
+            draw_rectangle(*self.get_top_bb_offset(camera))
+            draw_rectangle(*self.get_bottom_bb_offset(camera))
 
     def get_bb(self):
         if self.stomped:
@@ -132,16 +133,20 @@ class Koomba(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def get_top_bb(self):
-        # Top 히트박스: 굼바의 머리 부분
-        return self.x - 15, self.y + 10, self.x + 15, self.y + 25  # (left, bottom, right, top)
+        if self.stomped:
+            return ()  # stomped 상태일 때는 Top 히트박스 비활성화
+        # 기존 Top 히트박스 반환
+        return self.x - 15, self.y + 10, self.x + 15, self.y + 25
 
     def get_top_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_top_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def get_bottom_bb(self):
-        # Bottom 히트박스: 굼바의 몸통 부분
-        return self.x - 15, self.y - 15, self.x + 15, self.y + 20  # (left, bottom, right, top)
+        if self.stomped:
+            return ()  # stomped 상태일 때는 Bottom 히트박스 비활성화
+        # 기존 Bottom 히트박스 반환
+        return self.x - 15, self.y - 15, self.x + 15, self.y + 20
 
     def get_bottom_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_bottom_bb()
