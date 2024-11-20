@@ -136,7 +136,7 @@ class Koomba(GameObject):
         if self.stomped:
             return ()  # stomped 상태일 때는 Top 히트박스 비활성화
         # 기존 Top 히트박스 반환
-        return self.x - 15, self.y + 10, self.x + 15, self.y + 25
+        return self.x - 14, self.y + 10, self.x + 14, self.y + 25
 
     def get_top_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_top_bb()

@@ -367,9 +367,9 @@ class Mario(GameObject):
                 self.x = obj_bb[2] + (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 right 위치에 맞춤
                 self.dir = 0  # 이동 방향 초기화
         elif group == 'mario:coin':
-            self.points += 100  # 또는 원하는 점수
+            self.dashboard.increment_score(1000)  # 점수 1000점 추가
             game_world.remove_object(other)  # 코인 제거
-            print("코인을 수집했습니다!")
+            print("코인을 수집했습니다!")  # 디버깅 출력
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가

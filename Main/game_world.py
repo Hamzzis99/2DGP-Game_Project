@@ -98,11 +98,11 @@ def handle_collisions():
                 if group == 'mario:koomba_top':
                     if collide_hitboxes(a.get_bb(), b.get_top_bb()):
                         a.handle_collision(group, b, 'top')
-                        #b.handle_collision(group, a, 'top')
+                        b.handle_collision(group, a, 'top')
                 elif group == 'mario:koomba_bottom':
                     if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
                         a.handle_collision(group, b, 'bottom')
-                        #b.handle_collision(group, a, 'bottom')
+                        b.handle_collision(group, a, 'bottom')
                 elif group == 'mario:turtle':
                     # Mario와 Turtle 간의 충돌 처리
                     if collide_hitboxes(a.get_bb(), b.get_bb()):
