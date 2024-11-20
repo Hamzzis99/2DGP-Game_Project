@@ -138,3 +138,5 @@ class Random_box(GameObject):
             # 코인 생성
             coin = Coin(self.x, self.y + (self.height * self.scale))  # 박스 위에 생성
             game_world.add_object(coin, 1)
+            other.dashboard.increment_score(1000)
+            print("마리오에게 1000점이 추가되었습니다!")  # 디버깅 출력
