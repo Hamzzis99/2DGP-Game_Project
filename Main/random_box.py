@@ -6,6 +6,7 @@ from utils.camera import Camera
 import game_world
 from coin import Coin
 import game_framework
+from score_text import ScoreText  # ScoreText 클래스 임포트 추가
 
 class Random_box(GameObject):
     image = None  # 클래스 변수로 이미지 로드 공유
@@ -15,7 +16,6 @@ class Random_box(GameObject):
             Random_box.image = load_image('img/tiles.png')  # Items 이미지 로드
         self.x = x
         self.y = y
-        #self.sprite_y = 80  # 스프라이트 시트 내 y 좌표 (고정)
         self.sprite_y = 0  # 스프라이트 시트 내 y 좌표 (고정)
         self.width = 16      # 원본 스프라이트 너비
         self.height = 16     # 원본 스프라이트 높이
@@ -23,7 +23,6 @@ class Random_box(GameObject):
         self.changed = False # 상태 변화 여부
 
         # 애니메이션 관련 변수
-        #self.sprite_x_positions = [0, 16, 32, 48]  # 애니메이션 프레임 x 좌표들
         self.sprite_x_positions = [384, 400, 416]  # 애니메이션 프레임 x 좌표들
         self.frame = 0
         self.total_frames = len(self.sprite_x_positions)
@@ -140,3 +139,8 @@ class Random_box(GameObject):
             game_world.add_object(coin, 1)
             other.dashboard.increment_score(1000)
             print("마리오에게 1000점이 추가되었습니다!")  # 디버깅 출력
+
+            # ScoreText 생성 및 게임 월드에 추가
+            score_text = ScoreText(other.x, other.y + 50, "+1000")  # 마리오 위에 위치
+            game_world.add_object(score_text, 2)  # 레이어 2에 추가
+            print("ScoreText 추가됨: +1000")  # 디버깅 출력

@@ -22,6 +22,8 @@ from config import MarioConfig  # MarioConfig 임포트
 from dashboard import Dashboard  # Dashboard 클래스 임포트
 from bgm import BGMManager  # bgm.py에서 BGMManager 임포트
 
+
+
 # 전역 변수 선언
 camera = None          # 전역 카메라 객체
 dashboard = None       # 전역 대시보드 객체

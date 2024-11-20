@@ -9,6 +9,7 @@ from state_machine import StateMachine, right_down, left_down, right_up, left_up
 from game_object import GameObject
 from utils.camera import Camera
 import game_over
+from score_text import ScoreText
 
 # 상수 정의
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
@@ -307,9 +308,16 @@ class Mario(GameObject):
             if not other.stomped:
                 other.stomped = True  # Koomba를 밟혔음으로 표시
                 self.dashboard.increment_score(100)  # 점수 100점 추가
+                print(f"Score increased by 100. Total Score: {self.dashboard.points}")  # 디버깅 출력
+
+                # ScoreText
+                score_text = ScoreText(self.x, self.y + 30, "+100")  # 마리오 위에 위치
+                game_world.add_object(score_text, 2)  # 적절한 레이어에 추가 (예: 레이어 2)
+                print("ScoreText 추가됨: +100")
+
                 self.velocity_y = Jump.JUMP_VELOCITY  # Mario 점프 속도 설정
                 self.state_machine.set_state(Jump)  # Mario 상태를 Jump로 변경
-                print(f"Score increased by 100. Total Score: {self.dashboard.points}")  # 디버깅 출력
+
 
         elif group == 'mario:koomba_bottom':
             #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
@@ -370,6 +378,11 @@ class Mario(GameObject):
             self.dashboard.increment_score(1000)  # 점수 1000점 추가
             game_world.remove_object(other)  # 코인 제거
             print("코인을 수집했습니다!")  # 디버깅 출력
+
+            # ScoreText 생성 및 게임 월드에 추가
+            score_text = ScoreText(self.x, self.y + 50, "+1000")  # 마리오 위에 위치
+            game_world.add_object(score_text, 2)  # 레이어 2에 추가
+            print("ScoreText 추가됨: +1000")  # 디버깅 출력
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가
