@@ -1,4 +1,4 @@
-# config.py
+# utils/config.py
 
 class MarioConfig:
     WORLD_WIDTH = 1600

@@ -1,4 +1,4 @@
-# koomba.py
+# enemy/koomba.py
 from pico2d import load_image, draw_rectangle, clamp, load_wav
 from game_object import GameObject
 from utils.camera import Camera

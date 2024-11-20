@@ -1,4 +1,4 @@
-# boss_turtle.py
+# enemy/boss_turtle.py
 
 from pico2d import load_image, clamp
 from game_object import GameObject
@@ -6,7 +6,7 @@ from utils.camera import Camera
 import random
 import game_framework
 import game_world
-from config import TurtleConfig  # TurtleConfig 임포트
+from utils.config import TurtleConfig  # TurtleConfig 임포트
 
 # Turtle Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm

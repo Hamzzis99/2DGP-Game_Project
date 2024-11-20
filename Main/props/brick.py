@@ -1,4 +1,4 @@
-# brick.py
+# props/brick.py
 
 from pico2d import load_image, draw_rectangle
 from game_object import GameObject

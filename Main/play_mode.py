@@ -4,18 +4,18 @@ from pico2d import *
 import game_framework
 import game_world
 from grass import Grass
-from koomba import Koomba
-from boss_turtle import Turtle
+from enemy.koomba import Koomba
+from enemy.boss_turtle import Turtle
 from mario import Mario, reset_mario
-from brick import Brick
-from random_box import Random_box
-from gun_box import Gun_box
+from props.brick import Brick
+from props.random_box import Random_box
+from props.gun_box import Gun_box
 from star import Star
-from coin import Coin
+from items.coin import Coin
 from utils.camera import Camera
-from config import MarioConfig
-from dashboard import Dashboard
-from bgm import BGMManager
+from utils.config import MarioConfig
+from utils.dashboard import Dashboard
+from utils.bgm import BGMManager
 import game_over
 
 # 전역 변수 선언

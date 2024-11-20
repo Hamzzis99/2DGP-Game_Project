@@ -1,4 +1,4 @@
-# bgm.py
+# utils/bgm.py
 
 from pico2d import load_music, Music
 import os

@@ -1,19 +1,21 @@
-# random_box.py
+# props/gun_box.py
 
 from pico2d import load_image, draw_rectangle
 from game_object import GameObject
 from utils.camera import Camera
+from star import Star  # Star 클래스 임포트
 import game_world
-from coin import Coin
 import game_framework
-from score_text import ScoreText  # ScoreText 클래스 임포트 추가
 
-class Random_box(GameObject):
+# play_mode의 objects_to_add 리스트를 import
+import play_mode
+
+class Gun_box(GameObject):
     image = None  # 클래스 변수로 이미지 로드 공유
 
     def __init__(self, x, y):
-        if Random_box.image is None:
-            Random_box.image = load_image('img/tiles.png')  # Items 이미지 로드
+        if Gun_box.image is None:
+            Gun_box.image = load_image('img/tiles.png')  # Items 이미지 로드
         self.x = x
         self.y = y
         self.sprite_y = 0  # 스프라이트 시트 내 y 좌표 (고정)
@@ -44,12 +46,12 @@ class Random_box(GameObject):
 
     def draw(self):
         # 스프라이트 시트에서 (sprite_x, sprite_y) 위치의 (width, height) 크기 영역을 잘라서 그립니다.
-        adjusted_sprite_y = Random_box.image.h - self.sprite_y - self.height
+        adjusted_sprite_y = Gun_box.image.h - self.sprite_y - self.height
         if not self.changed:
             sprite_x = self.sprite_x_positions[self.frame]
         else:
-            sprite_x = 0  # 상태 변경 후에는 첫 번째 프레임 고정
-        Random_box.image.clip_draw(
+            sprite_x = 0  # 상태 변경 후에는 동일한 스프라이트 사용
+        Gun_box.image.clip_draw(
             sprite_x, adjusted_sprite_y, self.width, self.height,
             self.x, self.y, self.width * self.scale, self.height * self.scale
         )
@@ -61,13 +63,13 @@ class Random_box(GameObject):
         draw_rectangle(*self.get_right_bb())
 
     def draw_with_camera(self, camera: Camera):
-        adjusted_sprite_y = Random_box.image.h - self.sprite_y - self.height
+        adjusted_sprite_y = Gun_box.image.h - self.sprite_y - self.height
         if not self.changed:
             sprite_x = self.sprite_x_positions[self.frame]
         else:
-            sprite_x = 432  # 상태 변경 후에는 첫 번째 프레임 고정
+            sprite_x = 432  # 상태 변경 후에는 동일한 스프라이트 사용
         screen_x, screen_y = camera.apply(self.x, self.y)
-        Random_box.image.clip_draw(
+        Gun_box.image.clip_draw(
             sprite_x, adjusted_sprite_y, self.width, self.height,
             screen_x, screen_y, self.width * self.scale, self.height * self.scale
         )
@@ -80,67 +82,104 @@ class Random_box(GameObject):
 
     # 히트박스 메서드들
     def get_bb(self):
-        # 전체 Random_box의 충돌 박스
+        # 전체 Gun_box의 충돌 박스
         half_width = (self.width * self.scale) / 2
         half_height = (self.height * self.scale) / 2
-        return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
+        return (
+            self.x - half_width,
+            self.y - half_height,
+            self.x + half_width,
+            self.y + half_height
+        )
 
     def get_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_bb()
-        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
+        return (
+            left - camera.camera_x,
+            bottom - camera.camera_y,
+            right - camera.camera_x,
+            top - camera.camera_y
+        )
 
     def get_top_bb(self):
-        # Random_box 상단의 충돌 박스 (좌우로 1픽셀씩 줄이고 y 범위도 축소)
+        # Gun_box 상단의 충돌 박스 (좌우로 1픽셀씩 줄이고 y 범위도 축소)
         half_width = (self.width * self.scale) / 2 - 1
-        return self.x - half_width, self.y + (self.height * self.scale) / 2 - 2, \
-               self.x + half_width, self.y + (self.height * self.scale) / 2 + 2
+        return (
+            self.x - half_width,
+            self.y + (self.height * self.scale) / 2 - 2,
+            self.x + half_width,
+            self.y + (self.height * self.scale) / 2 + 2
+        )
 
     def get_top_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_top_bb()
-        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
+        return (
+            left - camera.camera_x,
+            bottom - camera.camera_y,
+            right - camera.camera_x,
+            top - camera.camera_y
+        )
 
     def get_bottom_bb(self):
-        # Random_box 하단의 충돌 박스 (좌우로 1픽셀씩 줄이고 y 범위도 축소)
+        # Gun_box 하단의 충돌 박스 (좌우로 1픽셀씩 줄이고 y 범위도 축소)
         half_width = (self.width * self.scale) / 2 - 1
-        return self.x - half_width, self.y - (self.height * self.scale) / 2 - 2, \
-               self.x + half_width, self.y - (self.height * self.scale) / 2 + 2
+        return (
+            self.x - half_width,
+            self.y - (self.height * self.scale) / 2 - 2,
+            self.x + half_width,
+            self.y - (self.height * self.scale) / 2 + 2
+        )
 
     def get_bottom_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_bottom_bb()
-        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
+        return (
+            left - camera.camera_x,
+            bottom - camera.camera_y,
+            right - camera.camera_x,
+            top - camera.camera_y
+        )
 
     def get_left_bb(self):
-        # Random_box 왼쪽의 충돌 박스 (위아래로 1픽셀씩 줄임)
+        # Gun_box 왼쪽의 충돌 박스 (위아래로 1픽셀씩 줄임)
         half_width = (self.width * self.scale) / 2
         half_height = (self.height * self.scale) / 2 - 1  # 상하로 1픽셀씩 줄임
-        return self.x - half_width - 1, self.y - half_height, self.x - half_width, self.y + half_height
+        return (
+            self.x - half_width - 1,
+            self.y - half_height,
+            self.x - half_width,
+            self.y + half_height
+        )
 
     def get_left_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_left_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def get_right_bb(self):
-        # Random_box 오른쪽의 충돌 박스 (위아래로 1픽셀씩 줄임)
+        # Gun_box 오른쪽의 충돌 박스 (위아래로 1픽셀씩 줄임)
         half_width = (self.width * self.scale) / 2
         half_height = (self.height * self.scale) / 2 - 1  # 상하로 1픽셀씩 줄임
-        return self.x + half_width, self.y - half_height, self.x + half_width + 1, self.y + half_height
+        return (
+            self.x + half_width,
+            self.y - half_height,
+            self.x + half_width + 1,
+            self.y + half_height
+        )
 
     def get_right_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_right_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
-        if group == 'mario:random_box_bottom' and not self.changed:
-            print("Random Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 코인을 생성합니다.")
+        if group == 'mario:gun_box_bottom' and not self.changed:
+            print("Gun Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 스타를 생성합니다.")
             self.changed = True
 
-            # 코인 생성
-            coin = Coin(self.x, self.y + (self.height * self.scale))  # 박스 위에 생성
-            game_world.add_object(coin, 1)
-            other.dashboard.increment_score(1000)
-            print("마리오에게 1000점이 추가되었습니다!")  # 디버깅 출력
+            # 스타 생성
+            star = Star(
+                self.x,
+                self.y + (self.height * self.scale)
+            )  # 박스 위에 생성
+            # 대신 game_world.add_object을 play_mode.py에서 처리하기 위해 objects_to_add에 추가
+            play_mode.objects_to_add.append(star)
 
-            # ScoreText 생성 및 게임 월드에 추가
-            score_text = ScoreText(other.x, other.y + 50, "+1000")  # 마리오 위에 위치
-            game_world.add_object(score_text, 2)  # 레이어 2에 추가
-            print("ScoreText 추가됨: +1000")  # 디버깅 출력
+            # 충돌 쌍 등록 필요 없음 (스타는 사라지지 않으므로)

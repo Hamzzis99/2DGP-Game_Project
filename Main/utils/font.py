@@ -1,4 +1,4 @@
-# font.py
+# utils/font.py
 
 import pico2d
 

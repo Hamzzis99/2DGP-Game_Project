@@ -1,4 +1,4 @@
-# dashboard.py
+# utils/dashboard.py
 
 import pico2d
 from utils.font import Font  # font.py에 포함된 Font 클래스 임포트

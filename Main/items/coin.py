@@ -1,4 +1,4 @@
-# coin.py
+# items/coin.py
 
 from pico2d import load_image, draw_rectangle, load_wav
 import game_framework

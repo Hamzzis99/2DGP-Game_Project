@@ -1,4 +1,4 @@
-# score_text.py
+# utils/score_text.py
 
 from pico2d import *
 

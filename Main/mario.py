@@ -4,13 +4,13 @@ from pico2d import load_image, draw_rectangle, load_wav
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
 import game_framework
 import game_world
-from config import MarioConfig
-from dashboard import Dashboard
+from utils.config import MarioConfig
+from utils.dashboard import Dashboard
 from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down, Dead
 from game_object import GameObject
 from utils.camera import Camera
 import game_over
-from score_text import ScoreText
+from utils.score_text import ScoreText
 
 # 상수 정의
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
