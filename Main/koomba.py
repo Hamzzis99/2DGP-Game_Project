@@ -38,17 +38,19 @@ class Koomba(GameObject):
         self.dir = random.choice([-1, 1])  # 이동 방향: -1(왼쪽), 1(오른쪽)
         self.alive = True  # 살아있는 상태
         self.stomped = False  # 굼바가 밟혔는지 여부
-        self.stomp_timer = 0  # 밟힌 후 경과 시간
+        self.stomp_timer = 10  # 밟힌 후 0.3초 후 제거
         self.frame_time = 0  # 애니메이션 시간
         self.stomp_sound = load_wav('sound/koomba.ogg')  # 사운드 파일 로드
         self.stomp_sound.set_volume(20)  # 필요에 따라 볼륨 설정
+        self.stomp_sound_played = False  # Stomp sound played flag
 
     def update(self):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
         if self.stomped:
+            if not self.stomp_sound_played:
+                self.stomp_sound.play()  # Stomp sound 한 번만 재생
+                self.stomp_sound_played = True
             self.stomp_timer -= frame_time
-            #print(f"Koomba stomped. Timer: {self.stomp_timer}")
-            self.stomp_sound.play()
             if self.stomp_timer <= 0:
                 self.alive = False
                 game_world.remove_object(self)
@@ -117,6 +119,8 @@ class Koomba(GameObject):
         draw_rectangle(*self.get_bottom_bb_offset(camera))
 
     def get_bb(self):
+        if self.stomped:
+            return ()  # stomped 상태일 때는 충돌 박스 비활성화
         width = 16 * 2  # 이미지의 폭 * 스케일 (16 * 2 = 32)
         height = 20 * 1.6  # 이미지의 높이 * 스케일 (20 * 1.6 = 32)
         half_width = width / 2
@@ -144,5 +148,4 @@ class Koomba(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
-        # 현재 Koomba는 충돌 처리 로직을 구현하지 않으므로 pass
-        pass
+        pass  # 현재 Koomba는 충돌 처리 로직을 구현하지 않으므로 pass

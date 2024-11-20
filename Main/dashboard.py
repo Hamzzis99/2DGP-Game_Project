@@ -20,7 +20,7 @@ class Dashboard:
     def draw(self, camera):
         scaling_factor = 2  # 글자 크기를 키우고 싶다면 이 값을 변경 (예: 3배로 확대)
         self.font.draw("MARIO", 60, 550, None, scaling_factor)  # HUD는 카메라 없이 그리기
-        self.font.draw(self.pointString(), 50, 530, None, scaling_factor)
+        self.font.draw(self.pointString(), 50, 530, None, scaling_factor)  # 점수 표시 위치 조정
         self.font.draw("LIFE", 220, 550, None, scaling_factor)
         self.font.draw("x{}".format(self.mariolife()), 225, 530, None, scaling_factor)
         self.font.draw("WORLD", 380, 550, None, scaling_factor)
@@ -39,3 +39,11 @@ class Dashboard:
 
     def timeString(self):
         return "{:03d}".format(self.time)
+
+    def increment_score(self, amount):
+        self.points += amount
+        print(f"Score increased by {amount}. Total Score: {self.points}")  # 디버깅 출력
+
+    def decrement_life(self, amount=1):
+        self.lives = max(self.lives - amount, 0)
+        print(f"Lives decreased by {amount}. Total Lives: {self.lives}")  # 디버깅 출력

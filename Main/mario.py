@@ -226,7 +226,9 @@ class Jump:
 
 # 마리오 클래스 정의
 class Mario(GameObject):
-    def __init__(self):
+    def __init__(self, dashboard):
+        self.dashboard = dashboard  # Dashboard 인스턴스 참조 설정
+
         self.x, self.y = MarioConfig.START_X, MarioConfig.START_Y  # 초기 위치
         self.face_dir = 1  # 방향: 1(오른쪽), -1(왼쪽)
         self.dir = 0  # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
@@ -252,8 +254,7 @@ class Mario(GameObject):
         self.frame = 0  # 애니메이션 프레임
         self.velocity_y = 0  # 수직 속도 추가
         self.dead = False  # Mario의 사망 상태 추가
-        self.dashboard = None  # Dashboard 참조 추가
-        self.points =0 #추후 넣을 Dashboard 포인트
+
 
 
     def update(self):
@@ -303,12 +304,12 @@ class Mario(GameObject):
 
     def handle_collision(self, group, other, hit_position):
         if group == 'mario:koomba_top':
-            #print("마리오가 굼바를 밟았습니다. 굼바를 납작하게 하고 점프합니다.")
-            other.stomped = True  # 굼바를 납작하게 설정
-            other.stomp_timer = 0.3  # 1초 후 제거
-            #game_world.remove_object(other)  # 굼바 제거
-            self.velocity_y = Jump.JUMP_VELOCITY  # 점프 속도 설정
-            self.state_machine.set_state(Jump)  # 점프 상태로 변경
+            if not other.stomped:
+                other.stomped = True  # Koomba를 밟혔음으로 표시
+                self.dashboard.increment_score(100)  # 점수 100점 추가
+                self.velocity_y = Jump.JUMP_VELOCITY  # Mario 점프 속도 설정
+                self.state_machine.set_state(Jump)  # Mario 상태를 Jump로 변경
+                print(f"Score increased by 100. Total Score: {self.dashboard.points}")  #
 
         elif group == 'mario:koomba_bottom':
             #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")

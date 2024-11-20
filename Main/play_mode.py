@@ -56,7 +56,9 @@ def init():
     grass = Grass()
     game_world.add_object(grass, 0)
 
-    mario = Mario()
+    dashboard = Dashboard()  # Dashboard 인스턴스 생성
+
+    mario = Mario(dashboard)  # Dashboard 인스턴스를 Mario에게 전달
     game_world.add_object(mario, 1)
 
     koombas = [Koomba() for _ in range(5)]
@@ -134,7 +136,7 @@ def init():
     print("Background music started.")  # 디버깅 출력
 
     camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)
-    dashboard = Dashboard()
+    #dashboard = Dashboard()
     game_time = MarioConfig.GAME_TIME_LIMIT
 
 
