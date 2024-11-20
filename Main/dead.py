@@ -77,22 +77,19 @@ class StateMachine:
 
 class Dead:
     def __init__(self):
-        self.wait_duration = 0.5  # 초기 대기 시간 (초)
         self.animation_duration = 0.5  # 올라가는 시간 (초)
         self.fall_speed = 350  # 내려가는 속도 (픽셀/초)
         self.elapsed_time = 0.0
-        self.state = 'waiting'  # 현재 애니메이션 상태: 'waiting', 'rising', 'falling'
+        self.rising = True
         self.sound_played = False  # 사운드 재생 여부 플래그 추가
 
     def enter(self, mario, e):
         mario.dir = 0
         mario.velocity_y = 0
-        mario.frame = 0  # 프레임 강제 초기화 (스프라이트 변경을 위한 설정)
+        mario.frame = 0  # 프레임 강제 초기화
         self.elapsed_time = 0.0
-        self.state = 'waiting'
+        self.rising = True
         self.sound_played = False  # 초기화
-        mario.dead_sound.play()  # 상태 진입 시 사운드 재생
-        self.sound_played = True  # 사운드가 재생되었음을 표시
         print("Dead 상태: 진입 - 사망 애니메이션 시작")  # 디버깅용
 
     def exit(self, mario, e):
@@ -100,23 +97,21 @@ class Dead:
 
     def do(self, mario):
         frame_time = game_framework.frame_time
-        self.elapsed_time += frame_time
 
-        if self.state == 'waiting':
-            # 초기 대기 상태
-            if self.elapsed_time >= self.wait_duration:
-                self.state = 'rising'
-                self.elapsed_time = 0.0
-                print("Dead 상태: 상승 애니메이션 시작")  # 디버깅용
-        elif self.state == 'rising':
+        # 사운드 재생 (한 번만 재생)
+        if not self.sound_played:
+            mario.dead_sound.play()
+            self.sound_played = True
+
+        if self.rising:
             # y를 올라가게 함
             rise_amount = 50 * (frame_time / self.animation_duration)
             mario.y += rise_amount
+            self.elapsed_time += frame_time
             if self.elapsed_time >= self.animation_duration:
-                self.state = 'falling'
+                self.rising = False
                 self.elapsed_time = 0.0
-                print("Dead 상태: 하강 애니메이션 시작")  # 디버깅용
-        elif self.state == 'falling':
+        else:
             # y를 떨어지게 함
             mario.y -= self.fall_speed * frame_time
             # y 좌표를 0으로 고정하지 않고 계속 떨어지도록 합니다.

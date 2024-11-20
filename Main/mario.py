@@ -5,7 +5,8 @@ from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
 import game_framework
 import game_world
 from config import MarioConfig
-from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down
+from dashboard import Dashboard
+from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down, Dead
 from game_object import GameObject
 from utils.camera import Camera
 import game_over
@@ -238,6 +239,8 @@ class Mario(GameObject):
         self.jump_sound.set_volume(32)  # 필요에 따라 볼륨 조절
         self.brick_sound = load_wav('sound/brick.ogg')
         self.brick_sound.set_volume(32)  # 필요에 따라 볼륨 조절
+        self.dead_sound = load_wav('sound/death.wav')  # 사망 사운드 로드
+        self.dead_sound.set_volume(32)  # 필요에 따라 볼륨 조절
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
@@ -250,42 +253,53 @@ class Mario(GameObject):
                 left_up: Jump,
                 # s_down 이벤트는 점프 상태에서 추가 점프를 방지하기 위해 생략
             }
+            # Dead 상태는 transitions에 포함하지 않아, set_state로 직접 설정
         })
         self.pressed_keys = set()  # 현재 눌려 있는 키
         self.frame = 0  # 애니메이션 프레임
         self.velocity_y = 0  # 수직 속도 추가
         self.dead = False  # Mario의 사망 상태 추가
 
-
-
     def update(self):
         frame_time = game_framework.frame_time
-        self.state_machine.update()
+        self.state_machine.update()  # 상태 머신 업데이트는 항상 호출
 
-        # 중력 적용
-        self.velocity_y += GRAVITY * game_framework.frame_time
-        self.y += self.velocity_y * game_framework.frame_time
+        if not self.dead:
+            # 중력 적용
+            self.velocity_y += GRAVITY * frame_time
+            self.y += self.velocity_y * frame_time
 
-        # 바닥 이하로 내려가지 않도록 위치 제한
-        if self.y < 0:
-            self.y = 0
-            self.velocity_y = 0
+            # 바닥 이하로 내려가지 않도록 위치 제한
+            if self.y < 0:
+                self.dead = True
+                self.state_machine.set_state(Dead())  # Dead 상태로 전환
+                print("마리오의 y축값이 0이하여서 사망하였습니다.")
+        else:
+            # Dead 상태에서는 중력이나 다른 물리적 영향을 받지 않음
+            pass
 
     def handle_event(self, event):
+        if self.dead:
+            # Mario가 사망한 상태에서는 입력을 무시
+            return
         if event.type == SDL_KEYDOWN:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.add(event.key)
-                #print(f"Key Down: {event.key}")  # 디버깅용
+                # print(f"Key Down: {event.key}")  # 디버깅용
         elif event.type == SDL_KEYUP:
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.discard(event.key)
-                #print(f"Key Up: {event.key}")  # 디버깅용
+                # print(f"Key Up: {event.key}")  # 디버깅용
         self.state_machine.add_event(('INPUT', event))
 
     def draw(self):
-        self.state_machine.draw()
-        # 충돌 박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb())
+        if self.dead:
+            # Dead 상태일 경우 Dead 상태의 draw 메서드만 호출
+            self.state_machine.draw()
+        else:
+            # 살아있는 경우 상태의 draw 메서드와 충돌 박스 그리기 호출
+            self.state_machine.draw()
+            draw_rectangle(*self.get_bb())
 
     def draw_with_camera(self, camera: Camera):
         self.state_machine.draw_with_camera(camera)
@@ -304,13 +318,17 @@ class Mario(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
+        if self.dead:
+            # Mario가 사망 상태일 경우 충돌을 무시
+            return
+
         if group == 'mario:koomba_top':
             if not other.stomped:
                 other.stomped = True  # Koomba를 밟혔음으로 표시
                 self.dashboard.increment_score(100)  # 점수 100점 추가
                 print(f"Score increased by 100. Total Score: {self.dashboard.points}")  # 디버깅 출력
 
-                # ScoreText
+                # ScoreText 생성 및 게임 월드에 추가
                 score_text = ScoreText(self.x, self.y + 30, "+100")  # 마리오 위에 위치
                 game_world.add_object(score_text, 2)  # 적절한 레이어에 추가 (예: 레이어 2)
                 print("ScoreText 추가됨: +100")
@@ -318,17 +336,15 @@ class Mario(GameObject):
                 self.velocity_y = Jump.JUMP_VELOCITY  # Mario 점프 속도 설정
                 self.state_machine.set_state(Jump)  # Mario 상태를 Jump로 변경
 
-
         elif group == 'mario:koomba_bottom':
-            #print("마리오가 굼바와 충돌했습니다. 게임을 종료합니다.")
-            #game_framework.quit()
-            #game_framework.change_mode(game_over)
             self.dead = True
+            self.state_machine.set_state(Dead())  # Dead 상태로 전환 (인스턴스 전달)
+            print("Mario has been stomped by Koomba. Transitioning to Dead state.")
+
         elif group == 'mario:turtle':
-            #print("마리오가 보스와 충돌했습니다. 게임을 종료합니다.")
-            #game_framework.quit()  # 게임 종료
-            #game_framework.change_mode(game_over)  # 게임 오버 화면으로 전환
             self.dead = True
+            self.state_machine.set_state(Dead())  # Dead 상태로 전환 (인스턴스 전달)
+            print("Mario has collided with Turtle. Transitioning to Dead state.")
 
         elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
             #print(f"마리오가 {group} 상단과 충돌했습니다. 착지합니다.")
@@ -374,6 +390,7 @@ class Mario(GameObject):
                 obj_bb = other.get_bb()
                 self.x = obj_bb[2] + (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 right 위치에 맞춤
                 self.dir = 0  # 이동 방향 초기화
+
         elif group == 'mario:coin':
             self.dashboard.increment_score(1000)  # 점수 1000점 추가
             game_world.remove_object(other)  # 코인 제거
@@ -396,14 +413,16 @@ def reset_mario(mario):
     mario.state_machine.set_state(Idle)  # 기본 상태로 변경
     mario.pressed_keys.clear()  # 눌려 있는 키 초기화
     mario.frame = 0
+
 def reset_game():
     global mario
     game_world.remove_object(mario)  # 기존 마리오 객체 제거
-    mario = Mario()  # 새로운 마리오 객체 생성
+    mario = Mario(dashboard)  # 새로운 마리오 객체 생성 (dashboard 인스턴스 필요)
     game_world.add_object(mario, 1)
-def init():
-    global mario, running
-    # 마리오 객체 초기화 코드 추가
-    reset_mario(mario)  # 또는 reset_game() 호출
-    running = True
 
+def init():
+    global mario, running, dashboard
+    dashboard = Dashboard()
+    mario = Mario(dashboard)
+    game_world.add_object(mario, 1)
+    running = True

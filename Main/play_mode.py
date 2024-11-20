@@ -1,4 +1,5 @@
 # play_mode.py
+
 from pico2d import *
 import game_framework
 import game_world
@@ -133,7 +134,6 @@ def init():
     print("Background music started.")  # 디버깅 출력
 
     camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)
-    #dashboard = Dashboard()
     game_time = MarioConfig.GAME_TIME_LIMIT
 
 def finish():
@@ -157,12 +157,13 @@ def update():
         print("Mario is dead. Stopping music and starting death timer.")
         if bgm_manager:
             bgm_manager.stop()  # 배경음악 명시적으로 중지
-        # 추가로, Mario의 상태를 'dead'로 변경하거나 애니메이션을 재생할 수 있습니다.
+        # Dead 상태로의 전환은 Mario 클래스에서 이미 처리됨
+
 
     # Mario가 사망한 상태이고, 타이머가 시작되었으며, 2초가 경과했을 때 게임 오버로 전환
     if mario_dead and death_timer is not None:
         elapsed_time = get_time() - death_timer
-        if elapsed_time >= 2.0:  # 2초 지연
+        if elapsed_time >= 3.0:  # 2초 지연
             print("2초 경과. 게임 오버로 전환합니다.")
             game_framework.change_mode(game_over)
 
