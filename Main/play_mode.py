@@ -1,35 +1,30 @@
 # play_mode.py
-import game_over
-
-# 1. 최상단에 objects_to_add 리스트 정의
-objects_to_add = []
-mario_dead = False
-
 from pico2d import *
 import game_framework
 import game_world
 from grass import Grass
 from koomba import Koomba
-from boss_turtle import Turtle  # Turtle 클래스 임포트
+from boss_turtle import Turtle
 from mario import Mario, reset_mario
 from brick import Brick
 from random_box import Random_box
-from gun_box import Gun_box  # Gun_box 임포트
-from star import Star        # Star 클래스 임포트
-from coin import Coin        # Coin 클래스 임포트
+from gun_box import Gun_box
+from star import Star
+from coin import Coin
 from utils.camera import Camera
-from config import MarioConfig  # MarioConfig 임포트
-from dashboard import Dashboard  # Dashboard 클래스 임포트
-from bgm import BGMManager  # bgm.py에서 BGMManager 임포트
-
-
+from config import MarioConfig
+from dashboard import Dashboard
+from bgm import BGMManager
+import game_over
 
 # 전역 변수 선언
 camera = None          # 전역 카메라 객체
 dashboard = None       # 전역 대시보드 객체
 game_time = None       # 게임 시간 (초)
 bgm_manager = None     # 배경음악 관리자 객체
-
+objects_to_add = []    # 추가할 객체 리스트
+mario_dead = False     # Mario의 사망 상태 플래그
+death_timer = None     # Mario 사망 시각 기록
 
 def handle_events():
     global mario
@@ -45,11 +40,11 @@ def handle_events():
             #print(f"Key Event: {event.type}, Key: {event.key}")  # 디버깅 출력
             mario.handle_event(event)  # 키 이벤트만 마리오에게 전달
 
-
 def init():
-    global mario, camera, dashboard, game_time, bgm_manager, mario_dead
+    global mario, camera, dashboard, game_time, bgm_manager, mario_dead, death_timer
 
-    mario_dead = False  # 초기화 시 dead 플래그 초기화
+    mario_dead = False          # 초기화 시 dead 플래그 초기화
+    death_timer = None          # 초기화 시 타이머 초기화
 
     if 'mario' in globals():
         reset_mario(mario)
@@ -141,7 +136,6 @@ def init():
     #dashboard = Dashboard()
     game_time = MarioConfig.GAME_TIME_LIMIT
 
-
 def finish():
     global bgm_manager
     if bgm_manager:
@@ -149,21 +143,28 @@ def finish():
     game_world.reset()  # game_world 완전 초기화
     print("play_mode의 finish()가 호출되었습니다.")  # 디버깅 출력
 
-
 def update():
-    global game_time, objects_to_add, mario_dead
+    global game_time, objects_to_add, mario_dead, death_timer
 
     game_world.update()            # 객체들의 위치 업데이트
     game_world.handle_collisions() # 충돌 처리
     camera.update(mario)           # 카메라 위치 업데이트
 
-    # Mario의 dead 상태 확인
+    # Mario의 dead 상태 확인 및 타이머 설정
     if mario.dead and not mario_dead:
         mario_dead = True
-        print("Mario is dead. Stopping music and triggering game over.")
+        death_timer = get_time()  # 사망 시각 기록
+        print("Mario is dead. Stopping music and starting death timer.")
         if bgm_manager:
             bgm_manager.stop()  # 배경음악 명시적으로 중지
-        game_framework.change_mode(game_over)  # 게임 오버로 전환
+        # 추가로, Mario의 상태를 'dead'로 변경하거나 애니메이션을 재생할 수 있습니다.
+
+    # Mario가 사망한 상태이고, 타이머가 시작되었으며, 2초가 경과했을 때 게임 오버로 전환
+    if mario_dead and death_timer is not None:
+        elapsed_time = get_time() - death_timer
+        if elapsed_time >= 2.0:  # 2초 지연
+            print("2초 경과. 게임 오버로 전환합니다.")
+            game_framework.change_mode(game_over)
 
     # 추가할 객체 처리
     for obj in objects_to_add:
@@ -199,17 +200,14 @@ def update():
     #     print("mario_dead flag is True. Changing mode to game_over.")
     #     game_framework.change_mode(game_over)
 
-
 def draw():
     clear_canvas()
     game_world.render_with_camera(camera)  # 카메라를 고려하여 렌더링
     dashboard.draw(camera)                 # 대시보드 그리기
     update_canvas()
 
-
 def pause():
     pass
-
 
 def resume():
     pass
