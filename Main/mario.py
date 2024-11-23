@@ -5,11 +5,12 @@ from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
 import game_framework
 import game_world
 import play_mode
+from ball import Ball
 from items.coin import Coin
 from items.star import Star
 from utils.config import MarioConfig
 from utils.dashboard import Dashboard
-from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down, Dead
+from state_machine import StateMachine, right_down, left_down, right_up, left_up, s_down, Dead, a_down
 from game_object import GameObject
 from utils.camera import Camera
 from utils.score_text import ScoreText
@@ -38,11 +39,9 @@ class Idle:
                 mario.face_dir = -1
             elif right_down(e):
                 mario.face_dir = 1
-        #print("Idle 상태: 진입")  # 디버깅용
 
     @staticmethod
     def exit(mario, e):
-        #print("Idle 상태: 종료")  # 디버깅용
         pass
 
     @staticmethod
@@ -102,16 +101,21 @@ class Idle:
                 frame_width * 3, frame_height * 3
             )
 
+    @staticmethod
+    def handle_event(mario, e):
+        if a_down(e) and mario.gun_mode:
+            print("Idle 상태에서 a_down 이벤트 감지")
+            mario.fire_ball()
+
 class Run:
     @staticmethod
     def enter(mario, e):
-        # 헬퍼 함수를 사용하여 이벤트에 따라 방향 설정
-        if right_down(e) or left_up(e):  # 오른쪽으로 RUN
+        if right_down(e) or left_up(e):
             mario.dir, mario.face_dir, mario.action = 1, 1, 1
-        elif left_down(e) or right_up(e):  # 왼쪽으로 RUN
+        elif left_down(e) or right_up(e):
             mario.dir, mario.face_dir, mario.action = -1, -1, 0
         else:
-            mario.dir = 0  # 이동하지 않음
+            mario.dir = 0
 
         if mario.gun_mode:
             mario.run_frame_x_positions = [100, 125, 146]
@@ -124,21 +128,16 @@ class Run:
             mario.frame_width = 16
             mario.frame_height = 16
         mario.frame = 0
-        #print("Run 상태: 진입")  # 디버깅용
 
     @staticmethod
     def exit(mario, e):
-        #print("Run 상태: 종료")  # 디버깅용
         pass
 
     @staticmethod
     def do(mario):
-        # 애니메이션 프레임 업데이트
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(
             mario.run_frame_x_positions)
-        # 마리오 이동
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
-        # 월드 경계 내로 위치 클램프
         mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))
 
     @staticmethod
@@ -180,6 +179,12 @@ class Run:
                 frame_width * 3, frame_height * 3
             )
 
+    @staticmethod
+    def handle_event(mario, e):
+        if a_down(e) and mario.gun_mode:
+            print("Run 상태에서 a_down 이벤트 감지")
+            mario.fire_ball()
+
 class Jump:
     JUMP_VELOCITY = 350  # 점프 초기 속도
 
@@ -188,9 +193,7 @@ class Jump:
         if e is not None and isinstance(e, tuple):
             if s_down(e):
                 mario.velocity_y = Jump.JUMP_VELOCITY
-                mario.jump_sound.play()  # 점프 사운드 재생
-                #print("Jump 상태: 점프 시작")  # 디버깅용
-            # 방향 키 처리
+                mario.jump_sound.play()
             if left_down(e):
                 mario.dir = -1
                 mario.face_dir = -1
@@ -209,16 +212,13 @@ class Jump:
             mario.frame_width = 16
             mario.frame_height = 16
         mario.frame = 0
-        #print("Jump 상태: enter 메소드 호출")  # 디버깅용
 
     @staticmethod
     def exit(mario, e):
-        #print("Jump 상태: 점프 종료")  # 디버깅용
         pass
 
     @staticmethod
     def do(mario):
-        # 수평 이동 처리
         if SDLK_LEFT in mario.pressed_keys and SDLK_RIGHT not in mario.pressed_keys:
             mario.dir = -1
             mario.face_dir = -1
@@ -229,7 +229,7 @@ class Jump:
             mario.dir = 0
 
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
-        mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))  # 월드 경계 내로 클램프
+        mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))
 
         mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(
             mario.jump_frame_x_positions)
@@ -273,6 +273,12 @@ class Jump:
                 frame_width * 3, frame_height * 3
             )
 
+    @staticmethod
+    def handle_event(mario, e):
+        if a_down(e) and mario.gun_mode:
+            print("Jump 상태에서 a_down 이벤트 감지")
+            mario.fire_ball()
+
 # 마리오 클래스 정의
 class Mario(GameObject):
     def __init__(self, dashboard):
@@ -284,11 +290,11 @@ class Mario(GameObject):
         self.image = load_image('img/character.png')
         self.gun_image = load_image('img/gun_mario.png')  # gun_mode용 이미지
         self.jump_sound = load_wav('sound/jump.ogg')
-        self.jump_sound.set_volume(32)  # 필요에 따라 볼륨 조절
+        self.jump_sound.set_volume(32)
         self.brick_sound = load_wav('sound/brick.ogg')
-        self.brick_sound.set_volume(32)  # 필요에 따라 볼륨 조절
-        self.dead_sound = load_wav('sound/death.wav')  # 사망 사운드 로드
-        self.dead_sound.set_volume(32)  # 필요에 따라 볼륨 조절
+        self.brick_sound.set_volume(32)
+        self.dead_sound = load_wav('sound/death.wav')
+        self.dead_sound.set_volume(32)
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
         self.state_machine.set_transitions({
@@ -299,9 +305,7 @@ class Mario(GameObject):
                 left_down: Jump,
                 right_up: Jump,
                 left_up: Jump,
-                # s_down 이벤트는 점프 상태에서 추가 점프를 방지하기 위해 생략
             }
-            # Dead 상태는 transitions에 포함하지 않아, set_state로 직접 설정
         })
         self.pressed_keys = set()  # 현재 눌려 있는 키
         self.frame = 0  # 애니메이션 프레임
@@ -314,45 +318,38 @@ class Mario(GameObject):
         self.state_machine.update()  # 상태 머신 업데이트는 항상 호출
 
         if not self.dead:
-            # 중력 적용
             self.velocity_y += GRAVITY * frame_time
             self.y += self.velocity_y * frame_time
 
-            # 바닥 이하로 내려가지 않도록 위치 제한
             if self.y < 0:
                 self.dead = True
-                self.state_machine.set_state(Dead())  # Dead 상태로 전환
+                self.state_machine.set_state(Dead())
                 print("마리오의 y축값이 0이하여서 사망하였습니다.")
         else:
-            # Dead 상태에서는 중력이나 다른 물리적 영향을 받지 않음
             pass
 
     def handle_event(self, event):
         if self.dead:
-            # Mario가 사망한 상태에서는 입력을 무시
             return
         if event.type == SDL_KEYDOWN:
+            print(f"Key Down: {event.key}")
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.add(event.key)
-                # print(f"Key Down: {event.key}")  # 디버깅용
         elif event.type == SDL_KEYUP:
+            print(f"Key Up: {event.key}")
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.discard(event.key)
-                # print(f"Key Up: {event.key}")  # 디버깅용
         self.state_machine.add_event(('INPUT', event))
 
     def draw(self):
         if self.dead:
-            # Dead 상태일 경우 Dead 상태의 draw 메서드만 호출
             self.state_machine.draw()
         else:
-            # 살아있는 경우 상태의 draw 메서드와 충돌 박스 그리기 호출
             self.state_machine.draw()
             draw_rectangle(*self.get_bb())
 
     def draw_with_camera(self, camera: Camera):
         self.state_machine.draw_with_camera(camera)
-        # 충돌 박스 그리기 (디버깅용)
         draw_rectangle(*self.get_bb_offset(camera))
 
     def get_bb(self):
@@ -372,43 +369,37 @@ class Mario(GameObject):
 
     def handle_collision(self, group, other, hit_position):
         if self.dead:
-            # Mario가 사망 상태일 경우 충돌을 무시
             return
 
         if group == 'mario:koomba_top':
             if not other.stomped:
-                other.stomped = True  # Koomba를 밟혔음으로 표시
-                game_state.score += 100  # 점수 100점 추가
-                print(f"Score increased by 100. Total Score: {game_state.score}")  # 디버깅 출력
+                other.stomped = True
+                game_state.score += 100
+                print(f"Score increased by 100. Total Score: {game_state.score}")
 
-                # ScoreText 생성 및 게임 월드에 추가
-                score_text = ScoreText(self.x, self.y + 30, "+100")  # 마리오 위에 위치
-                game_world.add_object(score_text, 2)  # 적절한 레이어에 추가 (예: 레이어 2)
+                score_text = ScoreText(self.x, self.y + 30, "+100")
+                game_world.add_object(score_text, 2)
                 print("ScoreText 추가됨: +100")
 
-                self.velocity_y = Jump.JUMP_VELOCITY  # Mario 점프 속도 설정
-                self.state_machine.set_state(Jump)  # Mario 상태를 Jump로 변경
+                self.velocity_y = Jump.JUMP_VELOCITY
+                self.state_machine.set_state(Jump)
 
         elif group == 'mario:koomba_bottom':
-            game_state.lives -= 1  # 목숨 감소
             print(f"Mario has been stomped by Koomba. Lives remaining: {game_state.lives}")
             self.dead = True
-            self.state_machine.set_state(Dead())  # Dead 상태로 전환 (인스턴스 전달)
+            self.state_machine.set_state(Dead())
 
         elif group == 'mario:turtle':
-            game_state.lives -= 1  # 목숨 감소
             print(f"Mario has collided with Turtle. Lives remaining: {game_state.lives}")
             self.dead = True
-            self.state_machine.set_state(Dead())  # Dead 상태로 전환 (인스턴스 전달)
+            self.state_machine.set_state(Dead())
 
         elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
-            # 마리오가 객체의 상단과 충돌
-            if self.velocity_y <= 0:  # 마리오가 아래로 이동 중일 때만 충돌 처리
+            if self.velocity_y <= 0:
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
-                self.y = obj_bb[3] + (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 top 위치에 맞춤
-                self.velocity_y = 0  # 수직 속도 0으로 설정
-                # 현재 눌려 있는 키에 따라 상태 설정
+                self.y = obj_bb[3] + (mario_bb[3] - mario_bb[1]) / 2
+                self.velocity_y = 0
                 if SDLK_LEFT in self.pressed_keys and SDLK_RIGHT not in self.pressed_keys:
                     self.dir = -1
                     self.face_dir = -1
@@ -422,79 +413,92 @@ class Mario(GameObject):
                     self.state_machine.set_state(Idle)
 
         elif group in ['mario:brick_bottom', 'mario:random_box_bottom', 'mario:gun_box_bottom']:
-            # 마리오가 객체의 하단과 충돌
-            if self.velocity_y > 0:  # 마리오가 위로 이동 중일 때만 충돌 처리
+            if self.velocity_y > 0:
                 if group == 'mario:random_box_bottom' and not other.changed:
                     print("Random Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 코인을 생성합니다.")
                     other.changed = True
 
-                    # 코인 생성
-                    coin = Coin(other.x, other.y + (other.height * other.scale))  # 박스 위에 생성
+                    coin = Coin(other.x, other.y + (other.height * other.scale))
                     game_world.add_object(coin, 1)
-                    game_state.score += 1000  # 점수 1000점 추가
-                    print("마리오에게 1000점이 추가되었습니다!")  # 디버깅 출력
+                    game_state.score += 1000
+                    print("마리오에게 1000점이 추가되었습니다!")
 
-                    # ScoreText 생성 및 게임 월드에 추가
-                    score_text = ScoreText(self.x, self.y + 50, "+1000")  # 마리오 위에 위치
-                    game_world.add_object(score_text, 2)  # 레이어 2에 추가
-                    print("ScoreText 추가됨: +1000")  # 디버깅 출력
+                    score_text = ScoreText(self.x, self.y + 50, "+1000")
+                    game_world.add_object(score_text, 2)
+                    print("ScoreText 추가됨: +1000")
 
                 elif group == 'mario:gun_box_bottom' and not other.changed:
                     print("Gun Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 스타를 생성합니다.")
                     other.changed = True
 
-                    # 스타 생성
                     star = Star(
                         other.x,
                         other.y + (other.height * other.scale)
-                    )  # 박스 위에 생성
-                    # 대신 game_world.add_object을 play_mode.py에서 처리하기 위해 objects_to_add에 추가
+                    )
                     play_mode.objects_to_add.append(star)
-
                 else:
-                    # 일반적인 충돌 처리
-                    self.brick_sound.play()  # 점프 사운드 재생
+                    self.brick_sound.play()
                     mario_bb = self.get_bb()
                     obj_bb = other.get_bb()
-                    self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2  # 오브젝트의 bottom 위치에 맞춤
-                    self.velocity_y = 0  # 수직 속도 초기화
+                    self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2
+                    self.velocity_y = 0
 
         elif group in ['mario:brick_left', 'mario:random_box_left', 'mario:gun_box_left']:
-            # 마리오가 객체의 왼쪽과 충돌
-            if self.dir > 0:  # 마리오가 오른쪽으로 이동 중일 때만 충돌 처리
+            if self.dir > 0:
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
-                self.x = obj_bb[0] - (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 left 위치에 맞춤
-                self.dir = 0  # 이동 방향 초기화
+                self.x = obj_bb[0] - (mario_bb[2] - mario_bb[0]) / 2
+                self.dir = 0
 
         elif group in ['mario:brick_right', 'mario:random_box_right', 'mario:gun_box_right']:
-            # 마리오가 객체의 오른쪽과 충돌
-            if self.dir < 0:  # 마리오가 왼쪽으로 이동 중일 때만 충돌 처리
+            if self.dir < 0:
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
-                self.x = obj_bb[2] + (mario_bb[2] - mario_bb[0]) / 2  # 오브젝트의 right 위치에 맞춤
-                self.dir = 0  # 이동 방향 초기화
+                self.x = obj_bb[2] + (mario_bb[2] - mario_bb[0]) / 2
+                self.dir = 0
 
         elif group == 'mario:coin':
-            # 마리오가 코인을 수집함
-            game_state.score += 1000  # 점수 1000점 추가
-            game_world.remove_object(other)  # 코인 제거
-            print("코인을 수집했습니다!")  # 디버깅 출력
+            game_state.score += 1000
+            game_world.remove_object(other)
+            print("코인을 수집했습니다!")
 
-            # ScoreText 생성 및 게임 월드에 추가
-            score_text = ScoreText(self.x, self.y + 50, "+1000")  # 마리오 위에 위치
-            game_world.add_object(score_text, 2)  # 레이어 2에 추가
-            print("ScoreText 추가됨: +1000")  # 디버깅 출력
+            score_text = ScoreText(self.x, self.y + 50, "+1000")
+            game_world.add_object(score_text, 2)
+            print("ScoreText 추가됨: +1000")
 
         elif group == 'mario:star':
-            # 마리오가 스타를 수집함
-            Star.collect_sound.play()  # 스타 수집 시 소리 재생
-            game_world.remove_object(other)  # 스타 제거
-            print("스타를 수집했습니다!")  # 디버깅 출력
-            self.gun_mode = True  # gun_mode 활성화
+            Star.collect_sound.play()
+            game_world.remove_object(other)
+            print("스타를 수집했습니다!")
+            self.gun_mode = True
 
         else:
-            pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가
+            pass
+
+    def fire_ball(self):
+        print("fire_ball 메서드가 호출되었습니다.")
+        if self.face_dir == 1:
+            ball_x = self.x + self.get_width() / 2
+            velocity_x = 500
+        else:
+            ball_x = self.x - self.get_width() / 2
+            velocity_x = -500
+        ball_y = self.y
+
+        ball = Ball(ball_x, ball_y, velocity_x)
+        game_world.add_object(ball, 1)
+        print("Ball 객체가 game_world에 추가되었습니다.")
+
+    def get_width(self):
+        if self.gun_mode:
+            return 20 * 3
+        else:
+            return 16 * 3
+
+    # reset_mario 함수는 필요에 따라 추가하거나 수정하세요.
+
+# 필요에 따라 추가적인 함수나 클래스가 있다면 여기에 추가하세요.
+
 
 def reset_mario(mario):
     mario.x = MarioConfig.START_X

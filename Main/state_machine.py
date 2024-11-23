@@ -26,6 +26,18 @@ def s_down(e):
 def s_up(e):
     return isinstance(e, tuple) and e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
 
+# 'a' 키 코드 직접 정의
+SDLK_a = ord('a')  # 또는 SDLK_a = 97
+
+def a_down(e):
+    return (
+        isinstance(e, tuple) and
+        e[0] == 'INPUT' and
+        e[1].type == SDL_KEYDOWN and
+        e[1].key == SDLK_a
+    )
+
+
 class StateMachine:
     def __init__(self, o):
         self.o = o
@@ -57,8 +69,10 @@ class StateMachine:
         self.cur_state.draw_with_camera(self.o, camera)
 
     def handle_event(self, e):
+        handled = False
         for event, next_state in self.transitions.get(self.cur_state, {}).items():
             if event(e):
+                handled = True
                 if next_state != self.cur_state:
                     self.cur_state.exit(self.o, e)
                     self.cur_state = next_state
@@ -68,6 +82,9 @@ class StateMachine:
                     if hasattr(self.cur_state, 'handle_event'):
                         self.cur_state.handle_event(self.o, e)
                 return
+        # 상태 전이가 없더라도 현재 상태의 handle_event 호출
+        if not handled and hasattr(self.cur_state, 'handle_event'):
+            self.cur_state.handle_event(self.o, e)
 
     def set_state(self, new_state):
         if new_state != self.cur_state:
