@@ -51,35 +51,53 @@ class Idle:
 
     @staticmethod
     def draw(mario):
-        frame_width = 16
-        frame_height = 16
-        frame_x = 276
-        frame_y = 342
+        if mario.gun_mode:
+            frame_width = 20
+            frame_height = 20
+            frame_x = 26  # 수정된 x 좌표
+            frame_y = 476  # 수정된 y 좌표
+            image = mario.gun_image
+        else:
+            frame_width = 16
+            frame_height = 16
+            frame_x = 276
+            frame_y = 342
+            image = mario.image
+
         if mario.face_dir == -1:
-            mario.image.clip_composite_draw(
+            image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
                 mario.x, mario.y, frame_width * 3, frame_height * 3
             )
         else:
-            mario.image.clip_draw(
+            image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
                 frame_width * 3, frame_height * 3
             )
 
     @staticmethod
     def draw_with_camera(mario, camera: Camera):
-        frame_width = 16
-        frame_height = 16
-        frame_x = 276
-        frame_y = 342
+        if mario.gun_mode:
+            frame_width = 20
+            frame_height = 20
+            frame_x = 26  # 수정된 x 좌표
+            frame_y = 476  # 수정된 y 좌표
+            image = mario.gun_image
+        else:
+            frame_width = 16
+            frame_height = 16
+            frame_x = 276
+            frame_y = 342
+            image = mario.image
+
         screen_x, screen_y = camera.apply(mario.x, mario.y)
         if mario.face_dir == -1:
-            mario.image.clip_composite_draw(
+            image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
                 screen_x, screen_y, frame_width * 3, frame_height * 3
             )
         else:
-            mario.image.clip_draw(
+            image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
                 frame_width * 3, frame_height * 3
             )
@@ -95,8 +113,16 @@ class Run:
         else:
             mario.dir = 0  # 이동하지 않음
 
-        # 애니메이션 프레임 초기화
-        mario.run_frame_x_positions = [290, 304, 321]
+        if mario.gun_mode:
+            mario.run_frame_x_positions = [100, 125, 146]
+            mario.frame_y = 476
+            mario.frame_width = 20
+            mario.frame_height = 20
+        else:
+            mario.run_frame_x_positions = [290, 304, 321]
+            mario.frame_y = 342
+            mario.frame_width = 16
+            mario.frame_height = 16
         mario.frame = 0
         #print("Run 상태: 진입")  # 디버깅용
 
@@ -117,35 +143,39 @@ class Run:
 
     @staticmethod
     def draw(mario):
-        frame_width = 16
-        frame_height = 16
-        frame_y = 342
         frame_x = mario.run_frame_x_positions[int(mario.frame)]
+        frame_y = mario.frame_y
+        frame_width = mario.frame_width
+        frame_height = mario.frame_height
+        image = mario.gun_image if mario.gun_mode else mario.image
+
         if mario.face_dir == -1:
-            mario.image.clip_composite_draw(
+            image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
                 mario.x, mario.y, frame_width * 3, frame_height * 3
             )
         else:
-            mario.image.clip_draw(
+            image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
                 frame_width * 3, frame_height * 3
             )
 
     @staticmethod
     def draw_with_camera(mario, camera: Camera):
-        frame_width = 16
-        frame_height = 16
-        frame_y = 342
         frame_x = mario.run_frame_x_positions[int(mario.frame)]
+        frame_y = mario.frame_y
+        frame_width = mario.frame_width
+        frame_height = mario.frame_height
+        image = mario.gun_image if mario.gun_mode else mario.image
+
         screen_x, screen_y = camera.apply(mario.x, mario.y)
         if mario.face_dir == -1:
-            mario.image.clip_composite_draw(
+            image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
                 screen_x, screen_y, frame_width * 3, frame_height * 3
             )
         else:
-            mario.image.clip_draw(
+            image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
                 frame_width * 3, frame_height * 3
             )
@@ -167,7 +197,17 @@ class Jump:
             elif right_down(e):
                 mario.dir = 1
                 mario.face_dir = 1
-        mario.jump_frame_x_positions = [336, 353, 321]
+
+        if mario.gun_mode:
+            mario.jump_frame_x_positions = [173]
+            mario.frame_y = 476
+            mario.frame_width = 20
+            mario.frame_height = 20
+        else:
+            mario.jump_frame_x_positions = [336, 353, 321]
+            mario.frame_y = 342
+            mario.frame_width = 16
+            mario.frame_height = 16
         mario.frame = 0
         #print("Jump 상태: enter 메소드 호출")  # 디버깅용
 
@@ -191,39 +231,44 @@ class Jump:
         mario.x += mario.dir * RUN_SPEED_PPS * game_framework.frame_time
         mario.x = max(0, min(MarioConfig.WORLD_WIDTH, mario.x))  # 월드 경계 내로 클램프
 
-        mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
+        mario.frame = (mario.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % len(
+            mario.jump_frame_x_positions)
 
     @staticmethod
     def draw(mario):
-        frame_width = 16
-        frame_height = 16
-        frame_y = 342
-        frame_x = mario.jump_frame_x_positions[int(mario.frame)]
+        frame_x = mario.jump_frame_x_positions[int(mario.frame) % len(mario.jump_frame_x_positions)]
+        frame_y = mario.frame_y
+        frame_width = mario.frame_width
+        frame_height = mario.frame_height
+        image = mario.gun_image if mario.gun_mode else mario.image
+
         if mario.face_dir == -1:
-            mario.image.clip_composite_draw(
+            image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
                 mario.x, mario.y, frame_width * 3, frame_height * 3
             )
         else:
-            mario.image.clip_draw(
+            image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
                 frame_width * 3, frame_height * 3
             )
 
     @staticmethod
     def draw_with_camera(mario, camera: Camera):
-        frame_width = 16
-        frame_height = 16
-        frame_y = 342
-        frame_x = mario.jump_frame_x_positions[int(mario.frame)]
+        frame_x = mario.jump_frame_x_positions[int(mario.frame) % len(mario.jump_frame_x_positions)]
+        frame_y = mario.frame_y
+        frame_width = mario.frame_width
+        frame_height = mario.frame_height
+        image = mario.gun_image if mario.gun_mode else mario.image
+
         screen_x, screen_y = camera.apply(mario.x, mario.y)
         if mario.face_dir == -1:
-            mario.image.clip_composite_draw(
+            image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
                 screen_x, screen_y, frame_width * 3, frame_height * 3
             )
         else:
-            mario.image.clip_draw(
+            image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
                 frame_width * 3, frame_height * 3
             )
@@ -237,6 +282,7 @@ class Mario(GameObject):
         self.face_dir = 1  # 방향: 1(오른쪽), -1(왼쪽)
         self.dir = 0  # 이동 방향: -1(왼쪽), 0(정지), 1(오른쪽)
         self.image = load_image('img/character.png')
+        self.gun_image = load_image('img/gun_mario.png')  # gun_mode용 이미지
         self.jump_sound = load_wav('sound/jump.ogg')
         self.jump_sound.set_volume(32)  # 필요에 따라 볼륨 조절
         self.brick_sound = load_wav('sound/brick.ogg')
@@ -261,6 +307,7 @@ class Mario(GameObject):
         self.frame = 0  # 애니메이션 프레임
         self.velocity_y = 0  # 수직 속도 추가
         self.dead = False  # Mario의 사망 상태 추가
+        self.gun_mode = False  # gun_mode 상태 추가
 
     def update(self):
         frame_time = game_framework.frame_time
@@ -309,8 +356,12 @@ class Mario(GameObject):
         draw_rectangle(*self.get_bb_offset(camera))
 
     def get_bb(self):
-        width = 16 * 3  # 이미지의 폭 * 스케일
-        height = 16 * 3  # 이미지의 높이 * 스케일
+        if self.gun_mode:
+            width = 20 * 3
+            height = 20 * 3
+        else:
+            width = 16 * 3
+            height = 16 * 3
         half_width = width / 2
         half_height = height / 2
         return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
@@ -440,8 +491,7 @@ class Mario(GameObject):
             Star.collect_sound.play()  # 스타 수집 시 소리 재생
             game_world.remove_object(other)  # 스타 제거
             print("스타를 수집했습니다!")  # 디버깅 출력
-
-            # 추가 점수 또는 능력 부여 로직을 여기에 추가할 수 있습니다.
+            self.gun_mode = True  # gun_mode 활성화
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가
@@ -455,6 +505,7 @@ def reset_mario(mario):
     mario.state_machine.set_state(Idle)  # 기본 상태로 변경
     mario.pressed_keys.clear()  # 눌려 있는 키 초기화
     mario.frame = 0
+    mario.gun_mode = False  # gun_mode 비활성화
 
 def reset_game():
     global mario
