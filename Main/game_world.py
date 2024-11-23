@@ -7,9 +7,15 @@ def add_collision_pair(group, a, b):
     if group not in collision_pairs:
         collision_pairs[group] = [[], []]
     if a:
-        collision_pairs[group][0].append(a)
+        if isinstance(a, list):
+            collision_pairs[group][0].extend(a)
+        else:
+            collision_pairs[group][0].append(a)
     if b:
-        collision_pairs[group][1].append(b)
+        if isinstance(b, list):
+            collision_pairs[group][1].extend(b)
+        else:
+            collision_pairs[group][1].append(b)
 
 def remove_collision_object(o):
     for pairs in collision_pairs.values():
@@ -90,7 +96,6 @@ def collide_hitboxes(box_a, box_b):
 
     return True
 
-
 def handle_collisions():
     for group, pairs in collision_pairs.items():
         for a in pairs[0]:
@@ -146,6 +151,10 @@ def handle_collisions():
                 elif group == 'mario:gun_box_right':  # [추가]
                     if collide_hitboxes(a.get_bb(), b.get_right_bb()):
                         a.handle_collision(group, b, 'gun_box_right')
+                elif group == 'fire_ball:turtle':
+                    if collide_hitboxes(a.get_bb(), b.get_bb()):
+                        a.handle_collision(group, b, 'collision')
+                        # b.handle_collision(group, a, 'collision')  # 제거: 한쪽만 처리
                 elif group == 'mario:grass':
                     if collide(a, b):
                         a.handle_collision(group, b, 'grass')

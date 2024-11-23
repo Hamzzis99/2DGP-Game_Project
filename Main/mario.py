@@ -486,8 +486,8 @@ class Mario(GameObject):
         ball_y = self.y
 
         ball = Ball(ball_x, ball_y, velocity_x)
-        game_world.add_object(ball, 1)
-        print("Ball 객체가 game_world에 추가되었습니다.")
+        play_mode.objects_to_add.append(ball)  # Ball을 objects_to_add에 추가
+        print("Ball 객체가 objects_to_add 리스트에 추가되었습니다.")
 
     def get_width(self):
         if self.gun_mode:
@@ -495,10 +495,7 @@ class Mario(GameObject):
         else:
             return 16 * 3
 
-    # reset_mario 함수는 필요에 따라 추가하거나 수정하세요.
-
-# 필요에 따라 추가적인 함수나 클래스가 있다면 여기에 추가하세요.
-
+# reset_mario 함수는 필요에 따라 추가하거나 수정하세요.
 
 def reset_mario(mario):
     mario.x = MarioConfig.START_X

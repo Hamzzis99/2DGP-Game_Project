@@ -2,6 +2,7 @@
 
 from pico2d import load_image, clamp
 from game_object import GameObject
+from states import game_state
 from utils.camera import Camera
 import random
 import game_framework
@@ -104,7 +105,7 @@ class Turtle(GameObject):
             self.dir = 1
 
         # 위치 클램프
-        self.x = clamp(1000, self.x, 1400)  # 이동 범위를 200~1400으로 설정
+        self.x = clamp(1000, self.x, 1400)  # 이동 범위를 1000~1400으로 설정
 
     def draw_with_camera(self, camera: Camera):
         if not self.alive:
@@ -131,10 +132,6 @@ class Turtle(GameObject):
                 frame_x, frame_y, self.frame_width, self.frame_height,
                 screen_x, screen_y, dest_width, dest_height
             )
-
-        # 디버깅용 충돌 박스 그리기 활성화 (릴리즈 시 주석 처리)
-        # draw_rectangle(*self.get_top_bb_offset(camera))
-        # draw_rectangle(*self.get_bottom_bb_offset(camera))
 
     def get_bb(self):
         width = 16 * 2  # 이미지의 폭 * 스케일 (16 * 2 = 32)
@@ -164,5 +161,9 @@ class Turtle(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
-        # Turtle의 handle_collision 메서드를 pass로 유지
-        pass
+        if group == 'fire_ball:turtle':
+            print(f"Turtle이 fire_ball과 충돌했습니다: Turtle={self}, Ball={other}")
+            self.alive = False  # Turtle을 비활성화
+            game_state.score += 200  # 점수 추가 (예시)
+            print(f"Score increased by 200. Total Score: {game_state.score}")
+            # Ball 제거는 Ball의 handle_collision에서 이미 처리됨

@@ -4,6 +4,7 @@ from pico2d import *
 import game_framework
 import game_world
 import logo_mode
+from ball import Ball
 from grass import Grass
 from enemy.koomba import Koomba
 from enemy.boss_turtle import Turtle
@@ -128,6 +129,11 @@ def init():
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)
 
+    # 'fire_ball:turtle' 충돌 그룹 초기화
+    game_world.add_collision_pair('fire_ball:turtle', [], turtlers)
+    print("'fire_ball:turtle' 충돌 그룹이 추가되었습니다:", 'fire_ball:turtle' in game_world.collision_pairs)
+    print("fire_ball:turtle 그룹의 Turtlers 수:", len(game_world.collision_pairs['fire_ball:turtle'][1]))
+
     # 배경음악 관리자 초기화
     bgm_manager = BGMManager()
     print("Loading background music...")  # 디버깅 출력
@@ -162,7 +168,7 @@ def update():
         game_state.lives -= 1  # 목숨 감소
         print(f"Mario has {game_state.lives} lives remaining.")
 
-    # Mario가 사망한 상태이고, 타이머가 시작되었으며, 2초가 경과했을 때 게임 오버로 전환
+    # Mario가 사망한 상태이고, 타이머가 시작되었으며, 3초가 경과했을 때 게임 오버로 전환
     if mario_dead and death_timer is not None:
         elapsed_time = get_time() - death_timer
         if elapsed_time >= 3.0:  # 3초 지연
@@ -181,6 +187,13 @@ def update():
             game_world.add_collision_pair('mario:coin', mario, obj)
         elif isinstance(obj, Star):
             game_world.add_collision_pair('mario:star', mario, obj)
+        elif isinstance(obj, Ball):
+            # 'fire_ball:turtle' 그룹에 추가
+            if 'fire_ball:turtle' in game_world.collision_pairs:
+                game_world.collision_pairs['fire_ball:turtle'][0].append(obj)
+                print("Ball이 'fire_ball:turtle' 충돌 그룹에 추가되었습니다.")
+            else:
+                print("'fire_ball:turtle' 충돌 그룹이 존재하지 않습니다.")
     objects_to_add.clear()
 
     # 게임 시간 업데이트
@@ -199,13 +212,6 @@ def update():
 
     # 대시보드 업데이트
     dashboard.update()
-
-    #print(f"Game Time: {game_time}")  # 디버그 출력
-
-    # 아래 중복된 조건문 제거
-    # if mario_dead:
-    #     print("mario_dead flag is True. Changing mode to game_over.")
-    #     game_framework.change_mode(game_over)
 
 def draw():
     clear_canvas()
