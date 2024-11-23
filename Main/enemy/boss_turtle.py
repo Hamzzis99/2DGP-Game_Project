@@ -161,9 +161,10 @@ class Turtle(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def handle_collision(self, group, other, hit_position):
-        if group == 'fire_ball:turtle':
-            print(f"Turtle이 fire_ball과 충돌했습니다: Turtle={self}, Ball={other}")
-            self.alive = False  # Turtle을 비활성화
-            game_state.score += 200  # 점수 추가 (예시)
-            print(f"Score increased by 200. Total Score: {game_state.score}")
+        #if group == 'fire_ball:turtle':
+            #print(f"Turtle이 fire_ball과 충돌했습니다: Turtle={self}, Ball={other}")
+            #self.alive = False  # Turtle을 비활성화
+            #game_state.score += 200  # 점수 추가 (예시)
+            #print(f"Score increased by 200. Total Score: {game_state.score}")
             # Ball 제거는 Ball의 handle_collision에서 이미 처리됨
+        pass
