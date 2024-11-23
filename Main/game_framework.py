@@ -1,5 +1,9 @@
 # game_framework.py
+
 import time
+import game_world
+import play_mode
+import states
 
 running = False
 stack = []
@@ -33,6 +37,13 @@ def quit():
     global running
     running = False
 
+def reset_game():
+    """게임을 초기화하고 play_mode를 재초기화합니다."""
+    print("[GameFramework] Resetting game...")
+    game_world.reset()  # 게임 월드 초기화
+    play_mode.init()     # play_mode 재초기화
+    print("[GameFramework] Game reset completed.")
+
 def run(start_mode):
     global running, stack, frame_time
     running = True
@@ -46,7 +57,6 @@ def run(start_mode):
         stack[-1].draw()
         frame_time = time.time() - current_time
         frame_time = min(frame_time, 0.05)  # 프레임 타임 제한
-        frame_rate = 1.0 / frame_time if frame_time > 0 else 0
         current_time += frame_time
 
     while len(stack) > 0:

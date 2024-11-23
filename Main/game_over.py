@@ -1,9 +1,9 @@
-#game_over.py
+# game_over.py
 
 import game_framework
-from pico2d import load_image, load_wav, clear_canvas, update_canvas, get_events, get_time, get_canvas_width, get_canvas_height
-
+from pico2d import load_image, load_wav, clear_canvas, update_canvas, get_events, get_time, get_canvas_width, get_canvas_height, SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 import logo_mode
+from states import reset_game
 from utils.font import Font
 
 def init():
@@ -16,6 +16,7 @@ def init():
 
     running = True
     logo_start_time = get_time()
+    reset_game()  # 게임 상태 초기화 (lives=3, score=0)
 
 def finish():
     global font, sound, background
@@ -25,8 +26,7 @@ def finish():
 
 def update():
     global logo_start_time
-    if get_time() - logo_start_time >= 1.0: #원래는 10
-        logo_start_time = get_time()
+    if get_time() - logo_start_time >= 1.0:  # 원래는 10초였음
         game_framework.change_mode(logo_mode)
 
 def draw():
@@ -55,3 +55,9 @@ def draw():
 
 def handle_events():
     events = get_events()
+    for event in events:
+        if event.type == SDL_QUIT:
+            game_framework.quit()
+        elif event.type == SDL_KEYDOWN:
+            if event.key == SDLK_ESCAPE:  # ESC 키를 누르면 게임 종료
+                game_framework.quit()

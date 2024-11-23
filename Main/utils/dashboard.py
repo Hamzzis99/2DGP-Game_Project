@@ -1,15 +1,14 @@
 # utils/dashboard.py
 
-import pico2d
+from pico2d import *
 from utils.font import Font  # font.py에 포함된 Font 클래스 임포트
+from states import game_state  # game_state 임포트
 
 class Dashboard:
     def __init__(self):
         self.font = Font("img/font.png", char_width=8, char_height=8)  # Font 객체 생성 (font.png 파일 사용)
         self.state = "menu"
         self.levelName = "1-1"
-        self.points = 0
-        self.coins = 0
         self.ticks = 0
         self.time = 0
 
@@ -32,18 +31,18 @@ class Dashboard:
         self.time = time
 
     def mariolife(self):
-        return "{:02d}".format(self.coins)
+        return "{:02d}".format(game_state.lives)  # game_state.lives 참조
 
     def pointString(self):
-        return "{:06d}".format(self.points)
+        return "{:06d}".format(game_state.score)  # game_state.score 참조
 
     def timeString(self):
         return "{:03d}".format(self.time)
 
     def increment_score(self, amount):
-        self.points += amount
-        print(f"Score increased by {amount}. Total Score: {self.points}")  # 디버깅 출력
+        game_state.score += amount  # game_state.score 증가
+        print(f"Score increased by {amount}. Total Score: {game_state.score}")  # 디버깅 출력
 
     def decrement_life(self, amount=1):
-        self.lives = max(self.lives - amount, 0)
-        print(f"Lives decreased by {amount}. Total Lives: {self.lives}")  # 디버깅 출력
+        game_state.lives = max(game_state.lives - amount, 0)  # game_state.lives 감소
+        print(f"Lives decreased by {amount}. Total Lives: {game_state.lives}")  # 디버깅 출력

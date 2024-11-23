@@ -3,6 +3,7 @@
 from pico2d import *
 import game_framework
 import game_world
+import logo_mode
 from grass import Grass
 from enemy.koomba import Koomba
 from enemy.boss_turtle import Turtle
@@ -12,6 +13,7 @@ from props.random_box import Random_box
 from props.gun_box import Gun_box
 from items.star import Star
 from items.coin import Coin
+from states import game_state
 from utils.camera import Camera
 from utils.config import MarioConfig
 from utils.dashboard import Dashboard
@@ -157,15 +159,19 @@ def update():
         print("Mario is dead. Stopping music and starting death timer.")
         if bgm_manager:
             bgm_manager.stop()  # 배경음악 명시적으로 중지
-        # Dead 상태로의 전환은 Mario 클래스에서 이미 처리됨
-
+        game_state.lives -= 1  # 목숨 감소
+        print(f"Mario has {game_state.lives} lives remaining.")
 
     # Mario가 사망한 상태이고, 타이머가 시작되었으며, 2초가 경과했을 때 게임 오버로 전환
     if mario_dead and death_timer is not None:
         elapsed_time = get_time() - death_timer
-        if elapsed_time >= 3.0:  # 2초 지연
-            print("2초 경과. 게임 오버로 전환합니다.")
-            game_framework.change_mode(game_over)
+        if elapsed_time >= 3.0:  # 3초 지연
+            if game_state.lives > 0:
+                print("Lives remaining. Restarting the game.")
+                game_framework.change_mode(logo_mode)
+            else:
+                print("No lives remaining. Game Over.")
+                game_framework.change_mode(game_over)
 
     # 추가할 객체 처리
     for obj in objects_to_add:

@@ -13,6 +13,7 @@ from state_machine import StateMachine, right_down, left_down, right_up, left_up
 from game_object import GameObject
 from utils.camera import Camera
 from utils.score_text import ScoreText
+from states import game_state  # game_state 임포트
 
 # 상수 정의
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
@@ -148,7 +149,6 @@ class Run:
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
                 frame_width * 3, frame_height * 3
             )
-
 
 class Jump:
     JUMP_VELOCITY = 350  # 점프 초기 속도
@@ -327,8 +327,8 @@ class Mario(GameObject):
         if group == 'mario:koomba_top':
             if not other.stomped:
                 other.stomped = True  # Koomba를 밟혔음으로 표시
-                self.dashboard.increment_score(100)  # 점수 100점 추가
-                print(f"Score increased by 100. Total Score: {self.dashboard.points}")  # 디버깅 출력
+                game_state.score += 100  # 점수 100점 추가
+                print(f"Score increased by 100. Total Score: {game_state.score}")  # 디버깅 출력
 
                 # ScoreText 생성 및 게임 월드에 추가
                 score_text = ScoreText(self.x, self.y + 30, "+100")  # 마리오 위에 위치
@@ -339,14 +339,16 @@ class Mario(GameObject):
                 self.state_machine.set_state(Jump)  # Mario 상태를 Jump로 변경
 
         elif group == 'mario:koomba_bottom':
+            game_state.lives -= 1  # 목숨 감소
+            print(f"Mario has been stomped by Koomba. Lives remaining: {game_state.lives}")
             self.dead = True
             self.state_machine.set_state(Dead())  # Dead 상태로 전환 (인스턴스 전달)
-            print("Mario has been stomped by Koomba. Transitioning to Dead state.")
 
         elif group == 'mario:turtle':
+            game_state.lives -= 1  # 목숨 감소
+            print(f"Mario has collided with Turtle. Lives remaining: {game_state.lives}")
             self.dead = True
             self.state_machine.set_state(Dead())  # Dead 상태로 전환 (인스턴스 전달)
-            print("Mario has collided with Turtle. Transitioning to Dead state.")
 
         elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
             # 마리오가 객체의 상단과 충돌
@@ -378,7 +380,7 @@ class Mario(GameObject):
                     # 코인 생성
                     coin = Coin(other.x, other.y + (other.height * other.scale))  # 박스 위에 생성
                     game_world.add_object(coin, 1)
-                    self.dashboard.increment_score(1000)
+                    game_state.score += 1000  # 점수 1000점 추가
                     print("마리오에게 1000점이 추가되었습니다!")  # 디버깅 출력
 
                     # ScoreText 생성 및 게임 월드에 추가
@@ -424,7 +426,7 @@ class Mario(GameObject):
 
         elif group == 'mario:coin':
             # 마리오가 코인을 수집함
-            self.dashboard.increment_score(1000)  # 점수 1000점 추가
+            game_state.score += 1000  # 점수 1000점 추가
             game_world.remove_object(other)  # 코인 제거
             print("코인을 수집했습니다!")  # 디버깅 출력
 
@@ -438,6 +440,8 @@ class Mario(GameObject):
             Star.collect_sound.play()  # 스타 수집 시 소리 재생
             game_world.remove_object(other)  # 스타 제거
             print("스타를 수집했습니다!")  # 디버깅 출력
+
+            # 추가 점수 또는 능력 부여 로직을 여기에 추가할 수 있습니다.
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리 필요 시 추가
