@@ -20,16 +20,22 @@ class Ball:
         self.x, self.y = x, y
         self.velocity_x = velocity_x
         self.velocity_y = velocity_y
-        self.width = 16
-        self.height = 16
+        self.width = 32
+        self.height = 32
 
     def draw(self):
+        if self.image:
+            self.image.draw(self.x, self.y)
+            draw_rectangle(*self.get_bb())  # 충돌 박스 그리기
+        else:
+            print("Ball 이미지가 로드되지 않아 그릴 수 없습니다.")
         pass  # draw 메서드에서는 아무것도 하지 않음
 
     def draw_with_camera(self, camera):
         if self.image:
             screen_x, screen_y = camera.apply(self.x, self.y)
             self.image.draw(screen_x, screen_y)
+            draw_rectangle(*self.get_bb_offset(camera))
         else:
             print("Ball 이미지가 로드되지 않아 그릴 수 없습니다.")
 

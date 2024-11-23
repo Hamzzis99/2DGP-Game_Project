@@ -32,7 +32,7 @@ class Koomba(GameObject):
         self.frame_height = 20
 
     def __init__(self):
-        self.x, self.y = random.randint(600, 800), 70  # 초기 위치 설정
+        self.x, self.y = random.randint(1000, 1400), 70  # 초기 위치 설정
         self.load_images()
         self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
         self.dir = random.choice([-1, 1])  # 이동 방향: -1(왼쪽), 1(오른쪽)
@@ -73,7 +73,7 @@ class Koomba(GameObject):
             self.dir = 1
 
         # 위치 클램프
-        self.x = clamp(600, self.x, 800)
+        self.x = clamp(1000, self.x, 1400)
 
     def draw_with_camera(self, camera: Camera):
         if not self.alive:
