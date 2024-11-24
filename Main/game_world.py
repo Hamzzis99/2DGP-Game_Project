@@ -154,7 +154,11 @@ def handle_collisions():
                 elif group == 'fire_ball:turtle':
                     if collide_hitboxes(a.get_bb(), b.get_bb()):
                         a.handle_collision(group, b, 'collision')
-                        # b.handle_collision(group, a, 'collision')  # 제거: 한쪽만 처리
+                        # b.handle_collision(group, a, 'collision')  # Turtle의 handle_collision을 수정하지 않으므로 호출하지 않음
+                elif group == 'fire_ball:koomba':
+                    if collide_hitboxes(a.get_bb(), b.get_normal_bb()):
+                        a.handle_collision(group, b, 'collision')
+                        # b.handle_collision(group, a, 'collision')  # Koomba의 handle_collision을 수정하지 않으므로 호출하지 않음
                 elif group == 'mario:grass':
                     if collide(a, b):
                         a.handle_collision(group, b, 'grass')

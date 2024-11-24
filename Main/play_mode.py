@@ -134,6 +134,11 @@ def init():
     print("'fire_ball:turtle' 충돌 그룹이 추가되었습니다:", 'fire_ball:turtle' in game_world.collision_pairs)
     print("fire_ball:turtle 그룹의 Turtlers 수:", len(game_world.collision_pairs['fire_ball:turtle'][1]))
 
+    # 'fire_ball:koomba' 충돌 그룹 초기화
+    game_world.add_collision_pair('fire_ball:koomba', [], koombas)
+    print("'fire_ball:koomba' 충돌 그룹이 추가되었습니다:", 'fire_ball:koomba' in game_world.collision_pairs)
+    print("fire_ball:koomba 그룹의 Koombas 수:", len(game_world.collision_pairs['fire_ball:koomba'][1]))
+
     # 배경음악 관리자 초기화
     bgm_manager = BGMManager()
     print("Loading background music...")  # 디버깅 출력
@@ -194,6 +199,12 @@ def update():
                 print("Ball이 'fire_ball:turtle' 충돌 그룹에 추가되었습니다.")
             else:
                 print("'fire_ball:turtle' 충돌 그룹이 존재하지 않습니다.")
+            # 'fire_ball:koomba' 그룹에 추가 (수정된 부분)
+            if 'fire_ball:koomba' in game_world.collision_pairs:
+                game_world.collision_pairs['fire_ball:koomba'][0].append(obj)
+                print("Ball이 'fire_ball:koomba' 충돌 그룹에 추가되었습니다.")
+            else:
+                print("'fire_ball:koomba' 충돌 그룹이 존재하지 않습니다.")
     objects_to_add.clear()
 
     # 게임 시간 업데이트

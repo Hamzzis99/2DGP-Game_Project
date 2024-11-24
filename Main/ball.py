@@ -104,8 +104,39 @@ class Ball(GameObject):
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
 
             # 점수 추가
-            game_state.score += 200
+            game_state.score += 100
             print(f"Score increased by 200. Total Score: {game_state.score}")
             score_text = ScoreText(self.x, self.y + 30, "+200")
             game_world.add_object(score_text, 2)
             print("ScoreText 추가됨: +200")
+
+        elif group == 'fire_ball:koomba':
+            print(f"Ball이 Koomba와 충돌했습니다: Ball={self}, Koomba={other}")
+
+            # 사운드 재생 추가 (클래스 변수 사용)
+            if Ball.common_kick_sound:
+                Ball.common_kick_sound.play()
+                print("common_kick_sound 재생됨.")
+            else:
+                print("common_kick_sound가 로드되지 않았습니다.")
+
+            # Koomba 제거
+            try:
+                game_world.remove_object(other)
+                print("Koomba 객체가 제거되었습니다.")
+            except ValueError:
+                print(f"Koomba 객체 {other}가 이미 제거되었습니다.")
+
+            # Ball 제거
+            try:
+                game_world.remove_object(self)
+                print("Ball 객체가 제거되었습니다.")
+            except ValueError:
+                print(f"Ball 객체 {self}는 이미 제거되었습니다.")
+
+            # 점수 추가
+            game_state.score += 100  # 점수는 필요에 따라 조정 가능
+            print(f"Score increased by 100. Total Score: {game_state.score}")
+            score_text = ScoreText(self.x, self.y + 30, "+100")
+            game_world.add_object(score_text, 2)
+            print("ScoreText 추가됨: +100")
