@@ -41,7 +41,7 @@ class Clean_box(GameObject):
             self.frame_time += game_framework.frame_time
             frame_progress = self.frame_time / self.time_per_action
             self.frame = int(frame_progress * self.total_frames) % self.total_frames
-            print(f"Clean_box Frame: {self.frame}")  # 디버깅용 출력
+            #print(f"Clean_box Frame: {self.frame}")  # 디버깅용 출력
         else:
             self.frame = 0  # 상태 변경 후에는 첫 번째 프레임 사용
 
