@@ -1,4 +1,4 @@
-# enemy/boss_turtle.py
+# enemy/turtle.py
 
 from pico2d import load_image, clamp
 from game_object import GameObject

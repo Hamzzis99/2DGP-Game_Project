@@ -7,7 +7,7 @@ import logo_mode
 from ball import Ball
 from grass import Grass
 from enemy.koomba import Koomba
-from enemy.boss_turtle import Turtle
+from enemy.turtle import Turtle
 from mario import Mario, reset_mario
 from props.brick import Brick
 from props.random_box import Random_box
