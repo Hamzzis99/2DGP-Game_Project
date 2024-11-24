@@ -2,6 +2,7 @@
 
 from pico2d import load_image, draw_rectangle
 from game_object import GameObject
+from states import game_state
 from utils.camera import Camera
 import game_world
 from items.coin import Coin
@@ -148,8 +149,11 @@ class Clean_box(GameObject):
             coin = Coin(self.x, self.y + self.height * self.scale / 2 + 10)  # 박스 위에 생성
             game_world.add_object(coin, 1)  # 적절한 층에 추가
 
+            game_state.score += 100  # 점수는 필요에 따라 조정 가능
+            print(f"Score increased by 1000. Total Score: {game_state.score}")
+
             # 점수 텍스트 생성
-            score_text = ScoreText(self.x, self.y + self.height * self.scale / 2 + 20, "+100")  # 문자열 전달
+            score_text = ScoreText(self.x, self.y + self.height * self.scale / 2 + 20, "+1000")  # 문자열 전달
             game_world.add_object(score_text, 1)
 
             # 사운드 재생 (선택 사항)
