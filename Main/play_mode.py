@@ -12,6 +12,7 @@ from mario import Mario, reset_mario
 from props.brick import Brick
 from props.random_box import Random_box
 from props.gun_box import Gun_box
+from props.clean_box import Clean_box
 from items.star import Star
 from items.coin import Coin
 from states import game_state
@@ -93,6 +94,12 @@ def init():
     ]
     game_world.add_objects(gun_boxes, 1)
 
+    clean_boxes = [
+        Clean_box(800, 150),
+        Clean_box(850, 150)
+    ]
+    game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
+
     # 충돌 쌍 등록
     for koomba in koombas:
         # 마리오와 Koomba의 Top 히트박스 충돌 쌍 등록
@@ -125,6 +132,13 @@ def init():
         game_world.add_collision_pair('mario:gun_box_bottom', mario, gun_box)
         game_world.add_collision_pair('mario:gun_box_left', mario, gun_box)
         game_world.add_collision_pair('mario:gun_box_right', mario, gun_box)
+
+    for clean_box in clean_boxes:
+        game_world.add_collision_pair('mario:clean_box_top', mario, clean_box)
+        game_world.add_collision_pair('mario:clean_box_bottom', mario, clean_box)
+        game_world.add_collision_pair('mario:clean_box_left', mario, clean_box)
+        game_world.add_collision_pair('mario:clean_box_right', mario, clean_box)
+
 
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)

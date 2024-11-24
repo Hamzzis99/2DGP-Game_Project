@@ -96,6 +96,8 @@ def collide_hitboxes(box_a, box_b):
 
     return True
 
+# game_world.py
+
 def handle_collisions():
     for group, pairs in collision_pairs.items():
         for a in pairs[0]:
@@ -162,7 +164,24 @@ def handle_collisions():
                 elif group == 'mario:grass':
                     if collide(a, b):
                         a.handle_collision(group, b, 'grass')
+                elif group.startswith('mario:clean_box'):
+                    # Clean_box 충돌 처리
+                    if group.endswith('top'):
+                        if collide_hitboxes(a.get_bb(), b.get_top_bb()):
+                            a.handle_collision(group, b, 'top')
+                            b.handle_collision(group, a, 'top')
+                    elif group.endswith('bottom'):
+                        if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
+                            a.handle_collision(group, b, 'bottom')
+                            b.handle_collision(group, a, 'bottom')
+                    elif group.endswith('left'):
+                        if collide_hitboxes(a.get_bb(), b.get_left_bb()):
+                            a.handle_collision(group, b, 'left')
+                    elif group.endswith('right'):
+                        if collide_hitboxes(a.get_bb(), b.get_right_bb()):
+                            a.handle_collision(group, b, 'right')
                 else:
                     if collide(a, b):
                         a.handle_collision(group, b, 'unknown')
                         b.handle_collision(group, a, 'unknown')
+
