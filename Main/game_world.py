@@ -96,8 +96,6 @@ def collide_hitboxes(box_a, box_b):
 
     return True
 
-# game_world.py
-
 def handle_collisions():
     for group, pairs in collision_pairs.items():
         for a in pairs[0]:
@@ -161,6 +159,10 @@ def handle_collisions():
                     if collide_hitboxes(a.get_bb(), b.get_normal_bb()):
                         a.handle_collision(group, b, 'collision')
                         # b.handle_collision(group, a, 'collision')  # Koomba의 handle_collision을 수정하지 않으므로 호출하지 않음
+                elif group == 'fire_ball:brick' or group == 'fire_ball:clean_box' or group == 'fire_ball:gun_box' or group == 'fire_ball:random_box':
+                    if collide(a, b):
+                        a.handle_collision(group, b, 'collision')
+                        # 벽은 특별한 처리를 하지 않으므로 b.handle_collision은 호출하지 않음
                 elif group == 'mario:grass':
                     if collide(a, b):
                         a.handle_collision(group, b, 'grass')
@@ -184,4 +186,3 @@ def handle_collisions():
                     if collide(a, b):
                         a.handle_collision(group, b, 'unknown')
                         b.handle_collision(group, a, 'unknown')
-

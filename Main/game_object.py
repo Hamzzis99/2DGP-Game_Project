@@ -41,3 +41,6 @@ class GameObject:
 
     def get_right_bb_offset(self, camera):
         pass
+
+    def handle_collision(self, group, other, hit_position):
+        pass

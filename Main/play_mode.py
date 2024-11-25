@@ -153,6 +153,27 @@ def init():
     print("'fire_ball:koomba' 충돌 그룹이 추가되었습니다:", 'fire_ball:koomba' in game_world.collision_pairs)
     print("fire_ball:koomba 그룹의 Koombas 수:", len(game_world.collision_pairs['fire_ball:koomba'][1]))
 
+    # 벽과 fire_ball의 충돌 그룹 등록
+    # 'fire_ball:brick' 충돌 그룹 초기화
+    game_world.add_collision_pair('fire_ball:brick', [], bricks)
+    print("'fire_ball:brick' 충돌 그룹이 추가되었습니다:", 'fire_ball:brick' in game_world.collision_pairs)
+    print("fire_ball:brick 그룹의 Bricks 수:", len(game_world.collision_pairs['fire_ball:brick'][1]))
+
+    # 'fire_ball:clean_box' 충돌 그룹 초기화
+    game_world.add_collision_pair('fire_ball:clean_box', [], clean_boxes)
+    print("'fire_ball:clean_box' 충돌 그룹이 추가되었습니다:", 'fire_ball:clean_box' in game_world.collision_pairs)
+    print("fire_ball:clean_box 그룹의 Clean_boxes 수:", len(game_world.collision_pairs['fire_ball:clean_box'][1]))
+
+    # 'fire_ball:gun_box' 충돌 그룹 초기화
+    game_world.add_collision_pair('fire_ball:gun_box', [], gun_boxes)
+    print("'fire_ball:gun_box' 충돌 그룹이 추가되었습니다:", 'fire_ball:gun_box' in game_world.collision_pairs)
+    print("fire_ball:gun_box 그룹의 Gun_boxes 수:", len(game_world.collision_pairs['fire_ball:gun_box'][1]))
+
+    # 'fire_ball:random_box' 충돌 그룹 초기화
+    game_world.add_collision_pair('fire_ball:random_box', [], random_boxes)
+    print("'fire_ball:random_box' 충돌 그룹이 추가되었습니다:", 'fire_ball:random_box' in game_world.collision_pairs)
+    print("fire_ball:random_box 그룹의 Random_boxes 수:", len(game_world.collision_pairs['fire_ball:random_box'][1]))
+
     # 배경음악 관리자 초기화
     bgm_manager = BGMManager()
     print("Loading background music...")  # 디버깅 출력
@@ -207,18 +228,20 @@ def update():
         elif isinstance(obj, Star):
             game_world.add_collision_pair('mario:star', mario, obj)
         elif isinstance(obj, Ball):
-            # 'fire_ball:turtle' 그룹에 추가
+            # 기존의 'fire_ball:turtle', 'fire_ball:koomba' 그룹에 추가
             if 'fire_ball:turtle' in game_world.collision_pairs:
                 game_world.collision_pairs['fire_ball:turtle'][0].append(obj)
-                print("Ball이 'fire_ball:turtle' 충돌 그룹에 추가되었습니다.")
-            else:
-                print("'fire_ball:turtle' 충돌 그룹이 존재하지 않습니다.")
-            # 'fire_ball:koomba' 그룹에 추가 (수정된 부분)
             if 'fire_ball:koomba' in game_world.collision_pairs:
                 game_world.collision_pairs['fire_ball:koomba'][0].append(obj)
-                print("Ball이 'fire_ball:koomba' 충돌 그룹에 추가되었습니다.")
-            else:
-                print("'fire_ball:koomba' 충돌 그룹이 존재하지 않습니다.")
+            # 벽과의 충돌 그룹에 Ball 객체 추가
+            if 'fire_ball:brick' in game_world.collision_pairs:
+                game_world.collision_pairs['fire_ball:brick'][0].append(obj)
+            if 'fire_ball:clean_box' in game_world.collision_pairs:
+                game_world.collision_pairs['fire_ball:clean_box'][0].append(obj)
+            if 'fire_ball:gun_box' in game_world.collision_pairs:
+                game_world.collision_pairs['fire_ball:gun_box'][0].append(obj)
+            if 'fire_ball:random_box' in game_world.collision_pairs:
+                game_world.collision_pairs['fire_ball:random_box'][0].append(obj)
     objects_to_add.clear()
 
     # 게임 시간 업데이트

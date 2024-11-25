@@ -140,3 +140,16 @@ class Ball(GameObject):
             score_text = ScoreText(self.x, self.y + 30, "+100")
             game_world.add_object(score_text, 2)
             print("ScoreText 추가됨: +100")
+
+        elif group in ['fire_ball:brick', 'fire_ball:clean_box', 'fire_ball:gun_box', 'fire_ball:random_box']:
+            print(f"Ball이 벽과 충돌했습니다: {group}")
+            # Ball 제거
+            try:
+                game_world.remove_object(self)
+                print("Ball 객체가 벽과의 충돌로 제거되었습니다.")
+            except ValueError:
+                print(f"Ball 객체 {self}는 이미 제거되었습니다.")
+            # 벽은 제거하지 않음
+
+        else:
+            pass  # 기타 그룹에 대한 처리는 필요 없으므로 pass
