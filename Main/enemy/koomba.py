@@ -35,7 +35,7 @@ class Koomba(GameObject):
         self.x, self.y = random.randint(1000, 1400), 70  # 초기 위치 설정
         self.load_images()
         self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
-        self.dir = random.choice([-1, 1])  # 이동 방향: -1(왼쪽), 1(오른쪽)
+        self.dir = random.choice([-1, 1])  # 초기 이동 방향: -1(왼쪽), 1(오른쪽)
         self.alive = True  # 살아있는 상태
         self.stomped = False  # 굼바가 밟혔는지 여부
         self.stomp_timer = 0.3  # 밟힌 후 0.3초 후 제거 (디버깅용)
@@ -66,13 +66,7 @@ class Koomba(GameObject):
         # 위치 업데이트
         self.x += RUN_SPEED_PPS * self.dir * frame_time
 
-        # 화면 경계를 벗어나면 방향 전환
-        if self.x > 800:
-            self.dir = -1
-        elif self.x < 600:
-            self.dir = 1
-
-        # 위치 클램프
+        # 위치 클램프 (방향 전환은 play_mode.py에서 관리)
         self.x = clamp(1000, self.x, 1400)
 
     def draw_with_camera(self, camera: Camera):
@@ -153,7 +147,6 @@ class Koomba(GameObject):
         left, bottom, right, top = self.get_bottom_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
-    # 새로 추가된 'normal' 히트박스 메서드
     def get_normal_bb(self):
         if self.stomped:
             return ()  # stomped 상태일 때는 Normal 히트박스 비활성화
@@ -167,6 +160,13 @@ class Koomba(GameObject):
     def get_normal_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_normal_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
+
+    def set_dir(self, dir):
+        """
+        적의 이동 방향을 설정합니다.
+        :param dir: -1 (왼쪽), 1 (오른쪽)
+        """
+        self.dir = dir
 
     def handle_collision(self, group, other, hit_position):
         pass  # 현재 Koomba는 충돌 처리 로직을 구현하지 않으므로 pass

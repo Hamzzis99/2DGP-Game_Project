@@ -1,6 +1,5 @@
-# enemy/Boss_turtle.py
-
-from pico2d import load_image, clamp
+# enemy/boss_turtle.py
+from pico2d import load_image, clamp, draw_rectangle
 from game_object import GameObject
 from states import game_state
 from utils.camera import Camera
@@ -20,7 +19,6 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 2.0  # 두 가지 프레임으로 애니메이션
 
-
 class Boss_turtle(GameObject):
     image = None  # 스프라이트 시트 이미지
 
@@ -34,14 +32,20 @@ class Boss_turtle(GameObject):
         self.frame_width = 20
         self.frame_height = 29
 
-    def __init__(self):
-        self.x, self.y = random.randint(1000, 1400), 70  # 초기 위치 설정
+    def __init__(self, scale=2.0, initial_y=70):
+        """
+        Boss_turtle 초기화
+        :param scale: 캐릭터의 스케일 (기본값: 2.0)
+        :param initial_y: Boss_turtle의 초기 y 좌표 (기본값: 70)
+        """
+        self.x, self.y = random.randint(1000, 1400), initial_y  # 초기 위치 설정
         self.load_images()
         self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
-        self.dir = random.choice([-1, 1])  # 이동 방향: -1(왼쪽), 1(오른쪽)
+        self.dir = random.choice([-1, 1])  # 초기 이동 방향: -1(왼쪽), 1(오른쪽)
         self.alive = True  # 살아있는 상태
         self.state = 'normal'  # 현재 상태: 항상 'normal' 상태
         self.frame_time = 0.0  # 애니메이션 시간
+        self.scale = scale  # 스케일 설정
 
     def update(self):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
@@ -56,14 +60,8 @@ class Boss_turtle(GameObject):
         # 위치 업데이트
         self.x += RUN_SPEED_PPS * self.dir * frame_time
 
-        # 화면 경계를 벗어나면 방향 전환
-        if self.x > 1400:
-            self.dir = -1
-        elif self.x < 1000:
-            self.dir = 1
-
-        # 위치 클램프
-        self.x = clamp(1000, self.x, 1400)  # 이동 범위를 1000~1400으로 설정
+        # 위치 클램프 (방향 전환은 play_mode.py에서 관리)
+        self.x = clamp(1000, self.x, 1400)
 
     def draw_with_camera(self, camera: Camera):
         if not self.alive:
@@ -75,8 +73,8 @@ class Boss_turtle(GameObject):
         frame_x = self.normal_frame_x_positions[self.frame]
         frame_y = self.normal_frame_y_position
 
-        # 그릴 크기 설정
-        dest_width, dest_height = 32, 32  # 화면에 그릴 크기
+        # 그릴 크기 설정 (스케일 적용)
+        dest_width, dest_height = self.frame_width * self.scale, self.frame_height * self.scale  # 화면에 그릴 크기
 
         if self.dir < 0:
             # 왼쪽으로 이동 중이면 프레임을 수평 반전하여 그립니다.
@@ -91,9 +89,18 @@ class Boss_turtle(GameObject):
                 screen_x, screen_y, dest_width, dest_height
             )
 
+        # 히트박스 그리기 (디버깅용)
+        draw_rectangle(*self.get_bb_offset(camera))
+        draw_rectangle(*self.get_top_bb_offset(camera))
+        draw_rectangle(*self.get_bottom_bb_offset(camera))
+
     def get_bb(self):
-        width = 16 * 2  # 이미지의 폭 * 스케일 (16 * 2 = 32)
-        height = 20 * 1.6  # 이미지의 높이 * 스케일 (20 * 1.6 = 32)
+        """
+        히트박스 계산 (스케일 적용)
+        :return: (left, bottom, right, top)
+        """
+        width = self.frame_width * self.scale  # 이미지의 폭 * 스케일
+        height = self.frame_height * self.scale  # 이미지의 높이 * 스케일
         half_width = width / 2
         half_height = height / 2
         return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
@@ -103,22 +110,47 @@ class Boss_turtle(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def get_top_bb(self):
-        # Top 히트박스: Boss_turtle의 머리 부분
-        return self.x - 13, self.y + 10, self.x + 13, self.y + 25  # (left, bottom, right, top)
+        """
+        Top 히트박스: Boss_turtle의 머리 부분 (스케일 적용)
+        :return: (left, bottom, right, top)
+        """
+        return (self.x - 13 * self.scale, self.y + 10 * self.scale,
+                self.x + 13 * self.scale, self.y + 25 * self.scale)  # (left, bottom, right, top)
 
     def get_top_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_top_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def get_bottom_bb(self):
-        # Bottom 히트박스: Boss_turtle의 몸통 부분
-        return self.x - 15, self.y - 15, self.x + 15, self.y + 20  # (left, bottom, right, top)
+        """
+        Bottom 히트박스: Boss_turtle의 몸통 부분 (스케일 적용)
+        :return: (left, bottom, right, top)
+        """
+        return (self.x - 15 * self.scale, self.y - 15 * self.scale,
+                self.x + 15 * self.scale, self.y + 20 * self.scale)  # (left, bottom, right, top)
 
     def get_bottom_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_bottom_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
+    def set_dir(self, dir):
+        """
+        적의 이동 방향을 설정합니다.
+        :param dir: -1 (왼쪽), 1 (오른쪽)
+        """
+        self.dir = dir
+
     def handle_collision(self, group, other, hit_position):
-        # Boss_turtle과 충돌 시 처리 로직
-        # 현재는 아무 동작도 하지 않도록 설정
-        pass
+        if group == 'fire_ball:boss_turtle':
+            print(f"Boss_turtle이 fire_ball과 충돌했습니다: Boss_turtle={self}, Ball={other}")
+            self.alive = False  # Boss_turtle을 비활성화
+            game_state.score += 500  # 점수 추가 (예시)
+            print(f"Score increased by 500. Total Score: {game_state.score}")
+            # Ball 제거는 Ball의 handle_collision에서 이미 처리됨
+            # 추가로 점수 텍스트를 표시할 수 있음
+            from utils.score_text import ScoreText
+            score_text = ScoreText(self.x, self.y + 30, "+500")
+            game_world.add_object(score_text, 2)
+            print("ScoreText 추가됨: +500")
+        else:
+            pass  # 다른 충돌 그룹에 대한 처리는 필요 없으므로 pass

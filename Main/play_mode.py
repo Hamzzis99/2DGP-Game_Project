@@ -8,6 +8,7 @@ from ball import Ball
 from grass import Grass
 from enemy.koomba import Koomba
 from enemy.turtle import Turtle
+from enemy.boss_turtle import Boss_turtle  # Boss_turtle 임포트
 from mario import Mario, reset_mario
 from props.brick import Brick
 from props.random_box import Random_box
@@ -63,6 +64,7 @@ def init():
     mario = Mario(dashboard)  # Dashboard 인스턴스를 Mario에게 전달
     game_world.add_object(mario, 1)
 
+    # Koombas 추가
     koombas = [Koomba() for _ in range(5)]
     game_world.add_objects(koombas, 1)
 
@@ -94,11 +96,16 @@ def init():
     ]
     game_world.add_objects(gun_boxes, 1)
 
+    # Clean Box 추가
     clean_boxes = [
         Clean_box(800, 150),
         Clean_box(850, 150)
     ]
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
+
+    # Boss_turtle 추가
+    boss = Boss_turtle(scale=20.0)  # 스케일 설정 (2.0)
+    game_world.add_object(boss, 1)
 
     # 충돌 쌍 등록
     for koomba in koombas:
@@ -139,6 +146,13 @@ def init():
         game_world.add_collision_pair('mario:clean_box_left', mario, clean_box)
         game_world.add_collision_pair('mario:clean_box_right', mario, clean_box)
 
+    # Boss_turtle과 Mario 간의 충돌 쌍 등록
+    game_world.add_collision_pair('mario:boss_turtle', mario, boss)
+
+    # Boss_turtle과 Ball 간의 충돌 쌍 등록
+    game_world.add_collision_pair('fire_ball:boss_turtle', [], [boss])
+    print("'fire_ball:boss_turtle' 충돌 그룹이 추가되었습니다:", 'fire_ball:boss_turtle' in game_world.collision_pairs)
+    print("fire_ball:boss_turtle 그룹의 Boss_turtles 수:", len(game_world.collision_pairs['fire_ball:boss_turtle'][1]))
 
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)
@@ -242,6 +256,9 @@ def update():
                 game_world.collision_pairs['fire_ball:gun_box'][0].append(obj)
             if 'fire_ball:random_box' in game_world.collision_pairs:
                 game_world.collision_pairs['fire_ball:random_box'][0].append(obj)
+            # Boss_turtle과의 충돌 그룹에 Ball 객체 추가
+            if 'fire_ball:boss_turtle' in game_world.collision_pairs:
+                game_world.collision_pairs['fire_ball:boss_turtle'][0].append(obj)
     objects_to_add.clear()
 
     # 게임 시간 업데이트

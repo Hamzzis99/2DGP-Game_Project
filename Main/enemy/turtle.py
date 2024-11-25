@@ -1,5 +1,4 @@
 # enemy/turtle.py
-
 from pico2d import load_image, clamp
 from game_object import GameObject
 from states import game_state
@@ -20,7 +19,6 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 2.0  # 두 가지 프레임으로 애니메이션
-
 
 class Turtle(GameObject):
     image = None  # 스프라이트 시트 이미지
@@ -43,7 +41,7 @@ class Turtle(GameObject):
         self.x, self.y = random.randint(1000, 1400), 70  # 초기 위치 설정
         self.load_images()
         self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
-        self.dir = random.choice([-1, 1])  # 이동 방향: -1(왼쪽), 1(오른쪽)
+        self.dir = random.choice([-1, 1])  # 초기 이동 방향: -1(왼쪽), 1(오른쪽)
         self.alive = True  # 살아있는 상태
         self.state = 'normal'  # 현재 상태: 'normal', 'transform1', 'transform2'
         self.timer = TurtleConfig.TURTLE_TRANSFORM_INTERVAL  # 상태 전환 타이머
@@ -56,25 +54,19 @@ class Turtle(GameObject):
 
         if self.state == 'normal':
             self.timer -= frame_time
-            #print(f"Turtle normal. Timer: {self.timer:.2f}s")
             if self.timer <= 0:
                 self.state = 'transform1'
                 self.frame_x_positions = self.transform1_frame_x_positions
                 self.frame_y_position = self.transform1_frame_y_position
                 self.dir = 0  # 제자리 멈춤
-                self.timer = TurtleConfig.TURTLE_TRANSFORM_DURATION  # 5초 동안 변신
-                #print("Turtle entered transform1 state.")
-
+                self.timer = TurtleConfig.TURTLE_TRANSFORM_DURATION  # 변신 지속 시간
         elif self.state == 'transform1':
             self.timer -= frame_time
-            #print(f"Turtle transform1. Timer: {self.timer:.2f}s")
             if self.timer <= 0:
                 self.state = 'transform2'
                 self.frame_x_positions = self.transform2_frame_x_positions
                 self.frame_y_position = self.transform2_frame_y_position
                 self.timer = 0.0  # transform2는 즉시 다음 상태로 전환
-                #print("Turtle entered transform2 state.")
-
         elif self.state == 'transform2':
             # transform2 상태에서는 바로 normal 상태로 돌아감
             self.state = 'normal'
@@ -82,7 +74,6 @@ class Turtle(GameObject):
             self.frame_y_position = self.normal_frame_y_position
             self.dir = random.choice([-1, 1])  # 이동 방향 재설정
             self.timer = TurtleConfig.TURTLE_TRANSFORM_INTERVAL  # 다음 변신을 위한 타이머 리셋
-            #print("Turtle reverted to normal state.")
 
         # 상태가 'transform1' 또는 'transform2'일 때는 이동 및 애니메이션을 하지 않음
         if self.state in ['transform1', 'transform2']:
@@ -98,14 +89,8 @@ class Turtle(GameObject):
         # 위치 업데이트
         self.x += RUN_SPEED_PPS * self.dir * frame_time
 
-        # 화면 경계를 벗어나면 방향 전환
-        if self.x > 1400:
-            self.dir = -1
-        elif self.x < 200:
-            self.dir = 1
-
-        # 위치 클램프
-        self.x = clamp(1000, self.x, 1400)  # 이동 범위를 1000~1400으로 설정
+        # 위치 클램프 (방향 전환은 play_mode.py에서 관리)
+        self.x = clamp(1000, self.x, 1400)
 
     def draw_with_camera(self, camera: Camera):
         if not self.alive:
@@ -160,11 +145,12 @@ class Turtle(GameObject):
         left, bottom, right, top = self.get_bottom_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
+    def set_dir(self, dir):
+        """
+        적의 이동 방향을 설정합니다.
+        :param dir: -1 (왼쪽), 1 (오른쪽)
+        """
+        self.dir = dir
+
     def handle_collision(self, group, other, hit_position):
-        #if group == 'fire_ball:turtle':
-            #print(f"Turtle이 fire_ball과 충돌했습니다: Turtle={self}, Ball={other}")
-            #self.alive = False  # Turtle을 비활성화
-            #game_state.score += 200  # 점수 추가 (예시)
-            #print(f"Score increased by 200. Total Score: {game_state.score}")
-            # Ball 제거는 Ball의 handle_collision에서 이미 처리됨
-        pass
+        pass  # 현재 Turtle는 충돌 처리 로직을 구현하지 않으므로 pass
