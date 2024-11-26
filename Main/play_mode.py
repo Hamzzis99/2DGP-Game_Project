@@ -37,10 +37,13 @@ def handle_events():
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
+            #print("Quit event detected")
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            #print("Escape key pressed")
             game_framework.quit()
         elif event.type in (SDL_KEYDOWN, SDL_KEYUP):
+            #print(f"Key Event: {event.type}, Key: {event.key}")  # 디버깅 출력
             mario.handle_event(event)  # 키 이벤트만 마리오에게 전달
 
 def init():
@@ -61,57 +64,60 @@ def init():
     mario = Mario(dashboard)  # Dashboard 인스턴스를 Mario에게 전달
     game_world.add_object(mario, 1)
 
-    # Koombas 추가 (특정 위치에 배치)
-    koomba_positions = [
-        (300, 100),
-        (400, 100),
-        (500, 100)
+    # Koombas 추가
+    # Koombas 추가 (x, y 좌표로 생성)
+    koombas = [
+        Koomba(300, 70),
+        Koomba(400, 70),
+        Koomba(500, 70),
+        Koomba(600, 70),
+        Koomba(700, 70)
     ]
-    koombas = [Koomba(x, y) for (x, y) in koomba_positions]
     game_world.add_objects(koombas, 1)
 
-    # Turtle 추가 (특정 위치에 배치)
-    turtle_positions = [
-        (600, 100),
-        (700, 100)
+    # Turtle 추가
+    # Turtles 추가 (x, y 좌표로 생성)
+    turtlers = [
+        Turtle(800, 70),
+        Turtle(900, 70),
+        Turtle(1000, 70)
     ]
-    turtlers = [Turtle(x, y) for (x, y) in turtle_positions]
-    game_world.add_objects(turtlers, 1)
+    game_world.add_objects(turtlers, 1)      # 레이어 1에 추가
 
     # 벽돌 추가 (32x32 픽셀로 스프라이트 크기 두 배로 확장됨)
     bricks = [
-        Brick(300, 150),
-        Brick(350, 150),
-        Brick(400, 150),
-        Brick(450, 150),
-        Brick(500, 150)
+        Brick(300, 100),
+        Brick(350, 100),
+        Brick(400, 100),
+        Brick(450, 100),
+        Brick(500, 100)
     ]
     game_world.add_objects(bricks, 1)
 
     # Random Box 추가
     random_boxes = [
-        Random_box(600, 200),
-        Random_box(650, 200)
+        Random_box(600, 150),
+        Random_box(650, 150)
     ]
     game_world.add_objects(random_boxes, 1)
 
     # Gun Box 추가
     gun_boxes = [
-        Gun_box(700, 200),
-        Gun_box(750, 200)
+        Gun_box(700, 150),
+        Gun_box(750, 150)
     ]
     game_world.add_objects(gun_boxes, 1)
 
     # Clean Box 추가
     clean_boxes = [
-        Clean_box(800, 200),
-        Clean_box(850, 200)
+        Clean_box(800, 150),
+        Clean_box(850, 150)
     ]
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
 
-    # Boss_turtle 추가 (특정 위치에 배치)
-    boss = Boss_turtle(x=900, y=200, scale=20.0)  # 스케일 설정 (20.0)
-    game_world.add_object(boss, 1)
+    # Boss_turtle 추가
+    #boss = Boss_turtle(scale=20.0)  # 스케일 설정 (2.0)
+    #game_world.add_object(boss, 1)
 
     # 충돌 쌍 등록
     for koomba in koombas:
@@ -153,12 +159,12 @@ def init():
         game_world.add_collision_pair('mario:clean_box_right', mario, clean_box)
 
     # Boss_turtle과 Mario 간의 충돌 쌍 등록
-    game_world.add_collision_pair('mario:boss_turtle', mario, boss)
+    #game_world.add_collision_pair('mario:boss_turtle', mario, boss)
 
     # Boss_turtle과 Ball 간의 충돌 쌍 등록
-    game_world.add_collision_pair('fire_ball:boss_turtle', [], [boss])
+    #game_world.add_collision_pair('fire_ball:boss_turtle', [], [boss])
     print("'fire_ball:boss_turtle' 충돌 그룹이 추가되었습니다:", 'fire_ball:boss_turtle' in game_world.collision_pairs)
-    print("fire_ball:boss_turtle 그룹의 Boss_turtles 수:", len(game_world.collision_pairs['fire_ball:boss_turtle'][1]))
+    #print("fire_ball:boss_turtle 그룹의 Boss_turtles 수:", len(game_world.collision_pairs['fire_ball:boss_turtle'][1]))
 
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grass)
@@ -265,7 +271,6 @@ def update():
             # Boss_turtle과의 충돌 그룹에 Ball 객체 추가
             if 'fire_ball:boss_turtle' in game_world.collision_pairs:
                 game_world.collision_pairs['fire_ball:boss_turtle'][0].append(obj)
-        # 추가적인 충돌 쌍이 필요하다면 여기에 추가
     objects_to_add.clear()
 
     # 게임 시간 업데이트

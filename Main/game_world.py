@@ -156,7 +156,7 @@ def handle_collisions():
                         a.handle_collision(group, b, 'collision')
                         # b.handle_collision(group, a, 'collision')  # Turtle의 handle_collision을 수정하지 않으므로 호출하지 않음
                 elif group == 'fire_ball:koomba':
-                    if collide_hitboxes(a.get_bb(), b.get_normal_bb()):
+                    if collide_hitboxes(a.get_bb(), b.get_bb()):
                         a.handle_collision(group, b, 'collision')
                         # b.handle_collision(group, a, 'collision')  # Koomba의 handle_collision을 수정하지 않으므로 호출하지 않음
                 elif group == 'fire_ball:brick' or group == 'fire_ball:clean_box' or group == 'fire_ball:gun_box' or group == 'fire_ball:random_box':
