@@ -1,4 +1,4 @@
-#s main.py
+#main.py
 
 from pico2d import *
 import game_framework

@@ -32,7 +32,7 @@ class Boss_turtle(GameObject):
         self.frame_width = 20
         self.frame_height = 29
 
-    def __init__(self, scale=2.0, initial_y=70):
+    def __init__(self, scale=2.0, initial_y=300):
         """
         Boss_turtle 초기화
         :param scale: 캐릭터의 스케일 (기본값: 2.0)

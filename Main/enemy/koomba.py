@@ -1,10 +1,11 @@
 # enemy/koomba.py
-from pico2d import load_image, draw_rectangle, clamp, load_wav
+from pico2d import load_image, clamp, load_wav, draw_rectangle
 from game_object import GameObject
+from states import game_state
 from utils.camera import Camera
-import random
-import game_framework
 import game_world
+import game_framework
+import random
 
 # Koomba Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
@@ -16,36 +17,42 @@ RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 # Koomba Action Speed
 TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 2.0  # 두 가지 프레임으로 애니메이션
+FRAMES_PER_ACTION = 2.0
+
 
 class Koomba(GameObject):
     image = None  # 스프라이트 시트 이미지
+    stomp_sound = None  # stomp 사운드 공유
 
     def load_images(self):
         if Koomba.image is None:
             Koomba.image = load_image('img/character.png')  # 스프라이트 시트 로드
+            Koomba.stomp_sound = load_wav('sound/stomp.ogg')
+            Koomba.stomp_sound.set_volume(32)
 
         # 애니메이션 프레임 좌표 설정
-        self.frame_x_positions = [296, 315]
-        self.frame_y_position = 196
+        self.frame_x_positions = [290, 304]
+        self.frame_y_position = 342
         self.frame_width = 16
-        self.frame_height = 20
+        self.frame_height = 16
 
-    def __init__(self):
-        self.x, self.y = random.randint(1000, 1400), 70  # 초기 위치 설정
+    def __init__(self, x=1000, y=70):
+        self.x, self.y = x, y  # 위치를 인자로 설정
+        self.start_x = x  # 시작 x 위치 저장
+        self.min_x = self.start_x - 100  # 왼쪽 경계
+        self.max_x = self.start_x + 100  # 오른쪽 경계
         self.load_images()
-        self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
+        self.frame = 0  # 초기 프레임 (0)
         self.dir = random.choice([-1, 1])  # 초기 이동 방향: -1(왼쪽), 1(오른쪽)
         self.alive = True  # 살아있는 상태
-        self.stomped = False  # 굼바가 밟혔는지 여부
-        self.stomp_timer = 0.3  # 밟힌 후 0.3초 후 제거 (디버깅용)
-        self.frame_time = 0  # 애니메이션 시간
-        self.stomp_sound = load_wav('sound/koomba.ogg')  # 사운드 파일 로드
-        self.stomp_sound.set_volume(20)  # 필요에 따라 볼륨 설정
-        self.stomp_sound_played = False  # Stomp 사운드 재생 여부
+        self.stomped = False  # stomped 상태 초기화
+        self.frame_time = 0.0  # 애니메이션 시간
+        self.stomp_timer = 0.5  # stomped 상태 지속 시간
+        self.stomp_sound_played = False  # stomp 사운드 재생 여부
 
     def update(self):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
+
         if self.stomped:
             if not self.stomp_sound_played:
                 self.stomp_sound.play()  # Stomp 사운드 한 번만 재생
@@ -66,8 +73,13 @@ class Koomba(GameObject):
         # 위치 업데이트
         self.x += RUN_SPEED_PPS * self.dir * frame_time
 
-        # 위치 클램프 (방향 전환은 play_mode.py에서 관리)
-        self.x = clamp(1000, self.x, 1400)
+        # 이동 범위 내에 있는지 확인하고 방향 전환
+        if self.x <= self.min_x:
+            self.x = self.min_x
+            self.dir = 1  # 오른쪽으로 방향 전환
+        elif self.x >= self.max_x:
+            self.x = self.max_x
+            self.dir = -1  # 왼쪽으로 방향 전환
 
     def draw_with_camera(self, camera: Camera):
         if not self.alive:
