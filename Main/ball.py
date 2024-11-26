@@ -46,7 +46,7 @@ class Ball(GameObject):
             print("Ball 이미지가 로드되지 않아 그릴 수 없습니다.")
         pass  # draw 메서드에서는 아무것도 하지 않음
 
-    def draw_with_camera(self, camera):
+    def draw_with_camera(self, camera: Camera):
         if self.image:
             screen_x, screen_y = camera.apply(self.x, self.y)
             self.image.draw(screen_x, screen_y)
@@ -54,7 +54,7 @@ class Ball(GameObject):
         else:
             print("Ball 이미지가 로드되지 않아 그릴 수 없습니다.")
 
-    def get_bb_offset(self, camera):
+    def get_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
@@ -103,13 +103,6 @@ class Ball(GameObject):
             except ValueError:
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
 
-            # 점수 추가
-            game_state.score += 100
-            print(f"Score increased by 200. Total Score: {game_state.score}")
-            score_text = ScoreText(self.x, self.y + 30, "+200")
-            game_world.add_object(score_text, 2)
-            print("ScoreText 추가됨: +200")
-
         elif group == 'fire_ball:koomba':
             print(f"Ball이 Koomba와 충돌했습니다: Ball={self}, Koomba={other}")
 
@@ -135,7 +128,7 @@ class Ball(GameObject):
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
 
         elif group == 'fire_ball:boss_turtle':
-            print(f"Ball이 boss_turtle와 충돌했습니다: Ball={self}, boss_turtle={other}")
+            print(f"Ball이 Boss_turtle과 충돌했습니다: Ball={self}, Boss_turtle={other}")
 
             # 사운드 재생 추가 (클래스 변수 사용)
             if Ball.common_kick_sound:
@@ -144,21 +137,14 @@ class Ball(GameObject):
             else:
                 print("common_kick_sound가 로드되지 않았습니다.")
 
-            # Koomba 제거
-            try:
-                game_world.remove_object(other)
-                print("boss_turtle 객체가 제거되었습니다.")
-            except ValueError:
-                print(f"boss_turtle 객체 {other}가 이미 제거되었습니다.")
-
-            # Ball 제거
+            # Boss_turtle은 HP를 관리하므로, Ball은 제거만 합니다.
             try:
                 game_world.remove_object(self)
                 print("Ball 객체가 제거되었습니다.")
             except ValueError:
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
 
-            # 점수 추가
+            # 점수 추가 (각 충돌 시)
             game_state.score += 100  # 점수는 필요에 따라 조정 가능
             print(f"Score increased by 100. Total Score: {game_state.score}")
             score_text = ScoreText(self.x, self.y + 30, "+100")

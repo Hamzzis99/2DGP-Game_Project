@@ -32,11 +32,11 @@ class Boss_turtle(GameObject):
         self.frame_width = 20
         self.frame_height = 29
 
-    def __init__(self, scale=2.0, initial_y=200):
+    def __init__(self, scale=1.0, initial_y=300):
         """
         Boss_turtle 초기화
-        :param scale: 캐릭터의 스케일 (기본값: 2.0)
-        :param initial_y: Boss_turtle의 초기 y 좌표 (기본값: 70)
+        :param scale: 캐릭터의 스케일 (기본값: 1.0)
+        :param initial_y: Boss_turtle의 초기 y 좌표 (기본값: 300)
         """
         self.x, self.y = random.randint(1000, 1400), initial_y  # 초기 위치 설정
         self.load_images()
@@ -46,6 +46,8 @@ class Boss_turtle(GameObject):
         self.state = 'normal'  # 현재 상태: 항상 'normal' 상태
         self.frame_time = 0.0  # 애니메이션 시간
         self.scale = scale  # 스케일 설정
+
+        self.hp = 2  # Boss_turtle의 HP 설정
 
     def update(self):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
@@ -141,16 +143,20 @@ class Boss_turtle(GameObject):
         self.dir = dir
 
     def handle_collision(self, group, other, hit_position):
+        if not self.alive:
+            return
+
         if group == 'fire_ball:boss_turtle':
-            print(f"Boss_turtle이 fire_ball과 충돌했습니다: Boss_turtle={self}, Ball={other}")
-            self.alive = False  # Boss_turtle을 비활성화
-            game_state.score += 500  # 점수 추가 (예시)
-            print(f"Score increased by 500. Total Score: {game_state.score}")
-            # Ball 제거는 Ball의 handle_collision에서 이미 처리됨
-            # 추가로 점수 텍스트를 표시할 수 있음
-            from utils.score_text import ScoreText
-            score_text = ScoreText(self.x, self.y + 30, "+500")
-            game_world.add_object(score_text, 2)
-            print("ScoreText 추가됨: +500")
+            print(f"Boss_turtle이 Ball에 맞았습니다. 현재 HP: {self.hp}")
+            self.hp -= 1  # HP 감소
+
+            # Ball 제거는 ball.py에서 처리
+            # 여기서는 HP만 관리
+
+            if self.hp <= 0:
+                self.alive = False
+                game_world.remove_object(self)
+                print("Boss_turtle이 파괴되었습니다.")
+
         else:
             pass  # 다른 충돌 그룹에 대한 처리는 필요 없으므로 pass
