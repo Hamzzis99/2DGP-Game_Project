@@ -65,27 +65,27 @@ def init():
     grass1.width = 800
 
     grass2 = Grass()
-    grass2.x = 850
+    grass2.x = 900
     grass2.y = 30
     grass2.width = 800
 
     grass3 = Grass()
-    grass3.x = 1700
+    grass3.x = 1800
     grass3.y = 30
     grass3.width = 800
 
     grass4 = Grass()
-    grass4.x = 2550
+    grass4.x = 2700
     grass4.y = 30
     grass4.width = 800
 
     grass5 = Grass()
-    grass5.x = 3400
+    grass5.x = 3600
     grass5.y = 30
     grass5.width = 800
 
     grass6 = Grass()
-    grass6.x = 4250
+    grass6.x = 4500
     grass6.y = 30
     grass6.width = 800
 

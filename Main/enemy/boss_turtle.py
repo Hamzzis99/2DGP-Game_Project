@@ -157,6 +157,20 @@ class Boss_turtle(GameObject):
                 self.alive = False
                 game_world.remove_object(self)
                 print("Boss_turtle이 파괴되었습니다.")
+        else:
+            pass  # 다른 충돌 그룹에 대한 처리는 필요 없으므로 pass
+
+        if group == 'fire_ball:boss_turtle':
+            print(f"Boss_turtle이 Ball에 맞았습니다. 현재 HP: {self.hp}")
+            self.hp -= 1  # HP 감소
+
+            # Ball 제거는 ball.py에서 처리
+            # 여기서는 HP만 관리
+
+            if self.hp <= 0:
+                self.alive = False
+                game_world.remove_object(self)
+                print("Boss_turtle이 파괴되었습니다.")
 
         else:
             pass  # 다른 충돌 그룹에 대한 처리는 필요 없으므로 pass

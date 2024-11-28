@@ -1,7 +1,7 @@
 # utils/config.py
 
 class MarioConfig:
-    WORLD_WIDTH = 4000
+    WORLD_WIDTH = 4800
     WORLD_HEIGHT = 600
     START_X = 100
     START_Y = 100
