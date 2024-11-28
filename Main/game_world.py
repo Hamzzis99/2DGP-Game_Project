@@ -113,6 +113,11 @@ def handle_collisions():
                     if collide_hitboxes(a.get_bb(), b.get_bb()):
                         a.handle_collision(group, b, 'collision')  # Mario 처리
                         b.handle_collision(group, a, 'collision')  # Turtle 처리
+                elif group == 'mario:boss_turtle':
+                    # Mario와 Boss Turtle 간의 충돌 처리
+                    if collide_hitboxes(a.get_bb(), b.get_bb()):
+                        a.handle_collision(group, b, 'collision')  # Mario 처리
+                        b.handle_collision(group, a, 'collision')  # Turtle 처리
                 elif group == 'mario:brick_top':
                     if collide_hitboxes(a.get_bb(), b.get_top_bb()):
                         a.handle_collision(group, b, 'brick_top')

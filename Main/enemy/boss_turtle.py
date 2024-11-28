@@ -13,7 +13,7 @@ from utils.score_text import ScoreText
 
 # Boss_turtle Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
-RUN_SPEED_KMPH = 10.0  # Km / Hour
+RUN_SPEED_KMPH = 5.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -51,7 +51,7 @@ class Boss_turtle(GameObject):
         self.frame_time = 0.0  # 애니메이션 시간
         self.scale = scale  # 스케일 설정
 
-        self.hp = 2  # Boss_turtle의 HP 설정
+        self.hp = 100  # Boss_turtle의 HP 설정
 
     @property
     def dead(self):

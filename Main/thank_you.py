@@ -3,20 +3,20 @@
 import game_framework
 from pico2d import load_image, load_wav, clear_canvas, update_canvas, get_events, get_time, get_canvas_width, get_canvas_height, SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 import logo_mode
-from states import reset_game
+from states import game_over_reset  # 변경: reset_game 대신 game_over_reset 임포트
 from utils.font import Font
 
 def init():
     global font, sound, background, running, logo_start_time
     font = Font('img/font.png', char_width=8, char_height=8)
-    sound = load_wav('resources/super-mario-bros.mp3')  # 사운드 파일 로드
+    sound = load_wav('resources/super-mario-bros_win.mp3')
     sound.set_volume(32)  # 필요 시 볼륨 조정
     sound.play()  # 사운드 재생
     background = load_image('img/black.jpg')  # 검은 배경 이미지 로드
 
     running = True
     logo_start_time = get_time()
-    reset_game()  # 게임 상태 초기화 (lives=3, score=0)
+    game_over_reset()  # 게임 상태 완전 초기화
 
 def finish():
     global font, sound, background
@@ -26,7 +26,7 @@ def finish():
 
 def update():
     global logo_start_time
-    if get_time() - logo_start_time >= 7.0:  # 원래는 10초였음
+    if get_time() - logo_start_time >= 8.0:  # 원래는 10초였음
         game_framework.change_mode(logo_mode)
 
 def draw():

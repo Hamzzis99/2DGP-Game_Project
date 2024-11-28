@@ -345,7 +345,7 @@ class Mario(GameObject):
                 self.state_machine.set_state(Dead())
                 print("마리오의 y축값이 0이하여서 사망하였습니다.")
         else:
-            pass
+            pass  # 죽은 상태에서는 추가 로직 없음
 
     def handle_event(self, event):
         if self.dead:
@@ -406,12 +406,16 @@ class Mario(GameObject):
                 self.state_machine.set_state(Jump)
 
         elif group == 'mario:koomba_bottom':
-            print(f"Mario has been stomped by Koomba. Lives remaining: {game_state.lives}")
+            print(f"Mario가 Koomba에게 당했습니다. 남은 목숨: {game_state.lives}")
             self.dead = True
             self.state_machine.set_state(Dead())
 
         elif group == 'mario:turtle':
-            print(f"Mario has collided with Turtle. Lives remaining: {game_state.lives}")
+            print(f"Mario가 Turtle과 충돌했습니다. 남은 목숨: {game_state.lives}")
+            self.dead = True
+            self.state_machine.set_state(Dead())
+        elif group == 'mario:boss_turtle':
+            print(f"Mario가 Turtle과 충돌했습니다. 남은 목숨: {game_state.lives}")
             self.dead = True
             self.state_machine.set_state(Dead())
 
@@ -516,8 +520,6 @@ class Mario(GameObject):
         else:
             return 16 * self.scale
 
-# reset_mario 함수는 필요에 따라 추가하거나 수정하세요.
-
 def reset_mario(mario):
     mario.x = MarioConfig.START_X
     mario.y = MarioConfig.START_Y
@@ -528,16 +530,3 @@ def reset_mario(mario):
     mario.pressed_keys.clear()  # 눌려 있는 키 초기화
     mario.frame = 0
     mario.gun_mode = False  # gun_mode 비활성화
-
-def reset_game():
-    global mario
-    game_world.remove_object(mario)  # 기존 마리오 객체 제거
-    mario = Mario(dashboard)  # 새로운 마리오 객체 생성 (dashboard 인스턴스 필요)
-    game_world.add_object(mario, 1)
-
-def init():
-    global mario, running, dashboard
-    dashboard = Dashboard()
-    mario = Mario(dashboard)
-    game_world.add_object(mario, 1)
-    running = True

@@ -18,17 +18,25 @@ from props.gun_box import Gun_box
 from props.clean_box import Clean_box
 from items.star import Star
 from items.coin import Coin
-from states import game_state
+from states import game_state, reset_game  # GameState 및 reset_game 임포트
 from utils.camera import Camera
 from utils.config import MarioConfig
 from utils.dashboard import Dashboard
 from utils.bgm import BGMManager
 import game_over
 
+# ===== 상수 정의 =====
+WORLD_WIDTH = 9000  # 게임 월드의 전체 너비
+WORLD_HEIGHT = 600  # 게임 월드의 전체 높이
+BOSS_TRIGGER_X = 9000  # 보스 등장 트리거 x 좌표
+BOSS_EVENT_DURATION = 2.0  # 보스 등장 이벤트 지속 시간 (초)
+FADE_DURATION = 1.0  # 페이드 아웃 지속 시간 (초)
+WIN_SEQUENCE_DELAY = 6.0  # 승리 시퀀스 지연 시간 (초)
+# ======================
+
 # 전역 변수 선언
 camera = None  # 전역 카메라 객체
 dashboard = None  # 전역 대시보드 객체
-game_time = None  # 게임 시간 (초)
 bgm_manager = None  # 배경음악 관리자 객체
 objects_to_add = []  # 추가할 객체 리스트
 mario_dead = False  # Mario의 사망 상태 플래그
@@ -38,12 +46,11 @@ death_timer = None  # Mario 사망 시각 기록
 boss_event_triggered = False
 boss_event_completed = False  # 보스 이벤트 완료 플래그 추가
 boss_event_start_time = None
-boss_event_duration = 2.0  # 보스 등장 이벤트 지속 시간 (초)
 
 # 음악 페이드 아웃 관련 변수
 is_fading_out = False
 fade_start_time = None
-fade_duration = 1.0  # 페이드 아웃 지속 시간 (초)
+fade_duration = FADE_DURATION  # 페이드 아웃 지속 시간 (초)
 initial_volume_int = MarioConfig.GAME_MUSIC_VOLUME  # 초기 볼륨 (정수)
 
 # 보스 사망 시 승리 시퀀스 관련 변수 추가
@@ -66,11 +73,11 @@ def handle_events():
             # [디버깅] Escape 키 눌림
             game_framework.quit()
         elif event.type in (SDL_KEYDOWN, SDL_KEYUP):
-            # [디버깅] 키 이벤트 발생: {event.type}, 키: {event.key}
+            # [디버깅] 키 이벤트 발생
             mario.handle_event(event)  # 키 이벤트만 마리오에게 전달
 
 def init():
-    global mario, camera, dashboard, game_time, bgm_manager, mario_dead, death_timer
+    global mario, camera, dashboard, bgm_manager, mario_dead, death_timer
     global boss_event_triggered, boss_event_start_time, boss_event_completed
     global is_fading_out, fade_start_time, initial_volume_int
     global win_sequence_started, is_win_fading_out, win_fade_start_time, win_timer_start_time
@@ -95,54 +102,30 @@ def init():
 
     game_world.clear()  # 게임 월드 초기화
 
-    # Grass 객체 6개 생성 (x 간격은 50으로 설정)
-    grass1 = Grass()
-    grass1.x = 0
-    grass1.y = 30
-    grass1.width = 600
-
-    grass2 = Grass()
-    grass2.x = 880
-    grass2.y = 30
-    grass2.width = 500
-
-    grass3 = Grass()
-    grass3.x = 1900
-    grass3.y = 30
-    grass3.width = 400
-
-    grass4 = Grass()
-    grass4.x = 2700
-    grass4.y = 30
-    grass4.width = 800
-
-    grass5 = Grass()
-    grass5.x = 4200
-    grass5.y = 30
-    grass5.width = 1000
-
-    grass6 = Grass()
-    grass6.x = 4500
-    grass6.y = 30
-    grass6.width = 100
-
-    # Grass 객체들을 게임 월드에 추가
-    game_world.add_object(grass1, 0)
-    game_world.add_object(grass2, 0)
-    game_world.add_object(grass3, 0)
-    game_world.add_object(grass4, 0)
-    game_world.add_object(grass5, 0)
-    game_world.add_object(grass6, 0)
-
-    # Grass 객체들을 하나의 리스트로 묶음
-    grasses = [grass1, grass2, grass3, grass4, grass5, grass6]
+    # Grass 객체 생성 및 추가
+    grasses = []
+    grass_positions = [
+        (0, 30, 600),
+        (880, 30, 500),
+        (1900, 30, 400),
+        (2700, 30, 800),
+        (4300, 30, 1000),
+        (4500, 30, 1000)
+    ]
+    for x, y, width in grass_positions:
+        grass = Grass()
+        grass.x = x
+        grass.y = y
+        grass.width = width
+        grasses.append(grass)
+        game_world.add_object(grass, 0)
 
     dashboard = Dashboard()  # Dashboard 인스턴스 생성
 
     mario = Mario(dashboard)  # Dashboard 인스턴스를 Mario에게 전달
     game_world.add_object(mario, 1)
 
-    # Koombas 추가 (지정된 x, y 좌표로)
+    # Koombas 추가
     koombas = [
         Koomba(630, 70, 450),
         Koomba(700, 70, 400),
@@ -165,7 +148,7 @@ def init():
     ]
     game_world.add_objects(koombas, 1)
 
-    # Turtle 추가 (지정된 x, y 좌표로)
+    # Turtle 추가
     turtlers = [
         Turtle(1715, 70, 350),  # x : 1715 y = 70, distance = 360
         Turtle(1760, 160, 220),
@@ -178,7 +161,7 @@ def init():
     ]
     game_world.add_objects(turtlers, 1)
 
-    # 벽돌 추가 (32x32 픽셀로 스프라이트 크기 두 배로 확장됨)
+    # 벽돌 추가
     bricks = [
         Brick(360, 100),
         Brick(386, 100),
@@ -188,8 +171,6 @@ def init():
         Brick(464, 100),
         Brick(490, 100),
         Brick(516, 100),
-        #Brick(810, 90),
-        #Brick(836, 90),
 
         # 징검다리
         Brick(1145, 70),
@@ -247,7 +228,6 @@ def init():
         Brick(3520, 187),
         Brick(3548, 187),
     ]
-
     game_world.add_objects(bricks, 1)
 
     # Random Box 추가
@@ -273,7 +253,7 @@ def init():
 
         # Fake Brick 영역
         Random_box(3240, 187),  # Randombox
-        Random_box(3492, 187),  # Random box 중간줄2c층
+        Random_box(3492, 187),  # Random box 중간줄2층
 
         Random_box(3436, 277),  # Random box 3층
     ]
@@ -405,9 +385,8 @@ def init():
     bgm_manager.play('main_theme', MarioConfig.GAME_MUSIC_VOLUME)
     print("[디버깅] 배경음악 시작됨.")
 
-    camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)
-    game_time = MarioConfig.GAME_TIME_LIMIT
-
+    camera = Camera(800, 600, WORLD_WIDTH, WORLD_HEIGHT)
+    # game_time = MarioConfig.GAME_TIME_LIMIT  # 제거 (game_state에서 관리)
 
 def finish():
     global bgm_manager
@@ -416,9 +395,8 @@ def finish():
     game_world.reset()  # game_world 완전 초기화
     print("[디버깅] play_mode의 finish()가 호출되었습니다.")  # 디버깅 출력
 
-
 def update():
-    global game_time, objects_to_add, mario_dead, death_timer
+    global objects_to_add, mario_dead, death_timer
     global boss_event_triggered, boss_event_start_time, boss_event_completed
     global is_fading_out, fade_start_time, initial_volume_int
     global win_sequence_started, is_win_fading_out, win_fade_start_time, win_timer_start_time
@@ -429,16 +407,16 @@ def update():
     camera.update(mario)  # 카메라 위치 업데이트
 
     # 보스 등장 이벤트 트리거링
-    if not boss_event_triggered and not boss_event_completed and mario.x > 4500:
+    if not boss_event_triggered and not boss_event_completed and mario.x > BOSS_TRIGGER_X:
         boss_event_triggered = True
         boss_event_start_time = get_time()
         mario.dir = 0  # 마리오의 방향을 0으로 설정하여 움직임 중지
         mario.state_machine.set_state(Idle)  # 마리오 상태를 Idle로 변경
-        camera.start_shake(duration=2.0, magnitude=10)  # 카메라 흔들기 시작
+        camera.start_shake(duration=BOSS_EVENT_DURATION, magnitude=10)  # 카메라 흔들기 시작
         is_fading_out = True  # 페이드 아웃 시작
         fade_start_time = get_time()  # 페이드 아웃 시작 시간 기록
         initial_volume_int = bgm_manager.get_volume() if bgm_manager else MarioConfig.GAME_MUSIC_VOLUME  # 현재 볼륨 가져오기
-        print("[디버깅] 마리오 x > 4500 넘음 보스 등장 디버깅")
+        print("[디버깅] 마리오 x > BOSS_TRIGGER_X 넘음 보스 등장 디버깅")
 
     # 페이드 아웃 처리
     if is_fading_out:
@@ -464,10 +442,10 @@ def update():
     # 보스 등장 이벤트 동안 Mario의 움직임을 잠시 중지
     if boss_event_triggered and boss_event_start_time is not None:
         elapsed_time = get_time() - boss_event_start_time
-        if elapsed_time < boss_event_duration:
-            # 2초 동안 Mario의 움직임을 잠시 중지 (이미 dir=0으로 설정됨)
+        if elapsed_time < BOSS_EVENT_DURATION:
+            # BOSS_EVENT_DURATION 초 동안 Mario의 움직임을 잠시 중지 (이미 dir=0으로 설정됨)
             pass  # 추가 로직이 필요하다면 여기에 작성
-        elif elapsed_time >= boss_event_duration and not boss_event_completed:
+        elif elapsed_time >= BOSS_EVENT_DURATION and not boss_event_completed:
             # 흔들기 종료
             camera.is_shaking = False
             boss_event_triggered = False
@@ -476,7 +454,7 @@ def update():
             print("[디버깅] Boss Appearance Event Ended: Camera shaking stopped.")
 
             # 보스의 등장
-            boss = Boss_turtle(scale=10.0, initial_y=300)  # 보스 생성 (scale=10, y=300)
+            boss = Boss_turtle(scale=20.0, initial_y=300)  # 보스 생성 (scale=20, y=300)
             boss.x = 3900  # 보스의 x 좌표 설정
             game_world.add_object(boss, 1)
 
@@ -503,9 +481,9 @@ def update():
     # 승리 시퀀스: 보스 테마 페이드 아웃
     if is_win_fading_out:
         elapsed_time = get_time() - win_fade_start_time
-        if elapsed_time < fade_duration:
+        if elapsed_time < FADE_DURATION:
             # 선형으로 볼륨 감소
-            new_volume = initial_volume_int * (1 - elapsed_time / fade_duration)
+            new_volume = initial_volume_int * (1 - elapsed_time / FADE_DURATION)
             new_volume_int = int(new_volume)  # 정수로 변환
             bgm_manager.set_volume(new_volume_int)
             print(f"[디버깅] 보스 테마 뮤직 페이드 아웃 중... 볼륨: {new_volume_int}")
@@ -528,10 +506,10 @@ def update():
                 game_world.remove_object(boss)
                 print("[디버깅] Boss Turtle이 게임 월드에서 제거되었습니다.")
 
-    # 승리 음악 재생 후 6초 후에 게임 오버 화면으로 전환
+    # 승리 음악 재생 후 6초 후에 thank_you 화면으로 전환
     if win_timer_start_time is not None:
         elapsed_time = get_time() - win_timer_start_time
-        if elapsed_time >= 6.0:
+        if elapsed_time >= WIN_SEQUENCE_DELAY:
             print("[디버깅] 승리 시퀀스 완료. thank_you 화면으로 전환.")
             game_framework.change_mode(thank_you)
 
@@ -545,14 +523,18 @@ def update():
         game_state.lives -= 1  # 목숨 감소
         print(f"[디버깅] Mario의 남은 목숨: {game_state.lives}")
 
-    # Mario가 사망한 상태이고, 타이머가 시작되었으며, 3초가 경과했을 때 게임 오버로 전환
+    # Mario가 사망한 상태이고, 타이머가 시작되었으며, 3초가 경과했을 때 게임 재시작 또는 게임 오버로 전환
     if mario_dead and death_timer is not None:
         elapsed_time = get_time() - death_timer
         if elapsed_time >= 3.0:  # 3초 지연
-            # 목숨이 남아있지 않으면 게임 오버 화면으로 전환
-            print("[디버깅] 게임 오버 화면으로 전환합니다.")
-            game_framework.change_mode(game_over)
+            if game_state.lives > 0:
+                print("[디버깅] 목숨이 남아있습니다. 게임을 재시작합니다.")
+                reset_game()  # GameState를 초기화하지 않고, 게임 상태를 유지
+                game_framework.change_mode(logo_mode)  # 초기 화면으로 변경하여 게임 재시작
+            else:
+                print("[디버깅] 목숨이 남아있지 않습니다. 게임 오버 화면으로 전환합니다.")
 
+                game_framework.change_mode(game_over)
 
     # 추가할 객체 처리
     for obj in objects_to_add:
@@ -580,38 +562,37 @@ def update():
             # Boss_turtle과의 충돌 그룹에 Ball 객체 추가
             if 'fire_ball:boss_turtle' in game_world.collision_pairs:
                 game_world.collision_pairs['fire_ball:boss_turtle'][0].append(obj)
-        # 추가적인 객체 유형이 필요하면 여기서 추가
+            # 추가적인 객체 유형이 필요하면 여기서 추가
     objects_to_add.clear()
 
-    if game_time <= 0:
-        game_time = 0
-        dashboard.set_time(int(game_time))
+    # 게임 시간 업데이트
+    game_state.game_time -= game_framework.frame_time
+    if game_state.game_time <= 0 and not mario.dead:
+        game_state.game_time = 0
+        dashboard.set_time(int(game_state.game_time))
         dashboard.update()
-        print("[디버깅] 시간이 다 되었습니다! 게임 오버.")
+        print("[디버깅] 시간이 다 되었습니다! Mario가 사망합니다.")
         if bgm_manager:
             bgm_manager.stop()  # 배경음악 중지
 
         # 마리오를 죽은 상태로 변경하고 사망 애니메이션 시작
-        if not mario_dead:
-            mario.dead = True
-            mario.state_machine.set_state(Dead())
-            mario_dead = True
-            death_timer = get_time()
-            print("[디버깅] Mario가 시간 초과로 사망했습니다. 사망 애니메이션 시작.")
+        mario.dead = True
+        mario.state_machine.set_state(Dead())
+        # mario_dead = True  # 이 줄을 제거합니다.
+        death_timer = get_time()
+        print("[디버깅] Mario가 시간 초과로 사망했습니다. 사망 애니메이션 시작.")
 
     # 대시보드에 현재 게임 시간 설정
-    dashboard.set_time(int(game_time))  # 정수로 전달
+    dashboard.set_time(int(game_state.game_time))  # 정수로 전달
 
     # 대시보드 업데이트
     dashboard.update()
-
 
 def draw():
     clear_canvas()
     game_world.render_with_camera(camera)  # 카메라를 고려하여 렌더링
     dashboard.draw(camera)  # 대시보드 그리기
     update_canvas()
-
 
 def pause():
     pass
