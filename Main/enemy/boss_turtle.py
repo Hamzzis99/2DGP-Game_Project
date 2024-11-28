@@ -1,11 +1,15 @@
 # enemy/boss_turtle.py
+
 from pico2d import load_image, clamp, draw_rectangle
+
+from ball import Ball
 from game_object import GameObject
 from states import game_state
 from utils.camera import Camera
 import random
 import game_framework
 import game_world
+from utils.score_text import ScoreText
 
 # Boss_turtle Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
@@ -32,22 +36,27 @@ class Boss_turtle(GameObject):
         self.frame_width = 20
         self.frame_height = 29
 
-    def __init__(self, scale=1.0, initial_y=300):
+    def __init__(self, scale=10.0, initial_y=300):
         """
         Boss_turtle 초기화
-        :param scale: 캐릭터의 스케일 (기본값: 1.0)
+        :param scale: 캐릭터의 스케일 (기본값: 10.0)
         :param initial_y: Boss_turtle의 초기 y 좌표 (기본값: 300)
         """
-        self.x, self.y = random.randint(2000, 2800), initial_y  # 초기 위치 설정
+        self.x, self.y = 3900, initial_y  # 초기 위치 설정 (x=3900)
         self.load_images()
-        self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
-        self.dir = random.choice([-1, 1])  # 초기 이동 방향: -1(왼쪽), 1(오른쪽)
+        self.frame = 0  # 초기 프레임 (0 또는 1)
+        self.dir = 1  # 초기 이동 방향: 1(오른쪽)
         self.alive = True  # 살아있는 상태
         self.state = 'normal'  # 현재 상태: 항상 'normal' 상태
         self.frame_time = 0.0  # 애니메이션 시간
         self.scale = scale  # 스케일 설정
 
         self.hp = 2  # Boss_turtle의 HP 설정
+
+    @property
+    def dead(self):
+        """보스의 사망 상태를 반환합니다."""
+        return not self.alive
 
     def update(self):
         frame_time = game_framework.frame_time  # 전역 frame_time 사용
@@ -62,8 +71,15 @@ class Boss_turtle(GameObject):
         # 위치 업데이트
         self.x += RUN_SPEED_PPS * self.dir * frame_time
 
-        # 위치 클램프 (방향 전환은 play_mode.py에서 관리)
-        self.x = clamp(1000, self.x, 1400)
+        # 위치 클램프 및 방향 전환
+        if self.x >= 8000:
+            self.x = 8000
+            self.dir = -1  # 왼쪽으로 방향 전환
+            print("Boss_turtle reached x=8000. Changing direction to left.")
+        elif self.x <= 400:
+            self.x = 400
+            self.dir = 1  # 오른쪽으로 방향 전환
+            print("Boss_turtle reached x=400. Changing direction to right.")
 
     def draw_with_camera(self, camera: Camera):
         if not self.alive:
@@ -147,30 +163,55 @@ class Boss_turtle(GameObject):
             return
 
         if group == 'fire_ball:boss_turtle':
-            print(f"Boss_turtle이 Ball에 맞았습니다. 현재 HP: {self.hp}")
-            self.hp -= 1  # HP 감소
+            print(f"Ball이 Boss_turtle과 충돌했습니다: Ball={other}, Boss_turtle={self}")
 
-            # Ball 제거는 ball.py에서 처리
-            # 여기서는 HP만 관리
+            # 사운드 재생
+            if Ball.common_kick_sound:
+                Ball.common_kick_sound.play()
+                print("common_kick_sound 재생됨.")
+            else:
+                print("common_kick_sound가 로드되지 않았습니다.")
 
+            # Ball 제거
+            try:
+                game_world.remove_object(other)
+                print("Ball 객체가 제거되었습니다.")
+            except ValueError:
+                print(f"Ball 객체 {other}는 이미 제거되었습니다.")
+
+            # 점수 추가
+            game_state.score += 100
+            print(f"Score increased by 100. Total Score: {game_state.score}")
+            score_text = ScoreText(self.x, self.y + 30, "+100")
+            game_world.add_object(score_text, 2)
+            print("ScoreText 추가됨: +100")
+
+            # 보스의 HP 감소
+            self.hp -= 1
+            print(f"Boss_turtle의 현재 HP: {self.hp}")
             if self.hp <= 0:
                 self.alive = False
-                game_world.remove_object(self)
                 print("Boss_turtle이 파괴되었습니다.")
+                # game_world.remove_object(self)  # 이 줄을 제거하거나 주석 처리하세요.
+
+        elif group in ['fire_ball:brick', 'fire_ball:clean_box', 'fire_ball:gun_box', 'fire_ball:random_box']:
+            print(f"Ball이 벽과 충돌했습니다: {group}")
+            # Ball 제거
+            try:
+                game_world.remove_object(other)
+                print("Ball 객체가 벽과의 충돌로 제거되었습니다.")
+            except ValueError:
+                print(f"Ball 객체 {other}는 이미 제거되었습니다.")
+
         else:
             pass  # 다른 충돌 그룹에 대한 처리는 필요 없으므로 pass
 
-        if group == 'fire_ball:boss_turtle':
-            print(f"Boss_turtle이 Ball에 맞았습니다. 현재 HP: {self.hp}")
-            self.hp -= 1  # HP 감소
-
-            # Ball 제거는 ball.py에서 처리
-            # 여기서는 HP만 관리
-
-            if self.hp <= 0:
-                self.alive = False
-                game_world.remove_object(self)
-                print("Boss_turtle이 파괴되었습니다.")
-
-        else:
-            pass  # 다른 충돌 그룹에 대한 처리는 필요 없으므로 pass
+    def start_boss_battle(self):
+        """
+        보스 전투를 시작하는 메서드입니다.
+        """
+        self.active = True
+        print("Boss Turtle has started the battle!")
+        # 보스의 초기 행동을 추가 (예: 공격 시작)
+        # 현재는 이동 로직이 update 함수에서 처리되므로 별도의 행동 추가는 필요 없음
+        # 추후 보스의 공격 패턴 등을 추가할 수 있습니다.

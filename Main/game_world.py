@@ -186,3 +186,12 @@ def handle_collisions():
                     if collide(a, b):
                         a.handle_collision(group, b, 'unknown')
                         b.handle_collision(group, a, 'unknown')
+
+def find_object_by_type(obj_type):
+    for layer in world:
+        for obj in layer:
+            if isinstance(obj, obj_type):
+                #print(f"find_object_by_type : 탐색중 {obj_type.__name__}: {obj}")
+                return obj
+    #print(f"{obj_type.__name__}를 찾지 못했음.")
+    return None

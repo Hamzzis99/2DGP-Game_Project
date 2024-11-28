@@ -40,7 +40,7 @@ class BGMManager:
         if self.current_music is not None:
             self.current_music.stop()
         self.current_music = self.music_tracks[name]
-        self.current_music.set_volume(volume)
+        self.set_volume(volume)  # set_volume을 사용하여 볼륨 설정
         try:
             self.current_music.play(-1)  # 무한 반복을 위해 loops=-1 설정
             print(f"[BGMManager] '{name}' 음악을 재생합니다. 볼륨: {volume}")
@@ -55,6 +55,12 @@ class BGMManager:
 
     def set_volume(self, volume):
         if self.current_music is not None:
+            # 볼륨을 정수로 변환하고 0-128 사이로 제한
+            if isinstance(volume, float):
+                volume = int(volume * 128)  # 0.0 ~ 1.0을 0 ~ 128로 변환
+            else:
+                volume = int(volume)  # 정수로 변환
+            volume = max(0, min(volume, 128))  # 범위 제한
             self.current_music.set_volume(volume)
             print(f"[BGMManager] 볼륨이 {volume}으로 설정되었습니다.")
         else:

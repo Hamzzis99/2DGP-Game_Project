@@ -336,10 +336,10 @@ class Mario(GameObject):
         frame_time = game_framework.frame_time
         self.state_machine.update()  # 상태 머신 업데이트는 항상 호출
 
-        if not self.dead:
-            self.velocity_y += GRAVITY * frame_time
-            self.y += self.velocity_y * frame_time
+        self.velocity_y += GRAVITY * frame_time
+        self.y += self.velocity_y * frame_time
 
+        if not self.dead:
             if self.y < 0:
                 self.dead = True
                 self.state_machine.set_state(Dead())
