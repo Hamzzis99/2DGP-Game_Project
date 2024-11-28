@@ -329,7 +329,7 @@ class Mario(GameObject):
         self.frame = 0  # 애니메이션 프레임
         self.velocity_y = 0  # 수직 속도 추가
         self.dead = False  # Mario의 사망 상태 추가
-        self.gun_mode = True  # gun_mode 상태 추가
+        self.gun_mode = False  # gun_mode 상태 추가
         self.scale = 2  # 스케일 값 추가
 
     def update(self):
