@@ -75,9 +75,9 @@ def init():
     grass3.width = 400
 
     grass4 = Grass()
-    grass4.x = 2900
+    grass4.x = 2700
     grass4.y = 30
-    grass4.width = 100
+    grass4.width = 800
 
     grass5 = Grass()
     grass5.x = 3600
@@ -117,14 +117,15 @@ def init():
 
     # Turtle 추가 (지정된 x, y 좌표로)
     turtlers = [
-        #Turtle(350, 70),
-        #Turtle(450, 70),
+        Turtle(1715, 70, 350), #x : 1715 y = 70, distance = 360
+        Turtle(1760, 170, 220),
+        Turtle(1795, 250, 170),
         #Turtle(1000, 70)
     ]
     game_world.add_objects(turtlers, 1)
 
     # 벽돌 추가 (32x32 픽셀로 스프라이트 크기 두 배로 확장됨)
-    # 모든 prop들은 x값을 26씩 떨어뜨리면 됨.
+    # 모든 prop들은 x값을 28씩 떨어뜨리면 됨.
     bricks = [
         Brick(360, 100),
         Brick(386, 100),
@@ -151,13 +152,30 @@ def init():
         Brick(1476, 210),
         Brick(1504, 210),
         Brick(1532, 210),
-
         Brick(1560, 182),
         Brick(1588, 154),
         Brick(1616, 126),
         Brick(1644, 98),
         Brick(1672, 80),
 
+        Brick(1759, 140),
+        Brick(1787, 140),
+        Brick(1815, 140),
+        Brick(1843, 140),
+        Brick(1871, 140),
+        Brick(1899, 140),
+        Brick(1927, 140),
+        Brick(1955, 140),
+        Brick(1983, 140),
+
+        #트롤벽
+        Brick(1787, 230),
+        Brick(1815, 230),
+        Brick(1843, 230),
+        Brick(1871, 230),
+        Brick(1899, 230),
+        Brick(1927, 230),
+        Brick(1955, 230)
     ]
 
     # 브릭 생성: y=70, x=0, 24, 48, 72, 96
@@ -173,6 +191,8 @@ def init():
         #Random_box(626, 130),
         Random_box(714, 143), # 트롤박스
         Random_box(742, 143)  # 트롤박스
+
+        
     ]
     game_world.add_objects(random_boxes, 1)
 

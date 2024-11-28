@@ -8,6 +8,7 @@ from states import game_state
 from utils.camera import Camera  # 카메라 임포트
 from utils.config import MarioConfig
 from utils.score_text import ScoreText
+import math  # 거리 계산을 위한 math 모듈 임포트
 
 
 class Ball(GameObject):
@@ -28,6 +29,11 @@ class Ball(GameObject):
         self.width = 32
         self.height = 32
 
+        # 시작 위치 저장
+        self.start_x = x
+        self.start_y = y
+        self.distance_traveled = 0  # 이동 거리 누적을 위한 변수 추가
+
         # 클래스 변수로 사운드 로드 (한 번만 로드)
         if Ball.common_kick_sound is None:
             try:
@@ -44,7 +50,6 @@ class Ball(GameObject):
             draw_rectangle(*self.get_bb())  # 충돌 박스 그리기
         else:
             print("Ball 이미지가 로드되지 않아 그릴 수 없습니다.")
-        pass  # draw 메서드에서는 아무것도 하지 않음
 
     def draw_with_camera(self, camera: Camera):
         if self.image:
@@ -59,20 +64,39 @@ class Ball(GameObject):
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def update(self):
-        #print(f"Ball 업데이트: 위치=({self.x}, {self.y})")
+        # 이전 위치 저장
+        prev_x, prev_y = self.x, self.y
+
+        # 위치 업데이트
         self.x += self.velocity_x * game_framework.frame_time
         self.y += self.velocity_y * game_framework.frame_time
 
+        # 이동한 거리 계산 및 누적
+        delta_x = self.x - prev_x
+        delta_y = self.y - prev_y
+        delta_distance = math.hypot(delta_x, delta_y)
+        self.distance_traveled += delta_distance
+
+        #print(f"Ball 업데이트: 위치=({self.x}, {self.y}), 이동 거리 누적={self.distance_traveled}")
+
+        # 이동 거리 제한 확인
+        if self.distance_traveled >= 200:
+            try:
+                game_world.remove_object(self)
+                print("Ball 객체가 이동 거리 200을 초과하여 제거되었습니다.")
+            except ValueError:
+                print(f"Ball 객체 {self}는 이미 제거되었습니다.")
+            return  # 이후 코드 실행 방지
+
+        # 월드 범위 밖으로 나갔을 경우 제거
         if self.x < 0 or self.x > MarioConfig.WORLD_WIDTH or self.y < 0 or self.y > MarioConfig.WORLD_HEIGHT:
             try:
                 game_world.remove_object(self)
-                print("Ball 객체가 게임 월드에서 제거되었습니다.")
+                print("Ball 객체가 월드 밖으로 나가 제거되었습니다.")
             except ValueError:
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
-            # 'fire_ball:turtle' 충돌 그룹에서 제거
-            if 'fire_ball:turtle' in game_world.collision_pairs:
-                if self in game_world.collision_pairs['fire_ball:turtle'][0]:
-                    game_world.collision_pairs['fire_ball:turtle'][0].remove(self)
+
+            # 충돌 그룹에서 제거 (필요에 따라 추가)
 
     def get_bb(self):
         return self.x - self.width / 2, self.y - self.height / 2, \
@@ -102,6 +126,12 @@ class Ball(GameObject):
                 print("Ball 객체가 제거되었습니다.")
             except ValueError:
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
+            # 점수 추가
+            game_state.score += 100
+            print(f"Score increased by 100. Total Score: {game_state.score}")
+            score_text = ScoreText(self.x, self.y + 30, "+200")
+            game_world.add_object(score_text, 2)
+            print("ScoreText 추가됨: +100")
 
         elif group == 'fire_ball:koomba':
             print(f"Ball이 Koomba와 충돌했습니다: Ball={self}, Koomba={other}")
@@ -126,6 +156,12 @@ class Ball(GameObject):
                 print("Ball 객체가 제거되었습니다.")
             except ValueError:
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
+            # 점수 추가
+            game_state.score += 100
+            print(f"Score increased by 100. Total Score: {game_state.score}")
+            score_text = ScoreText(self.x, self.y + 30, "+200")
+            game_world.add_object(score_text, 2)
+            print("ScoreText 추가됨: +100")
 
         elif group == 'fire_ball:boss_turtle':
             print(f"Ball이 Boss_turtle과 충돌했습니다: Ball={self}, Boss_turtle={other}")
@@ -137,7 +173,7 @@ class Ball(GameObject):
             else:
                 print("common_kick_sound가 로드되지 않았습니다.")
 
-            # Boss_turtle은 HP를 관리하므로, Ball은 제거만 합니다.
+            # Ball 제거
             try:
                 game_world.remove_object(self)
                 print("Ball 객체가 제거되었습니다.")
@@ -159,7 +195,6 @@ class Ball(GameObject):
                 print("Ball 객체가 벽과의 충돌로 제거되었습니다.")
             except ValueError:
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
-            # 벽은 제거하지 않음
 
         else:
-            pass  # 기타 그룹에 대한 처리는 필요 없으므로 pass
+            pass

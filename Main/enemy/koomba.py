@@ -32,6 +32,12 @@ class Koomba(GameObject):
         self.frame_width = 16
         self.frame_height = 20
 
+        # 납작해진 Koomba의 스프라이트 좌표
+        self.stomped_frame_x = 276  # 납작해진 굼바의 스프라이트 x 좌표
+        self.stomped_frame_y = 196  # 납작해진 굼바의 스프라이트 y 좌표
+        self.stomped_frame_width = 16
+        self.stomped_frame_height = 16  # 납작해진 Koomba의 높이
+
     def __init__(self, x, y, move_distance=100):
         """
         Koomba 초기화
@@ -90,25 +96,35 @@ class Koomba(GameObject):
 
         screen_x, screen_y = camera.apply(self.x, self.y)
 
-        # 현재 프레임 인덱스 (0 또는 1)
-        frame_x = self.frame_x_positions[self.frame]
-        frame_y = self.frame_y_position
-
         # 그릴 크기 설정 (스케일 적용)
         dest_width, dest_height = 32, 32  # 화면에 그릴 크기
 
-        if self.dir < 0:
-            # 왼쪽으로 이동 중이면 프레임을 수평 반전하여 그립니다.
-            Koomba.image.clip_composite_draw(
-                frame_x, frame_y, self.frame_width, self.frame_height, 0, 'h',
+        if self.stomped:
+            # 납작해진 Koomba의 스프라이트 좌표 사용
+            Koomba.image.clip_draw(
+                self.stomped_frame_x, self.stomped_frame_y,
+                self.stomped_frame_width, self.stomped_frame_height,
                 screen_x, screen_y, dest_width, dest_height
             )
         else:
-            # 오른쪽으로 이동 중이면 프레임을 그대로 그립니다.
-            Koomba.image.clip_draw(
-                frame_x, frame_y, self.frame_width, self.frame_height,
-                screen_x, screen_y, dest_width, dest_height
-            )
+            # 현재 프레임 인덱스 (0 또는 1)
+            frame_x = self.frame_x_positions[self.frame]
+            frame_y = self.frame_y_position
+            frame_width = self.frame_width
+            frame_height = self.frame_height
+
+            if self.dir < 0:
+                # 왼쪽으로 이동 중이면 프레임을 수평 반전하여 그립니다.
+                Koomba.image.clip_composite_draw(
+                    frame_x, frame_y, frame_width, frame_height, 0, 'h',
+                    screen_x, screen_y, dest_width, dest_height
+                )
+            else:
+                # 오른쪽으로 이동 중이면 프레임을 그대로 그립니다.
+                Koomba.image.clip_draw(
+                    frame_x, frame_y, frame_width, frame_height,
+                    screen_x, screen_y, dest_width, dest_height
+                )
 
         # 히트박스 그리기 (디버깅용)
         bb_offset = self.get_bb_offset(camera)
@@ -123,7 +139,7 @@ class Koomba(GameObject):
 
     def get_bb(self):
         if self.stomped:
-            # stomped 상태일 때는 충돌 박스 비활성화 (0,0,0,0 또는 self.x, self.y, self.x, self.y 반환)
+            # stomped 상태일 때는 충돌 박스 비활성화
             return self.x, self.y, self.x, self.y
         width = 16 * 2  # 이미지의 폭 * 스케일 (16 * 2 = 32)
         height = 20 * 1.6  # 이미지의 높이 * 스케일 (20 * 1.6 = 32)
@@ -140,7 +156,7 @@ class Koomba(GameObject):
 
     def get_top_bb(self):
         if self.stomped:
-            # stomped 상태일 때는 Top 히트박스 비활성화 (0,0,0,0 또는 self.x, self.y, self.x, self.y 반환)
+            # stomped 상태일 때는 Top 히트박스 비활성화
             return self.x, self.y, self.x, self.y
         # 기존 Top 히트박스 반환
         return self.x - 14, self.y + 10, self.x + 14, self.y + 25
@@ -154,7 +170,7 @@ class Koomba(GameObject):
 
     def get_bottom_bb(self):
         if self.stomped:
-            # stomped 상태일 때는 Bottom 히트박스 비활성화 (0,0,0,0 또는 self.x, self.y, self.x, self.y 반환)
+            # stomped 상태일 때는 Bottom 히트박스 비활성화
             return self.x, self.y, self.x, self.y
         # 기존 Bottom 히트박스 반환
         return self.x - 15, self.y - 15, self.x + 15, self.y + 20
@@ -168,7 +184,7 @@ class Koomba(GameObject):
 
     def get_normal_bb(self):
         if self.stomped:
-            # stomped 상태일 때는 Normal 히트박스 비활성화 (0,0,0,0 또는 self.x, self.y, self.x, self.y 반환)
+            # stomped 상태일 때는 Normal 히트박스 비활성화
             return self.x, self.y, self.x, self.y
         # 전체 몸을 덮는 Normal 히트박스 정의
         width = 16 * 2  # 이미지의 폭 * 스케일 (32)
@@ -192,4 +208,4 @@ class Koomba(GameObject):
         self.dir = dir
 
     def handle_collision(self, group, other, hit_position):
-        pass  # 현재 Koomba는 충돌 처리 로직을 구현하지 않으므로 pass
+        pass
