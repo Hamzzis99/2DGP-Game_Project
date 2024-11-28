@@ -109,6 +109,15 @@ def init():
     koombas = [
         Koomba(650, 70, 100),
         Koomba(680, 70, 100),
+
+        Koomba(2325, 70, 300),
+        Koomba(2325, 70, 400),
+        Koomba(2375, 70, 700),
+        Koomba(2375, 70, 600),
+        Koomba(2475, 70, 600),
+        Koomba(2475, 70, 500),
+        Koomba(2475, 70, 500),
+        Koomba(2575, 70, 400),
         #Koomba(500, 70),
         #Koomba(600, 70),
         #Koomba(1000, 70)
@@ -118,8 +127,13 @@ def init():
     # Turtle 추가 (지정된 x, y 좌표로)
     turtlers = [
         Turtle(1715, 70, 350), #x : 1715 y = 70, distance = 360
-        Turtle(1760, 170, 220),
+        Turtle(1760, 160, 220),
         Turtle(1795, 250, 170),
+
+        Turtle(2325, 70, 700),
+        Turtle(2425, 70, 600),
+        Turtle(2425, 70, 500),
+        Turtle(2525, 70, 400),
         #Turtle(1000, 70)
     ]
     game_world.add_objects(turtlers, 1)
@@ -137,6 +151,8 @@ def init():
         Brick(516, 100),
         Brick(810, 90),
         Brick(836, 90),
+
+        # 징검다리
         Brick(1145, 70),
         Brick(1168, 98),
         Brick(1196, 126),
@@ -144,12 +160,12 @@ def init():
         Brick(1252, 184),
         Brick(1280, 210),
         Brick(1308, 210),
-        Brick(1336, 210),
-        Brick(1364, 210),
+        #Brick(1336, 210), #랜덤박스로 대체
+        #Brick(1364, 210),
         #Brick(1392, 210),
         #Brick(1420, 210),
         #Brick(1448, 210),
-        Brick(1476, 210),
+        #Brick(1476, 210),
         Brick(1504, 210),
         Brick(1532, 210),
         Brick(1560, 182),
@@ -157,25 +173,33 @@ def init():
         Brick(1616, 126),
         Brick(1644, 98),
         Brick(1672, 80),
+        
+        #거북이 함정 중간줄
+        Brick(1759, 130),
+        Brick(1787, 130),
+        Brick(1815, 130),
+        Brick(1843, 130),
+        Brick(1871, 130),
+        Brick(1899, 130),
+        Brick(1927, 130),
+        Brick(1955, 130),
+        Brick(1983, 130),
+        Brick(2011, 130),
 
-        Brick(1759, 140),
-        Brick(1787, 140),
-        Brick(1815, 140),
-        Brick(1843, 140),
-        Brick(1871, 140),
-        Brick(1899, 140),
-        Brick(1927, 140),
-        Brick(1955, 140),
-        Brick(1983, 140),
+        #거북이 함정 3층
+        Brick(1787, 220),
+        Brick(1815, 220),
+        Brick(1843, 220),
+        Brick(1871, 220),
+        Brick(1899, 220),
+        Brick(1927, 220),
+        Brick(1955, 220),
+        Brick(1983, 220),
 
-        #트롤벽
-        Brick(1787, 230),
-        Brick(1815, 230),
-        Brick(1843, 230),
-        Brick(1871, 230),
-        Brick(1899, 230),
-        Brick(1927, 230),
-        Brick(1955, 230)
+        #Gun Box 부분
+        Brick(2150, 160),
+
+        Brick(2262, 160)
     ]
 
     # 브릭 생성: y=70, x=0, 24, 48, 72, 96
@@ -190,14 +214,26 @@ def init():
         
         #Random_box(626, 130),
         Random_box(714, 143), # 트롤박스
-        Random_box(742, 143)  # 트롤박스
-
+        Random_box(742, 143),  # 트롤박스
         
+        #징검다리 함정
+        Random_box(1336, 210),
+        Random_box(1476, 210),
+
+        # Gun Box 다리
+        Random_box(2122, 40),
+        Random_box(2150, 40),
+        Random_box(2178, 40),
+        Random_box(2206, 40),
+        Random_box(2234, 40),
+        Random_box(2262, 40),
+        Random_box(2290, 40)  # 트롤박스
     ]
     game_world.add_objects(random_boxes, 1)
 
     # Gun Box 추가
     gun_boxes = [
+        Gun_box(2206, 160),
         #Gun_box(742, 143),
         #Gun_box(750, 100)
     ]
@@ -205,9 +241,12 @@ def init():
 
     # Clean Box 추가
     clean_boxes = [
+        #Clean_box(1336, 210),
+        Clean_box(1364, 210),
         Clean_box(1392, 210),
         Clean_box(1420, 210),
-        Clean_box(1448, 210)
+        Clean_box(1448, 210),
+        #Clean_box(1476, 210),
     ]
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
 
