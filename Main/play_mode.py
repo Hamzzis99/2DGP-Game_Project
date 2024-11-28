@@ -55,39 +55,39 @@ def init():
     game_world.clear()  # 게임 월드 초기화
 
     # Boss_turtle 추가 (지정된 x, y 좌표로)
-    boss = Boss_turtle(20, 300)  # 스케일 및 초기 y 위치 조정
+    boss = Boss_turtle(0, 300)  # 원래 20 스케일 및 초기 y 위치 조정
     game_world.add_object(boss, 1)
 
     # Grass 객체 6개 생성 (x 간격은 50으로 설정)
     grass1 = Grass()
     grass1.x = 0
     grass1.y = 30
-    grass1.width = 800
+    grass1.width = 600
 
     grass2 = Grass()
-    grass2.x = 900
+    grass2.x = 880
     grass2.y = 30
-    grass2.width = 800
+    grass2.width = 500
 
     grass3 = Grass()
-    grass3.x = 1800
+    grass3.x = 1900
     grass3.y = 30
-    grass3.width = 800
+    grass3.width = 400
 
     grass4 = Grass()
-    grass4.x = 2700
+    grass4.x = 2900
     grass4.y = 30
-    grass4.width = 800
+    grass4.width = 100
 
     grass5 = Grass()
     grass5.x = 3600
     grass5.y = 30
-    grass5.width = 800
+    grass5.width = 100
 
     grass6 = Grass()
     grass6.x = 4500
     grass6.y = 30
-    grass6.width = 800
+    grass6.width = 100
 
     # Grass 객체들을 게임 월드에 추가
     game_world.add_object(grass1, 0)
@@ -107,11 +107,11 @@ def init():
 
     # Koombas 추가 (지정된 x, y 좌표로)
     koombas = [
-        #Koomba(300, 70),
-        #Koomba(400, 70),
+        Koomba(650, 70, 100),
+        Koomba(680, 70, 100),
         #Koomba(500, 70),
         #Koomba(600, 70),
-        Koomba(1000, 70)
+        #Koomba(1000, 70)
     ]
     game_world.add_objects(koombas, 1)
 
@@ -119,42 +119,75 @@ def init():
     turtlers = [
         #Turtle(350, 70),
         #Turtle(450, 70),
-        Turtle(1000, 70)
+        #Turtle(1000, 70)
     ]
     game_world.add_objects(turtlers, 1)
 
     # 벽돌 추가 (32x32 픽셀로 스프라이트 크기 두 배로 확장됨)
+    # 모든 prop들은 x값을 26씩 떨어뜨리면 됨.
     bricks = [
-        Brick(300, 130),
-        Brick(350, 130),
-        Brick(400, 130),
-        Brick(450, 130),
-        Brick(500, 130)
+        Brick(360, 100),
+        Brick(386, 100),
+        Brick(412, 100),
+        Brick(438, 100),
+        Brick(438, 180), # 공중벽
+        Brick(464, 100),
+        Brick(490, 100),
+        Brick(516, 100),
+        Brick(810, 90),
+        Brick(836, 90),
+        Brick(1145, 70),
+        Brick(1168, 98),
+        Brick(1196, 126),
+        Brick(1224, 156),
+        Brick(1252, 184),
+        Brick(1280, 210),
+        Brick(1308, 210),
+        Brick(1336, 210),
+        Brick(1364, 210),
+        #Brick(1392, 210),
+        #Brick(1420, 210),
+        #Brick(1448, 210),
+        Brick(1476, 210),
+        Brick(1504, 210),
+        Brick(1532, 210),
+
+        Brick(1560, 182),
+        Brick(1588, 154),
+        Brick(1616, 126),
+        Brick(1644, 98),
+        Brick(1672, 80),
+
     ]
 
     # 브릭 생성: y=70, x=0, 24, 48, 72, 96
     #bricks = [Brick(x, 70) for x in range(0, 24 * 100, 24)]
 
     game_world.add_objects(bricks, 1)
-
+    # 모든 prop들은 x값을 28씩 떨어뜨리면 됨.
     # Random Box 추가
     random_boxes = [
-        Random_box(600, 130),
-        Random_box(650, 130)
+        Random_box(412, 180), #공중박스
+        Random_box(464, 180), #공중박스
+        
+        #Random_box(626, 130),
+        Random_box(714, 143), # 트롤박스
+        Random_box(742, 143)  # 트롤박스
     ]
     game_world.add_objects(random_boxes, 1)
 
     # Gun Box 추가
     gun_boxes = [
-        Gun_box(700, 130),
-        Gun_box(750, 130)
+        #Gun_box(742, 143),
+        #Gun_box(750, 100)
     ]
     game_world.add_objects(gun_boxes, 1)
 
     # Clean Box 추가
     clean_boxes = [
-        Clean_box(800, 100),
-        Clean_box(850, 100)
+        Clean_box(1392, 210),
+        Clean_box(1420, 210),
+        Clean_box(1448, 210)
     ]
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
 

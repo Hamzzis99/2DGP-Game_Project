@@ -38,13 +38,15 @@ class Turtle(GameObject):
         self.frame_width = 20
         self.frame_height = 29
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, move_distance=100):
         """
         Turtle 초기화
         :param x: Turtle의 초기 x 좌표
         :param y: Turtle의 초기 y 좌표
+        :param move_distance: Turtle의 이동 거리
         """
         self.start_x = x  # 이동 범위의 시작점
+        self.move_distance = move_distance  # 이동 거리 설정
         self.x, self.y = x, y  # 초기 위치 설정
         self.load_images()
         self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
@@ -97,8 +99,8 @@ class Turtle(GameObject):
         self.x += RUN_SPEED_PPS * self.dir * frame_time
 
         # 이동 범위 제한 및 방향 전환
-        if self.x > self.start_x + 100:
-            self.x = self.start_x + 100
+        if self.x > self.start_x + self.move_distance:
+            self.x = self.start_x + self.move_distance
             self.dir = -1  # 왼쪽으로 방향 전환
         elif self.x < self.start_x:
             self.x = self.start_x

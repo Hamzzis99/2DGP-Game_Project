@@ -38,7 +38,7 @@ class Boss_turtle(GameObject):
         :param scale: 캐릭터의 스케일 (기본값: 1.0)
         :param initial_y: Boss_turtle의 초기 y 좌표 (기본값: 300)
         """
-        self.x, self.y = random.randint(1000, 1400), initial_y  # 초기 위치 설정
+        self.x, self.y = random.randint(2000, 2800), initial_y  # 초기 위치 설정
         self.load_images()
         self.frame = random.randint(0, 1)  # 초기 프레임 (0 또는 1)
         self.dir = random.choice([-1, 1])  # 초기 이동 방향: -1(왼쪽), 1(오른쪽)

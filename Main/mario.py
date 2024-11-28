@@ -1,7 +1,7 @@
 # mario.py
 
 from pico2d import load_image, draw_rectangle, load_wav
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_s, SDLK_CAPSLOCK
 import game_framework
 import game_world
 import play_mode
@@ -63,15 +63,18 @@ class Idle:
             frame_y = 342
             image = mario.image
 
+        scaled_width = frame_width * mario.scale
+        scaled_height = frame_height * mario.scale
+
         if mario.face_dir == -1:
             image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
-                mario.x, mario.y, frame_width * 3, frame_height * 3
+                mario.x, mario.y, scaled_width, scaled_height
             )
         else:
             image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
-                frame_width * 3, frame_height * 3
+                scaled_width, scaled_height
             )
 
     @staticmethod
@@ -90,15 +93,18 @@ class Idle:
             image = mario.image
 
         screen_x, screen_y = camera.apply(mario.x, mario.y)
+        scaled_width = frame_width * mario.scale
+        scaled_height = frame_height * mario.scale
+
         if mario.face_dir == -1:
             image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
-                screen_x, screen_y, frame_width * 3, frame_height * 3
+                screen_x, screen_y, scaled_width, scaled_height
             )
         else:
             image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
-                frame_width * 3, frame_height * 3
+                scaled_width, scaled_height
             )
 
     @staticmethod
@@ -148,15 +154,18 @@ class Run:
         frame_height = mario.frame_height
         image = mario.gun_image if mario.gun_mode else mario.image
 
+        scaled_width = frame_width * mario.scale
+        scaled_height = frame_height * mario.scale
+
         if mario.face_dir == -1:
             image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
-                mario.x, mario.y, frame_width * 3, frame_height * 3
+                mario.x, mario.y, scaled_width, scaled_height
             )
         else:
             image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
-                frame_width * 3, frame_height * 3
+                scaled_width, scaled_height
             )
 
     @staticmethod
@@ -168,15 +177,18 @@ class Run:
         image = mario.gun_image if mario.gun_mode else mario.image
 
         screen_x, screen_y = camera.apply(mario.x, mario.y)
+        scaled_width = frame_width * mario.scale
+        scaled_height = frame_height * mario.scale
+
         if mario.face_dir == -1:
             image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
-                screen_x, screen_y, frame_width * 3, frame_height * 3
+                screen_x, screen_y, scaled_width, scaled_height
             )
         else:
             image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
-                frame_width * 3, frame_height * 3
+                scaled_width, scaled_height
             )
 
     @staticmethod
@@ -242,15 +254,18 @@ class Jump:
         frame_height = mario.frame_height
         image = mario.gun_image if mario.gun_mode else mario.image
 
+        scaled_width = frame_width * mario.scale
+        scaled_height = frame_height * mario.scale
+
         if mario.face_dir == -1:
             image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
-                mario.x, mario.y, frame_width * 3, frame_height * 3
+                mario.x, mario.y, scaled_width, scaled_height
             )
         else:
             image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, mario.x, mario.y,
-                frame_width * 3, frame_height * 3
+                scaled_width, scaled_height
             )
 
     @staticmethod
@@ -262,15 +277,18 @@ class Jump:
         image = mario.gun_image if mario.gun_mode else mario.image
 
         screen_x, screen_y = camera.apply(mario.x, mario.y)
+        scaled_width = frame_width * mario.scale
+        scaled_height = frame_height * mario.scale
+
         if mario.face_dir == -1:
             image.clip_composite_draw(
                 frame_x, frame_y, frame_width, frame_height, 0, 'h',
-                screen_x, screen_y, frame_width * 3, frame_height * 3
+                screen_x, screen_y, scaled_width, scaled_height
             )
         else:
             image.clip_draw(
                 frame_x, frame_y, frame_width, frame_height, screen_x, screen_y,
-                frame_width * 3, frame_height * 3
+                scaled_width, scaled_height
             )
 
     @staticmethod
@@ -312,6 +330,7 @@ class Mario(GameObject):
         self.velocity_y = 0  # 수직 속도 추가
         self.dead = False  # Mario의 사망 상태 추가
         self.gun_mode = False  # gun_mode 상태 추가
+        self.scale = 2  # 스케일 값 추가
 
     def update(self):
         frame_time = game_framework.frame_time
@@ -332,11 +351,13 @@ class Mario(GameObject):
         if self.dead:
             return
         if event.type == SDL_KEYDOWN:
-            print(f"Key Down: {event.key}")
+            # print(f"Key Down: {event.key}")
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.add(event.key)
+            elif event.key == SDLK_CAPSLOCK:
+                print(f"마리오의 위치: x={self.x}, y={self.y}")
         elif event.type == SDL_KEYUP:
-            print(f"Key Up: {event.key}")
+            # print(f"Key Up: {event.key}")
             if event.key in (SDLK_LEFT, SDLK_RIGHT, SDLK_s):
                 self.pressed_keys.discard(event.key)
         self.state_machine.add_event(('INPUT', event))
@@ -354,11 +375,11 @@ class Mario(GameObject):
 
     def get_bb(self):
         if self.gun_mode:
-            width = 20 * 3
-            height = 20 * 3
+            width = 20 * self.scale
+            height = 20 * self.scale
         else:
-            width = 16 * 3
-            height = 16 * 3
+            width = 16 * self.scale
+            height = 16 * self.scale
         half_width = width / 2
         half_height = height / 2
         return self.x - half_width, self.y - half_height, self.x + half_width, self.y + half_height
@@ -491,9 +512,9 @@ class Mario(GameObject):
 
     def get_width(self):
         if self.gun_mode:
-            return 20 * 3
+            return 20 * self.scale
         else:
-            return 16 * 3
+            return 16 * self.scale
 
 # reset_mario 함수는 필요에 따라 추가하거나 수정하세요.
 
