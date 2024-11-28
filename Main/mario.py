@@ -517,6 +517,7 @@ class Mario(GameObject):
     def get_width(self):
         if self.gun_mode:
             return 20 * self.scale
+
         else:
             return 16 * self.scale
 

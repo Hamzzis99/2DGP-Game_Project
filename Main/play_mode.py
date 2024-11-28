@@ -12,26 +12,32 @@ from enemy.turtle import Turtle
 from enemy.boss_turtle import Boss_turtle  # Boss_turtle 임포트
 from mario import Mario, reset_mario, Idle, Run, Jump, Dead  # 상태 클래스 임포트 추가
 from props.brick import Brick
+from props.castle import Castle
 from props.fake_brick import Fake_brick
 from props.random_box import Random_box
 from props.gun_box import Gun_box
 from props.clean_box import Clean_box
+from props.flag import Flag  # Flag 임포트 추가
 from items.star import Star
 from items.coin import Coin
 from states import game_state, reset_game  # GameState 및 reset_game 임포트
 from utils.camera import Camera
-from utils.config import MarioConfig
+from utils.config import MarioConfig  # 수정된 부분
 from utils.dashboard import Dashboard
 from utils.bgm import BGMManager
 import game_over
 
 # ===== 상수 정의 =====
-WORLD_WIDTH = 9000  # 게임 월드의 전체 너비
-WORLD_HEIGHT = 600  # 게임 월드의 전체 높이
-BOSS_TRIGGER_X = 9000  # 보스 등장 트리거 x 좌표
+BOSS_TRIGGER_X = 9000  # 보스 등장 트리거 x 좌표 # 5250예정
 BOSS_EVENT_DURATION = 2.0  # 보스 등장 이벤트 지속 시간 (초)
 FADE_DURATION = 1.0  # 페이드 아웃 지속 시간 (초)
 WIN_SEQUENCE_DELAY = 6.0  # 승리 시퀀스 지연 시간 (초)
+CASTLE_X = 4300  # 캐슬의 x 좌표
+CASTLE_Y = 226    # 캐슬의 y 좌표
+CASTLE_SCALE = 2.0  # 캐슬의 스케일 팩터
+FLAG_X = 4100  # Flag의 x 좌표
+FLAG_Y = 176   # Flag의 y 좌표
+FLAG_SCALE = 0.5  # Flag의 스케일 팩터
 # ======================
 
 # 전역 변수 선언
@@ -109,8 +115,9 @@ def init():
         (880, 30, 500),
         (1900, 30, 400),
         (2700, 30, 800),
-        (4300, 30, 1000),
-        (4500, 30, 1000)
+        (4200, 30, 800),
+        (5150, 30, 750),
+        (6400, 30, 1100)
     ]
     for x, y, width in grass_positions:
         grass = Grass()
@@ -119,6 +126,14 @@ def init():
         grass.width = width
         grasses.append(grass)
         game_world.add_object(grass, 0)
+
+    # Castle 객체 생성 및 추가
+    castle = Castle(x=CASTLE_X, y=CASTLE_Y, scale=CASTLE_SCALE)
+    game_world.add_object(castle, 0)  # 레이어 0에 추가 (배경 요소)
+
+    # Flag 객체 생성 및 추가
+    flag = Flag(x=FLAG_X, y=FLAG_Y, scale=FLAG_SCALE)
+    game_world.add_object(flag, 0)  # 레이어 0에 추가 (배경 요소)
 
     dashboard = Dashboard()  # Dashboard 인스턴스 생성
 
@@ -145,9 +160,18 @@ def init():
         # Fake Brick 함정
         Koomba(3268, 218, 200),
         Koomba(3308, 218, 100),
+
+        #Boss Run 1
+        Koomba(5530, 112, 0),
+
+        # Boss Run 2
+        Koomba(6516, 172, 100),
+        Koomba(6524, 172, 150),
+
+        Koomba(6544, 252, 100),
+        Koomba(6554, 252, 100),
     ]
     game_world.add_objects(koombas, 1)
-
     # Turtle 추가
     turtlers = [
         Turtle(1715, 70, 350),  # x : 1715 y = 70, distance = 360
@@ -158,6 +182,7 @@ def init():
         Turtle(2425, 70, 600),
         Turtle(2425, 70, 500),
         Turtle(2525, 70, 400),
+        Turtle(5558, 140, 0),
     ]
     game_world.add_objects(turtlers, 1)
 
@@ -227,6 +252,22 @@ def init():
         Brick(3492, 187),
         Brick(3520, 187),
         Brick(3548, 187),
+
+        # Boss전
+        Brick(5530, 84),
+        Brick(5558, 112),
+        Brick(5586, 140),
+        Brick(5698, 140), # Fake Block 영역
+
+        # Boss전 2차
+        # Boss Area
+        Brick(6514, 140),  # Gun Box 대체 Randombox
+        Brick(6542, 140),  # Gun Box 대체 Randombox
+        Brick(6658, 140),  # Gun Box 대체 Randombox
+        Brick(6686, 140),  # Gun Box 대체 Randombox
+
+        Brick(6544, 220),  # Gun Box 대체 Randombox
+        Brick(6656, 220),  # Gun Box 대체 Randombox
     ]
     game_world.add_objects(bricks, 1)
 
@@ -256,6 +297,15 @@ def init():
         Random_box(3492, 187),  # Random box 중간줄2층
 
         Random_box(3436, 277),  # Random box 3층
+
+        #Boss Area 2층
+        Random_box(6566, 140),  # Gun Box 대체 Randombox
+        Random_box(6634, 140),  # Gun Box 대체 Randombox
+
+        # Boss Area 3층
+        Random_box(6572, 220),  # Gun Box 대체 Randombox
+        Random_box(6600, 220),  # Gun Box 대체 Randombox
+        Random_box(6628, 220),  # Gun Box 대체 Randombox
     ]
     game_world.add_objects(random_boxes, 1)
 
@@ -266,6 +316,13 @@ def init():
 
         # FakeBrick 영역
         Gun_box(3268, 277),  # Gun Box 대체 Randombox
+
+        #Boss Fight
+        Gun_box(5200, 130),  # Gun Box 대체 Randombox\
+        Gun_box(5228, 130),  # Gun Box 대체 Randombox
+
+        #BOSS GUN BOX
+        Gun_box(6600, 139),  # Gun Box 대체 Randombox
     ]
     game_world.add_objects(gun_boxes, 1)
 
@@ -275,6 +332,10 @@ def init():
         Clean_box(1392, 210),
         Clean_box(1420, 210),
         Clean_box(1448, 210),
+
+        Clean_box(5614, 140),  # Fake Block 영역
+        Clean_box(5642, 140),  # Fake Block 영역
+        Clean_box(5670, 140),  # Fake Block 영역
     ]
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
 
@@ -385,7 +446,7 @@ def init():
     bgm_manager.play('main_theme', MarioConfig.GAME_MUSIC_VOLUME)
     print("[디버깅] 배경음악 시작됨.")
 
-    camera = Camera(800, 600, WORLD_WIDTH, WORLD_HEIGHT)
+    camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)  # 수정된 부분
     # game_time = MarioConfig.GAME_TIME_LIMIT  # 제거 (game_state에서 관리)
 
 def finish():
@@ -533,7 +594,6 @@ def update():
                 game_framework.change_mode(logo_mode)  # 초기 화면으로 변경하여 게임 재시작
             else:
                 print("[디버깅] 목숨이 남아있지 않습니다. 게임 오버 화면으로 전환합니다.")
-
                 game_framework.change_mode(game_over)
 
     # 추가할 객체 처리
