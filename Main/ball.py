@@ -127,11 +127,11 @@ class Ball(GameObject):
             except ValueError:
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
             # 점수 추가
-            game_state.score += 100
-            print(f"Score increased by 100. Total Score: {game_state.score}")
+            game_state.score += 200
+            print(f"Score increased by 200. Total Score: {game_state.score}")
             score_text = ScoreText(self.x, self.y + 30, "+200")
             game_world.add_object(score_text, 2)
-            print("ScoreText 추가됨: +100")
+            print("ScoreText 추가됨: +200")
 
         elif group == 'fire_ball:koomba':
             print(f"Ball이 Koomba와 충돌했습니다: Ball={self}, Koomba={other}")
@@ -159,7 +159,7 @@ class Ball(GameObject):
             # 점수 추가
             game_state.score += 100
             print(f"Score increased by 100. Total Score: {game_state.score}")
-            score_text = ScoreText(self.x, self.y + 30, "+200")
+            score_text = ScoreText(self.x, self.y + 30, "+100")
             game_world.add_object(score_text, 2)
             print("ScoreText 추가됨: +100")
 

@@ -81,9 +81,9 @@ def init():
     grass4.width = 800
 
     grass5 = Grass()
-    grass5.x = 3600
+    grass5.x = 4200
     grass5.y = 30
-    grass5.width = 100
+    grass5.width = 1000
 
     grass6 = Grass()
     grass6.x = 4500
@@ -119,6 +119,12 @@ def init():
         Koomba(2475, 70, 500),
         Koomba(2475, 70, 500),
         Koomba(2575, 70, 400),
+
+
+
+        #Fake Brick 함정
+        Koomba(3268, 218, 200),
+        Koomba(3308, 218, 100),
         #Koomba(500, 70),
         #Koomba(600, 70),
         #Koomba(1000, 70)
@@ -199,8 +205,29 @@ def init():
 
         #Gun Box 부분
         Brick(2150, 160),
+        Brick(2262, 160),
 
-        Brick(2262, 160)
+
+        #Fake Brick 함정
+        Brick(3100, 75),
+        Brick(3128, 103),
+        Brick(3156, 131),
+        Brick(3184, 159),
+
+        #계단 인덱스 순서
+        Brick(3212, 187),
+        Brick(3240, 187),
+        Brick(3268, 187), # Randombox
+        #Brick(3296, 187),
+        #Brick(3324, 187), #다섯개 FakeBrick 영역
+        #Brick(3352, 187),
+        #Brick(3380, 187),
+        #Brick(3408, 187),
+        #Brick(3436, 187), # Random box
+        #Brick(3464, 187),
+        Brick(3492, 187),
+        Brick(3520, 187),
+        Brick(3548, 187),
     ]
 
     # 브릭 생성: y=70, x=0, 24, 48, 72, 96
@@ -228,14 +255,24 @@ def init():
         Random_box(2206, 40),
         Random_box(2234, 40),
         Random_box(2262, 40),
-        Random_box(2290, 40)  # 트롤박스
+        Random_box(2290, 40),  # 트롤박스
+
+        #Fake Brick 영역
+        Random_box(3240, 187),  # Randombox
+        Random_box(3492, 187),  # Random box 중간줄2c층
+
+        #Random_box(3268, 277),  #  Gun Box
+        Random_box(3436, 277),  # Random box 3층
     ]
     game_world.add_objects(random_boxes, 1)
 
     # Gun Box 추가
     gun_boxes = [
+        #Turtle 영역
         Gun_box(2206, 160),
-        #Gun_box(742, 143),
+        
+        #FakeBrick 영역
+        Gun_box(3268, 277),  #  Gun Box 대체 Randombox
         #Gun_box(750, 100)
     ]
     game_world.add_objects(gun_boxes, 1)
@@ -252,7 +289,20 @@ def init():
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
 
     fake_bricks = [
-        Fake_brick(0, 130)
+        #첫번째 Fake Brick
+        Fake_brick(3296, 187),
+        Fake_brick(3324, 187),  # 2층
+        Fake_brick(3352, 187),
+        Fake_brick(3380, 187),
+        Fake_brick(3408, 187),
+        Fake_brick(3436, 187),
+        Fake_brick(3464, 187),
+
+        Fake_brick(3296, 277),
+        Fake_brick(3324, 277),  # 다섯개 FakeBrick 영역
+        Fake_brick(3352, 277),
+        Fake_brick(3380, 277),
+        Fake_brick(3408, 277)
     ]
     game_world.add_objects(fake_bricks, 1)
 

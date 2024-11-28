@@ -26,7 +26,7 @@ class Fake_brick(GameObject):
         self.changed = False # 상태 변화 여부
 
         # 애니메이션 관련 변수
-        self.sprite_x_positions = [384, 400, 416]  # 애니메이션 프레임 x 좌표들
+        self.sprite_x_positions = [0]  # 애니메이션 프레임 x 좌표들
         self.frame = 0
         self.total_frames = len(self.sprite_x_positions)
         self.frame_time = 0.0
