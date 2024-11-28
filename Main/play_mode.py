@@ -52,12 +52,53 @@ def init():
     mario_dead = False          # 초기화 시 dead 플래그 초기화
     death_timer = None          # 초기화 시 타이머 초기화
 
-    if 'mario' in globals():
-        reset_mario(mario)
-        game_world.clear()
+    game_world.clear()  # 게임 월드 초기화
 
-    grass = Grass()
-    game_world.add_object(grass, 0)
+    # Boss_turtle 추가 (지정된 x, y 좌표로)
+    boss = Boss_turtle(20, 300)  # 스케일 및 초기 y 위치 조정
+    game_world.add_object(boss, 1)
+
+    # Grass 객체 6개 생성 (x 간격은 50으로 설정)
+    grass1 = Grass()
+    grass1.x = 0
+    grass1.y = 30
+    grass1.width = 800
+
+    grass2 = Grass()
+    grass2.x = 850
+    grass2.y = 30
+    grass2.width = 800
+
+    grass3 = Grass()
+    grass3.x = 1700
+    grass3.y = 30
+    grass3.width = 800
+
+    grass4 = Grass()
+    grass4.x = 2550
+    grass4.y = 30
+    grass4.width = 800
+
+    grass5 = Grass()
+    grass5.x = 3400
+    grass5.y = 30
+    grass5.width = 800
+
+    grass6 = Grass()
+    grass6.x = 4250
+    grass6.y = 30
+    grass6.width = 800
+
+    # Grass 객체들을 게임 월드에 추가
+    game_world.add_object(grass1, 0)
+    game_world.add_object(grass2, 0)
+    game_world.add_object(grass3, 0)
+    game_world.add_object(grass4, 0)
+    game_world.add_object(grass5, 0)
+    game_world.add_object(grass6, 0)
+
+    # Grass 객체들을 하나의 리스트로 묶음
+    grasses = [grass1, grass2, grass3, grass4, grass5, grass6]
 
     dashboard = Dashboard()  # Dashboard 인스턴스 생성
 
@@ -90,6 +131,10 @@ def init():
         Brick(450, 130),
         Brick(500, 130)
     ]
+
+    # 브릭 생성: y=70, x=0, 24, 48, 72, 96
+    #bricks = [Brick(x, 70) for x in range(0, 24 * 100, 24)]
+
     game_world.add_objects(bricks, 1)
 
     # Random Box 추가
@@ -113,9 +158,7 @@ def init():
     ]
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
 
-    # Boss_turtle 추가 (지정된 x, y 좌표로)
-    boss = Boss_turtle(20, 300)  # 스케일 및 초기 y 위치 조정
-    game_world.add_object(boss, 1)
+    # Boss_turtle 추가 (지정된 x, y 좌표로) - 이미 추가되었으므로 중복 제거
 
     # 충돌 쌍 등록
     for koomba in koombas:
@@ -165,7 +208,7 @@ def init():
     print("fire_ball:boss_turtle 그룹의 Boss_turtles 수:", len(game_world.collision_pairs['fire_ball:boss_turtle'][1]))
 
     # Grass와 마리오의 충돌 쌍 등록
-    game_world.add_collision_pair('mario:grass', mario, grass)
+    game_world.add_collision_pair('mario:grass', mario, grasses)
 
     # 'fire_ball:turtle' 충돌 그룹 초기화
     game_world.add_collision_pair('fire_ball:turtle', [], turtlers)
@@ -300,3 +343,4 @@ def pause():
 
 def resume():
     pass
+
