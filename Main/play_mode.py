@@ -11,6 +11,7 @@ from enemy.turtle import Turtle
 from enemy.boss_turtle import Boss_turtle  # Boss_turtle 임포트
 from mario import Mario, reset_mario
 from props.brick import Brick
+from props.fake_brick import Fake_brick
 from props.random_box import Random_box
 from props.gun_box import Gun_box
 from props.clean_box import Clean_box
@@ -250,6 +251,11 @@ def init():
     ]
     game_world.add_objects(clean_boxes, 1)  # 레이어 1에 Clean_box 추가
 
+    fake_bricks = [
+        Fake_brick(0, 130)
+    ]
+    game_world.add_objects(fake_bricks, 1)
+
     # Boss_turtle 추가 (지정된 x, y 좌표로) - 이미 추가되었으므로 중복 제거
 
     # 충돌 쌍 등록
@@ -290,6 +296,12 @@ def init():
         game_world.add_collision_pair('mario:clean_box_bottom', mario, clean_box)
         game_world.add_collision_pair('mario:clean_box_left', mario, clean_box)
         game_world.add_collision_pair('mario:clean_box_right', mario, clean_box)
+
+    for fake_brick in fake_bricks:
+        game_world.add_collision_pair('mario:fake_brick_top', mario, fake_brick)
+        game_world.add_collision_pair('mario:fake_brick_bottom', mario, fake_brick)
+        game_world.add_collision_pair('mario:fake_brick_left', mario, fake_brick)
+        game_world.add_collision_pair('mario:fake_brick_right', mario, fake_brick)
 
     # Boss_turtle과 Mario 간의 충돌 쌍 등록
     game_world.add_collision_pair('mario:boss_turtle', mario, boss)
