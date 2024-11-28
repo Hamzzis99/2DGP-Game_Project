@@ -28,7 +28,7 @@ from utils.bgm import BGMManager
 import game_over
 
 # ===== 상수 정의 =====
-BOSS_TRIGGER_X = 9000  # 보스 등장 트리거 x 좌표 # 5250예정
+BOSS_TRIGGER_X = 4300  # 보스 등장 트리거 x 좌표 (원래 9000에서 5250으로 변경 예정)
 BOSS_EVENT_DURATION = 2.0  # 보스 등장 이벤트 지속 시간 (초)
 FADE_DURATION = 1.0  # 페이드 아웃 지속 시간 (초)
 WIN_SEQUENCE_DELAY = 6.0  # 승리 시퀀스 지연 시간 (초)
@@ -68,6 +68,9 @@ win_timer_start_time = None
 # 보스 사망 상태 변수 추가
 boss_dead = False  # 보스의 사망 상태를 나타내는 변수
 
+# 배경 이미지 전역 변수 추가
+background = None
+
 def handle_events():
     global mario
     events = get_events()
@@ -88,6 +91,7 @@ def init():
     global is_fading_out, fade_start_time, initial_volume_int
     global win_sequence_started, is_win_fading_out, win_fade_start_time, win_timer_start_time
     global boss_dead  # 보스 사망 상태 변수 추가
+    global background  # 배경 이미지 전역 변수
 
     mario_dead = False  # 초기화 시 dead 플래그 초기화
     death_timer = None  # 초기화 시 타이머 초기화
@@ -107,6 +111,10 @@ def init():
     boss_dead = False  # 보스 사망 상태 초기화
 
     game_world.clear()  # 게임 월드 초기화
+
+    # 배경 이미지 로드
+    background = load_image('map/map.png')  # 배경 이미지 경로 확인
+    print("[디버깅] 배경 이미지 로드 완료.")
 
     # Grass 객체 생성 및 추가
     grasses = []
@@ -161,27 +169,28 @@ def init():
         Koomba(3268, 218, 200),
         Koomba(3308, 218, 100),
 
-        #Boss Run 1
+        # Boss Run 1
         Koomba(5530, 112, 0),
 
         # Boss Run 2
-        Koomba(6516, 172, 100),
-        Koomba(6524, 172, 150),
+        Koomba(6516, 162, 100),
+        Koomba(6524, 162, 150),
 
-        Koomba(6544, 252, 100),
-        Koomba(6554, 252, 100),
+        Koomba(6544, 242, 100),
+        Koomba(6554, 242, 100),
     ]
     game_world.add_objects(koombas, 1)
+
     # Turtle 추가
     turtlers = [
         Turtle(1715, 70, 350),  # x : 1715 y = 70, distance = 360
         Turtle(1760, 160, 220),
         Turtle(1795, 250, 170),
 
-        Turtle(2325, 70, 700),
-        Turtle(2425, 70, 600),
-        Turtle(2425, 70, 500),
-        Turtle(2525, 70, 400),
+        Turtle(2325, 70, 500),
+        Turtle(2525, 70, 300),
+        #Turtle(2425, 70, 500),
+        #Turtle(2525, 70, 400),
         Turtle(5558, 140, 0),
     ]
     game_world.add_objects(turtlers, 1)
@@ -261,13 +270,13 @@ def init():
 
         # Boss전 2차
         # Boss Area
-        Brick(6514, 140),  # Gun Box 대체 Randombox
-        Brick(6542, 140),  # Gun Box 대체 Randombox
-        Brick(6658, 140),  # Gun Box 대체 Randombox
-        Brick(6686, 140),  # Gun Box 대체 Randombox
+        Brick(6514, 130),  # Gun Box 대체 Randombox
+        Brick(6542, 130),  # Gun Box 대체 Randombox
+        Brick(6658, 130),  # Gun Box 대체 Randombox
+        Brick(6686, 130),  # Gun Box 대체 Randombox
 
-        Brick(6544, 220),  # Gun Box 대체 Randombox
-        Brick(6656, 220),  # Gun Box 대체 Randombox
+        Brick(6544, 210),  # Gun Box 대체 Randombox
+        Brick(6656, 210),  # Gun Box 대체 Randombox
     ]
     game_world.add_objects(bricks, 1)
 
@@ -298,7 +307,7 @@ def init():
 
         Random_box(3436, 277),  # Random box 3층
 
-        #Boss Area 2층
+        # Boss Area 2층
         Random_box(6566, 140),  # Gun Box 대체 Randombox
         Random_box(6634, 140),  # Gun Box 대체 Randombox
 
@@ -318,11 +327,11 @@ def init():
         Gun_box(3268, 277),  # Gun Box 대체 Randombox
 
         #Boss Fight
-        Gun_box(5200, 130),  # Gun Box 대체 Randombox\
+        Gun_box(5200, 130),  # Gun Box 대체 Randombox
         Gun_box(5228, 130),  # Gun Box 대체 Randombox
 
         #BOSS GUN BOX
-        Gun_box(6600, 139),  # Gun Box 대체 Randombox
+        Gun_box(6600, 129),  # Gun Box 대체 Randombox
     ]
     game_world.add_objects(gun_boxes, 1)
 
@@ -446,6 +455,7 @@ def init():
     bgm_manager.play('main_theme', MarioConfig.GAME_MUSIC_VOLUME)
     print("[디버깅] 배경음악 시작됨.")
 
+    # 카메라 초기화
     camera = Camera(800, 600, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)  # 수정된 부분
     # game_time = MarioConfig.GAME_TIME_LIMIT  # 제거 (game_state에서 관리)
 
@@ -516,7 +526,7 @@ def update():
 
             # 보스의 등장
             boss = Boss_turtle(scale=20.0, initial_y=300)  # 보스 생성 (scale=20, y=300)
-            boss.x = 3900  # 보스의 x 좌표 설정
+            boss.x = 4100  # (보스 등장) 보스의 x 좌표 설정
             game_world.add_object(boss, 1)
 
             # 보스와의 충돌 쌍 등록
@@ -650,6 +660,16 @@ def update():
 
 def draw():
     clear_canvas()
+
+    # 배경 그리기
+    if background:
+        # 배경 이미지를 게임 월드의 중앙에 맞추어 그립니다.
+        # 배경 이미지의 중앙은 (MarioConfig.WORLD_WIDTH // 2, MarioConfig.WORLD_HEIGHT // 2)
+        # 카메라의 위치에 따라 배경을 고정시키려면, 배경은 카메라의 움직임과 무관하게 그립니다.
+        # 여기서는 배경을 월드의 중앙에 고정하여 그립니다.
+        background.draw(MarioConfig.WORLD_WIDTH // 2, MarioConfig.WORLD_HEIGHT // 2, MarioConfig.WORLD_WIDTH, MarioConfig.WORLD_HEIGHT)
+        # 배경은 항상 가장 먼저 그려져야 다른 객체들이 그 위에 표시됩니다.
+
     game_world.render_with_camera(camera)  # 카메라를 고려하여 렌더링
     dashboard.draw(camera)  # 대시보드 그리기
     update_canvas()

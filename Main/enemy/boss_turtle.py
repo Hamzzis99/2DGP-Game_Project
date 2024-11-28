@@ -1,7 +1,6 @@
 # enemy/boss_turtle.py
 
 from pico2d import load_image, clamp, draw_rectangle
-
 from ball import Ball
 from game_object import GameObject
 from states import game_state
@@ -42,7 +41,7 @@ class Boss_turtle(GameObject):
         :param scale: 캐릭터의 스케일 (기본값: 10.0)
         :param initial_y: Boss_turtle의 초기 y 좌표 (기본값: 300)
         """
-        self.x, self.y = 3900, initial_y  # 초기 위치 설정 (x=3900)
+        self.x, self.y = 5000, initial_y  # 초기 위치 설정 (x=5000, y=initial_y)
         self.load_images()
         self.frame = 0  # 초기 프레임 (0 또는 1)
         self.dir = 1  # 초기 이동 방향: 1(오른쪽)
@@ -108,9 +107,7 @@ class Boss_turtle(GameObject):
             )
 
         # 히트박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb_offset(camera))
-        draw_rectangle(*self.get_top_bb_offset(camera))
-        draw_rectangle(*self.get_bottom_bb_offset(camera))
+        draw_rectangle(*self.get_bb_offset(camera))  # 몸통 히트박스만 그리기
 
     def get_bb(self):
         """
@@ -125,30 +122,6 @@ class Boss_turtle(GameObject):
 
     def get_bb_offset(self, camera: Camera):
         left, bottom, right, top = self.get_bb()
-        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
-
-    def get_top_bb(self):
-        """
-        Top 히트박스: Boss_turtle의 머리 부분 (스케일 적용)
-        :return: (left, bottom, right, top)
-        """
-        return (self.x - 13 * self.scale, self.y + 10 * self.scale,
-                self.x + 13 * self.scale, self.y + 25 * self.scale)  # (left, bottom, right, top)
-
-    def get_top_bb_offset(self, camera: Camera):
-        left, bottom, right, top = self.get_top_bb()
-        return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
-
-    def get_bottom_bb(self):
-        """
-        Bottom 히트박스: Boss_turtle의 몸통 부분 (스케일 적용)
-        :return: (left, bottom, right, top)
-        """
-        return (self.x - 15 * self.scale, self.y - 15 * self.scale,
-                self.x + 15 * self.scale, self.y + 20 * self.scale)  # (left, bottom, right, top)
-
-    def get_bottom_bb_offset(self, camera: Camera):
-        left, bottom, right, top = self.get_bottom_bb()
         return left - camera.camera_x, bottom - camera.camera_y, right - camera.camera_x, top - camera.camera_y
 
     def set_dir(self, dir):

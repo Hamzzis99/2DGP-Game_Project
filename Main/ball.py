@@ -181,11 +181,11 @@ class Ball(GameObject):
                 print(f"Ball 객체 {self}는 이미 제거되었습니다.")
 
             # 점수 추가 (각 충돌 시)
-            game_state.score += 100  # 점수는 필요에 따라 조정 가능
-            print(f"Score increased by 100. Total Score: {game_state.score}")
-            score_text = ScoreText(self.x, self.y + 30, "+100")
-            game_world.add_object(score_text, 2)
-            print("ScoreText 추가됨: +100")
+            #game_state.score += 100  # 점수는 필요에 따라 조정 가능
+            #print(f"Score increased by 100. Total Score: {game_state.score}")
+            #score_text = ScoreText(self.x, self.y + 30, "+100")
+            #game_world.add_object(score_text, 2)
+            #print("ScoreText 추가됨: +100")
 
         elif group in ['fire_ball:brick', 'fire_ball:clean_box', 'fire_ball:gun_box', 'fire_ball:random_box']:
             print(f"Ball이 벽과 충돌했습니다: {group}")
