@@ -11,7 +11,7 @@ def init():
     global image, running, logo_start_time, sound
     image = load_image('img/tuk_credit.png')
     sound = load_wav('sound/select.mp3')
-    sound.set_volume(60)  # 필요 시 볼륨 조정
+    sound.set_volume(70)  # 필요 시 볼륨 조정
     sound.play()  # 사운드 재생
 
     running = True
