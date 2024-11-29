@@ -156,6 +156,22 @@ def handle_collisions():
                 elif group == 'mario:gun_box_right':  # [추가]
                     if collide_hitboxes(a.get_bb(), b.get_right_bb()):
                         a.handle_collision(group, b, 'gun_box_right')
+                elif group.startswith('mario:mushroom_box'):
+                    # 'mario:mushroom_box_top', 'mario:mushroom_box_bottom', etc.
+                    if group.endswith('top'):
+                        if collide_hitboxes(a.get_bb(), b.get_top_bb()):
+                            a.handle_collision(group, b, 'mushroom_box_top')
+                            b.handle_collision(group, a, 'mushroom_box_top')
+                    elif group.endswith('bottom'):
+                        if collide_hitboxes(a.get_bb(), b.get_bottom_bb()):
+                            a.handle_collision(group, b, 'mushroom_box_bottom')
+                            b.handle_collision(group, a, 'mushroom_box_bottom')
+                    elif group.endswith('left'):
+                        if collide_hitboxes(a.get_bb(), b.get_left_bb()):
+                            a.handle_collision(group, b, 'mushroom_box_left')
+                    elif group.endswith('right'):
+                        if collide_hitboxes(a.get_bb(), b.get_right_bb()):
+                            a.handle_collision(group, b, 'mushroom_box_right')
                 elif group == 'fire_ball:turtle':
                     if collide_hitboxes(a.get_bb(), b.get_bb()):
                         a.handle_collision(group, b, 'collision')
@@ -164,7 +180,7 @@ def handle_collisions():
                     if collide_hitboxes(a.get_bb(), b.get_normal_bb()):
                         a.handle_collision(group, b, 'collision')
                         # b.handle_collision(group, a, 'collision')  # Koomba의 handle_collision을 수정하지 않으므로 호출하지 않음
-                elif group == 'fire_ball:brick' or group == 'fire_ball:clean_box' or group == 'fire_ball:gun_box' or group == 'fire_ball:random_box':
+                elif group == 'fire_ball:brick' or group == 'fire_ball:clean_box' or group == 'fire_ball:gun_box' or group == 'fire_ball:random_box' or group == 'fire_ball:mushroom_box':
                     if collide(a, b):
                         a.handle_collision(group, b, 'collision')
                         # 벽은 특별한 처리를 하지 않으므로 b.handle_collision은 호출하지 않음
@@ -191,6 +207,7 @@ def handle_collisions():
                     if collide(a, b):
                         a.handle_collision(group, b, 'unknown')
                         b.handle_collision(group, a, 'unknown')
+
 
 def find_object_by_type(obj_type):
     for layer in world:

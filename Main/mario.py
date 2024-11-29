@@ -7,6 +7,7 @@ import game_world
 import play_mode
 from ball import Ball
 from items.coin import Coin
+from items.mushroom import Mushroom
 from items.star import Star
 from utils.config import MarioConfig
 from utils.dashboard import Dashboard
@@ -419,7 +420,7 @@ class Mario(GameObject):
             self.dead = True
             self.state_machine.set_state(Dead())
 
-        elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top']:
+        elif group in ['mario:grass', 'mario:brick_top', 'mario:random_box_top', 'mario:gun_box_top', 'mario:mushroom_box_top']:
             if self.velocity_y <= 0:
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
@@ -437,7 +438,7 @@ class Mario(GameObject):
                     self.dir = 0
                     self.state_machine.set_state(Idle)
 
-        elif group in ['mario:brick_bottom', 'mario:random_box_bottom', 'mario:gun_box_bottom']:
+        elif group in ['mario:brick_bottom', 'mario:random_box_bottom', 'mario:gun_box_bottom', 'mario:mushroom_box_bottom']:
             if self.velocity_y > 0:
                 if group == 'mario:random_box_bottom' and not other.changed:
                     print("Random Box가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 코인을 생성합니다.")
@@ -461,6 +462,15 @@ class Mario(GameObject):
                         other.y + (other.height * other.scale)
                     )
                     play_mode.objects_to_add.append(star)
+                elif group == 'mario:mushroom_box_bottom' and not other.changed:
+                    print("Mushroom boxx가 마리오에게 밑에서 맞았습니다. 스프라이트를 변경하고 Mushroom을 생성합니다.")
+                    other.changed = True
+
+                    mushroom = Mushroom(
+                        other.x,
+                        other.y + (other.height * other.scale)
+                    )
+                    play_mode.objects_to_add.append(mushroom)
                 else:
                     self.brick_sound.play()
                     mario_bb = self.get_bb()
@@ -468,14 +478,14 @@ class Mario(GameObject):
                     self.y = obj_bb[1] - (mario_bb[3] - mario_bb[1]) / 2
                     self.velocity_y = 0
 
-        elif group in ['mario:brick_left', 'mario:random_box_left', 'mario:gun_box_left']:
+        elif group in ['mario:brick_left', 'mario:random_box_left', 'mario:gun_box_left', 'mario:mushroom_box_left']:
             if self.dir > 0:
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()
                 self.x = obj_bb[0] - (mario_bb[2] - mario_bb[0]) / 2
                 self.dir = 0
 
-        elif group in ['mario:brick_right', 'mario:random_box_right', 'mario:gun_box_right']:
+        elif group in ['mario:brick_right', 'mario:random_box_right', 'mario:gun_box_right', 'mario:mushroom_box_right']:
             if self.dir < 0:
                 mario_bb = self.get_bb()
                 obj_bb = other.get_bb()

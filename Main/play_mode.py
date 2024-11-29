@@ -15,6 +15,7 @@ from mario import Mario, reset_mario, Idle, Run, Jump, Dead  # 상태 클래스 
 from props.brick import Brick
 from props.castle import Castle
 from props.fake_brick import Fake_brick
+from props.mushroom_box import Mushroom_box
 from props.random_box import Random_box
 from props.gun_box import Gun_box
 from props.clean_box import Clean_box
@@ -368,6 +369,14 @@ def init():
     ]
     game_world.add_objects(fake_bricks, 1)
 
+
+
+    mushroom_boxes = [
+        # Mushroom Box
+        Mushroom_box(30, 130),
+    ]
+    game_world.add_objects(mushroom_boxes, 1)
+
     # 충돌 쌍 등록
     for koomba in koombas:
         # 마리오와 Koomba의 Top 히트박스 충돌 쌍 등록
@@ -412,6 +421,13 @@ def init():
         game_world.add_collision_pair('mario:fake_brick_bottom', mario, fake_brick)
         game_world.add_collision_pair('mario:fake_brick_left', mario, fake_brick)
         game_world.add_collision_pair('mario:fake_brick_right', mario, fake_brick)
+
+
+    for mushroom_box in mushroom_boxes:
+        game_world.add_collision_pair('mario:mushroom_box_top', mario, mushroom_box)
+        game_world.add_collision_pair('mario:mushroom_box_bottom', mario, mushroom_box)
+        game_world.add_collision_pair('mario:mushroom_box_left', mario, mushroom_box)
+        game_world.add_collision_pair('mario:mushroom_box_right', mario, mushroom_box)
 
     # Grass와 마리오의 충돌 쌍 등록
     game_world.add_collision_pair('mario:grass', mario, grasses)
