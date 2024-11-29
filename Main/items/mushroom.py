@@ -1,60 +1,108 @@
 # items/mushroom.py
 
-from pico2d import load_image, load_wav
+from pico2d import load_image, load_wav, draw_rectangle
 import game_world
-from game_object import GameObject  # GameObject 베이스 클래스 임포트
-from utils.camera import Camera      # Camera 클래스 임포트
+from game_object import GameObject
+from utils.camera import Camera
+import game_framework
 
 class Mushroom(GameObject):
-    image = None              # 클래스 변수로 이미지 공유
-    collect_sound = None      # 클래스 변수로 수집 시 소리 로드 공유
-    create_sound = None       # 클래스 변수로 생성 시 소리 로드 공유
+    image = None
+    collect_sound = None
+    create_sound = None
 
     def __init__(self, x, y):
         # 이미지 로드
         if Mushroom.image is None:
             Mushroom.image = load_image('img/Items.png')  # Items 이미지 로드
 
-        # 머쉬룸 생성 시 소리 로드 및 재생 (upgradebox.ogg)
+        # 생성 시 소리 재생
         if Mushroom.create_sound is None:
-            Mushroom.create_sound = load_wav('sound/upgradebox.ogg')  # Mushroom 생성 시 소리 로드
-            Mushroom.create_sound.set_volume(20)  # 필요에 따라 볼륨 설정
-        Mushroom.create_sound.play()  # Mushroom 생성 시 소리 재생
+            Mushroom.create_sound = load_wav('sound/upgradebox.ogg')
+            Mushroom.create_sound.set_volume(20)
+        Mushroom.create_sound.play()
 
-        # 머쉬룸 수집 시 소리 로드 (powerup.ogg)
+        # 수집 시 소리 로드
         if Mushroom.collect_sound is None:
-            Mushroom.collect_sound = load_wav('sound/powerup.ogg')  # Mushroom 수집 사운드 로드
-            Mushroom.collect_sound.set_volume(20)  # 필요에 따라 볼륨 설정
+            Mushroom.collect_sound = load_wav('sound/powerup.ogg')
+            Mushroom.collect_sound.set_volume(20)
 
-        # 머쉬룸의 위치 및 속성 설정
+        # 위치 및 속성 설정
         self.x = x
         self.y = y
-        self.sprite_x = 0        # 머쉬룸의 고정 스프라이트 x 좌표 (Items.png 내 위치에 맞게 조정)
-        self.sprite_y = 16       # 머쉬룸의 스프라이트 y 좌표 (Items.png 내 위치에 맞게 조정)
-        self.width = 16          # 스프라이트 너비
-        self.height = 16         # 스프라이트 높이
-        self.scale = 1.5         # 이미지 확대 배율
+        self.sprite_x = 0
+        self.sprite_y = 16
+        self.width = 16
+        self.height = 16
+        self.scale = 1.5
+        self.changed = False  # 상태 변화 여부
+
+        # 애니메이션 변수
+        self.frame = 0
+        self.frame_time = 0.0
+        self.animation_speed = 0.1  # 초당 프레임 변화 속도
+        self.total_frames = 3  # 애니메이션 프레임 수
+
+        # 이동 상태 변수
+        self.state = 'idle'  # 'idle', 'moving_right', 'falling'
+        self.move_timer = 0.0  # 상태 전환 타이머
+        self.velocity_x = 100  # 오른쪽 이동 속도 (픽셀/초)
+        self.velocity_y = 0  # 수직 속도
+        self.gravity = -700  # 중력 가속도 (픽셀/초^2)
 
     def update(self):
-        pass  # 머쉬룸이 움직이지 않으므로 아무 동작도 하지 않음
+        frame_time = game_framework.frame_time
+
+        # 애니메이션 업데이트
+        self.frame_time += frame_time
+        if self.frame_time >= self.animation_speed:
+            self.frame = (self.frame + 1) % self.total_frames
+            self.frame_time -= self.animation_speed
+
+        # 상태별 동작 처리
+        if self.state == 'idle':
+            self.move_timer += frame_time
+            if self.move_timer >= 0.5:
+                self.state = 'moving_right'
+                self.move_timer = 0.0
+                print("Mushroom 상태가 'moving_right'로 변경되었습니다.")
+        elif self.state == 'moving_right':
+            # 오른쪽으로 이동
+            self.x += self.velocity_x * frame_time
+        elif self.state == 'falling':
+            # 중력 적용
+            self.velocity_y += self.gravity * frame_time
+            self.y += self.velocity_y * frame_time
+
+            # 화면 아래로 떨어지면 제거
+            if self.y < 0:
+                game_world.remove_object(self)
+                print("Mushroom이 화면 아래로 떨어져 제거되었습니다.")
 
     def draw(self):
+        # 애니메이션 프레임 계산
+        frame_width = self.width
+        frame_height = self.height
+        frame_x = self.sprite_x + self.frame * frame_width
         adjusted_sprite_y = Mushroom.image.h - self.sprite_y - self.height
         Mushroom.image.clip_draw(
-            self.sprite_x, adjusted_sprite_y, self.width, self.height,
+            frame_x, adjusted_sprite_y, frame_width, frame_height,
             self.x, self.y, self.width * self.scale, self.height * self.scale
         )
-        # 충돌 박스 그리기 (디버깅용)
+        # 디버깅용 충돌 박스 그리기
         # draw_rectangle(*self.get_bb())
 
     def draw_with_camera(self, camera: Camera):
-        screen_x, screen_y = camera.apply(self.x, self.y)  # 카메라 적용 위치 계산
+        screen_x, screen_y = camera.apply(self.x, self.y)
+        frame_width = self.width
+        frame_height = self.height
+        frame_x = self.sprite_x + self.frame * frame_width
         adjusted_sprite_y = Mushroom.image.h - self.sprite_y - self.height
         Mushroom.image.clip_draw(
-            self.sprite_x, adjusted_sprite_y, self.width, self.height,
+            frame_x, adjusted_sprite_y, frame_width, frame_height,
             screen_x, screen_y, self.width * self.scale, self.height * self.scale
         )
-        # 충돌 박스 그리기 (디버깅용)
+        # 디버깅용 충돌 박스 그리기
         # draw_rectangle(*self.get_bb_offset(camera))
 
     def get_bb(self):
@@ -77,5 +125,18 @@ class Mushroom(GameObject):
         )
 
     def handle_collision(self, group, other, hit_position):
-        # 충돌 처리 로직이 이제 mario.py로 통합되었으므로, 여기는 pass로 설정
-        pass
+        if self.state == 'moving_right':
+            if group in ['mushroom:grass', 'mushroom:brick', 'mushroom:mushroom_box']:
+                # 오른쪽으로 이동 중 충돌 발생 시 떨어지기 시작
+                self.state = 'falling'
+                self.velocity_x = 0
+                self.velocity_y = 0
+                print("Mushroom이 이동 중 충돌하여 'falling' 상태로 변경되었습니다.")
+        elif self.state == 'falling':
+            if group == 'mushroom:ground':
+                # 바닥에 닿으면 정지
+                self.y = other.y + (other.height * other.scale) / 2 + (self.height * self.scale) / 2
+                self.velocity_y = 0
+                self.state = 'idle'
+                print("Mushroom이 바닥에 닿아 'idle' 상태로 변경되었습니다.")
+        # 적과의 충돌은 무시 (아무 작업도 하지 않음)
