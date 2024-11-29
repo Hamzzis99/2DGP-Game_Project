@@ -2,7 +2,7 @@
 
 import game_framework
 from pico2d import load_image, clear_canvas, update_canvas, get_events, get_time, get_canvas_width, get_canvas_height, \
-    SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE, SDLK_SPACE, draw_rectangle
+    SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE, SDLK_SPACE, draw_rectangle, load_wav
 
 import world_start_mode
 from game_object import GameObject
@@ -11,7 +11,6 @@ from utils.font import Font
 from mario import Mario
 import game_world
 import play_mode
-
 
 class Grass(GameObject):
     def __init__(self, x, y, width, height):
@@ -37,7 +36,6 @@ class Grass(GameObject):
     def get_bb(self):
         return self.x - self.width / 2, self.y - self.height / 2, self.x + self.width / 2, self.y + self.height / 2
 
-
 font = None
 background = None
 title_overlay_image = None
@@ -48,25 +46,14 @@ mario = None
 grass = None
 press_space_font = None
 show_control = False
-
+select_sound = None  # 효과음 변수 추가
 
 def init():
-    global background, title_overlay_image, control_image, bgm_manager, start_time, mario, grass, font, press_space_font, show_control
+    global background, title_overlay_image, control_image, bgm_manager, start_time, mario, grass, font, press_space_font, show_control, select_sound
 
-    try:
-        background = load_image('map/title.png')
-    except Exception as e:
-        background = None
-
-    try:
-        title_overlay_image = load_image('map/mariotitle.png')
-    except Exception as e:
-        title_overlay_image = None
-
-    try:
-        control_image = load_image('map/control.png')
-    except Exception as e:
-        control_image = None
+    background = load_image('map/title.png')
+    title_overlay_image = load_image('map/mariotitle.png')
+    control_image = load_image('map/control.png')
 
     start_time = get_time()
 
@@ -90,18 +77,16 @@ def init():
 
     game_world.add_collision_pair('mario:grass', mario, grass)
 
-    try:
-        font = Font('img/font.png', char_width=8, char_height=8)
-        press_space_font = Font('img/font.png', char_width=8, char_height=8)
-    except Exception as e:
-        font = None
-        press_space_font = None
+    font = Font('img/font.png', char_width=8, char_height=8)
+    press_space_font = Font('img/font.png', char_width=8, char_height=8)
 
     show_control = False
 
+    # 효과음 로드
+    select_sound = load_wav('sound/select.mp3')
 
 def finish():
-    global background, title_overlay_image, control_image, bgm_manager, mario, grass, font, press_space_font, show_control
+    global background, title_overlay_image, control_image, bgm_manager, mario, grass, font, press_space_font, show_control, select_sound
     del background
     del title_overlay_image
     del control_image
@@ -112,21 +97,12 @@ def finish():
         bgm_manager.stop()
     game_world.remove_object(mario)
     game_world.remove_object(grass)
-
+    del select_sound  # 효과음 객체 삭제
 
 def update():
     global show_control
     game_world.update()
     game_world.handle_collisions()
-
-    # Mario의 x 좌표가 800을 넘지 않도록 제한
-    if mario.x > 800:
-        mario.x = 800
-
-    # 필요에 따라 왼쪽 경계도 설정 (선택 사항)
-    if mario.x < 0:
-        mario.x = 0
-
 
 def draw():
     clear_canvas()
@@ -164,7 +140,6 @@ def draw():
 
     update_canvas()
 
-
 def handle_events():
     global show_control
     events = get_events()
@@ -175,6 +150,8 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
             elif event.key == SDLK_SPACE:
+                if select_sound:
+                    select_sound.play()  # 효과음 재생
                 if not show_control:
                     show_control = True
                 else:
@@ -182,10 +159,8 @@ def handle_events():
     for event in events:
         mario.handle_event(event)
 
-
 def pause():
     pass
-
 
 def resume():
     pass
