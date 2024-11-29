@@ -506,6 +506,10 @@ class Mario(GameObject):
             game_world.remove_object(other)
             print("스타를 수집했습니다!")
             self.gun_mode = True
+        elif group == 'mario:mushroom':
+            Mushroom.collect_sound.play()  # 수집 사운드 재생
+            game_world.remove_object(other)  # Mushroom 객체 제거
+            print("머쉬룸을 수집했습니다!")
 
         else:
             pass

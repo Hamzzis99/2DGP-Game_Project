@@ -11,6 +11,7 @@ from grass import Grass
 from enemy.koomba import Koomba
 from enemy.turtle import Turtle
 from enemy.boss_turtle import Boss_turtle  # Boss_turtle 임포트
+from items.mushroom import Mushroom
 from mario import Mario, reset_mario, Idle, Run, Jump, Dead  # 상태 클래스 임포트 추가
 from props.brick import Brick
 from props.castle import Castle
@@ -631,6 +632,9 @@ def update():
             game_world.add_collision_pair('mario:coin', mario, obj)
         elif isinstance(obj, Star):
             game_world.add_collision_pair('mario:star', mario, obj)
+        elif isinstance(obj, Mushroom):
+            game_world.add_collision_pair('mario:mushroom', mario, obj)
+            game_world.add_collision_pair('fire_ball:mushroom', [], [obj])
         elif isinstance(obj, Ball):
             # 기존의 'fire_ball:turtle', 'fire_ball:koomba' 그룹에 추가
             if 'fire_ball:turtle' in game_world.collision_pairs:
