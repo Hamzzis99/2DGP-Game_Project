@@ -5,6 +5,7 @@ import game_framework
 import game_world
 import logo_mode
 import thank_you
+import world_start_mode
 from ball import Ball
 from grass import Grass
 from enemy.koomba import Koomba
@@ -601,7 +602,7 @@ def update():
             if game_state.lives > 0:
                 print("[디버깅] 목숨이 남아있습니다. 게임을 재시작합니다.")
                 reset_game()  # GameState를 초기화하지 않고, 게임 상태를 유지
-                game_framework.change_mode(logo_mode)  # 초기 화면으로 변경하여 게임 재시작
+                game_framework.change_mode(world_start_mode)  # 초기 화면으로 변경하여 게임 재시작
             else:
                 print("[디버깅] 목숨이 남아있지 않습니다. 게임 오버 화면으로 전환합니다.")
                 game_framework.change_mode(game_over)

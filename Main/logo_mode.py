@@ -4,6 +4,8 @@ from pico2d import get_time, load_image, clear_canvas, update_canvas, get_events
     load_wav
 import game_framework
 import play_mode  # play_mode로 전환하기 위해 import
+import title_mode
+
 
 def init():
     global image, running, logo_start_time, sound
@@ -23,7 +25,7 @@ def finish():
 def update():
     global logo_start_time
     if get_time() - logo_start_time >= 1.0:  # 5초 후에 play_mode로 전환
-        game_framework.change_mode(play_mode)
+        game_framework.change_mode(title_mode)
 
 def draw():
     clear_canvas()

@@ -1,4 +1,4 @@
-#s main.py
+#main.py
 
 from pico2d import *
 import game_framework
@@ -6,6 +6,7 @@ import play_mode
 import game_over
 import logo_mode
 import title_mode
+import world_start_mode
 
 open_canvas(800, 600)
 

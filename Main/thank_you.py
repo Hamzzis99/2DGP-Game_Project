@@ -1,4 +1,4 @@
-# game_over.py
+# thank_you.py
 
 import game_framework
 from pico2d import load_image, load_wav, clear_canvas, update_canvas, get_events, get_time, get_canvas_width, get_canvas_height, SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
