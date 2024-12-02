@@ -49,9 +49,13 @@ class Mushroom(GameObject):
         self.velocity_x = 100  # 오른쪽 이동 속도 (픽셀/초)
         self.velocity_y = 0  # 수직 속도
         self.gravity = -700  # 중력 가속도 (픽셀/초^2)
+        self.is_on_ground = False  # 바닥에 서 있는지 여부
 
     def update(self):
         frame_time = game_framework.frame_time
+
+        # Ground 상태 초기화
+        self.is_on_ground = False
 
         # 애니메이션 업데이트
         self.frame_time += frame_time
@@ -69,15 +73,24 @@ class Mushroom(GameObject):
         elif self.state == 'moving_right':
             # 오른쪽으로 이동
             self.x += self.velocity_x * frame_time
-        elif self.state == 'falling':
             # 중력 적용
             self.velocity_y += self.gravity * frame_time
             self.y += self.velocity_y * frame_time
+        elif self.state == 'falling':
+            # 중력 적용 및 이동
+            self.velocity_y += self.gravity * frame_time
+            self.y += self.velocity_y * frame_time
+            self.x += self.velocity_x * frame_time  # 계속 오른쪽으로 이동
 
             # 화면 아래로 떨어지면 제거
             if self.y < 0:
                 game_world.remove_object(self)
                 print("Mushroom이 화면 아래로 떨어져 제거되었습니다.")
+
+        # 바닥에 서 있지 않다면 'falling' 상태로 전환
+        if not self.is_on_ground and self.state != 'falling':
+            self.state = 'falling'
+            print("Mushroom이 바닥을 벗어나 'falling' 상태로 변경되었습니다.")
 
     def draw(self):
         # 애니메이션 프레임 계산
@@ -90,7 +103,7 @@ class Mushroom(GameObject):
             self.x, self.y, self.width * self.scale, self.height * self.scale
         )
         # 디버깅용 충돌 박스 그리기
-        # draw_rectangle(*self.get_bb())
+        draw_rectangle(*self.get_bb())
 
     def draw_with_camera(self, camera: Camera):
         screen_x, screen_y = camera.apply(self.x, self.y)
@@ -103,7 +116,7 @@ class Mushroom(GameObject):
             screen_x, screen_y, self.width * self.scale, self.height * self.scale
         )
         # 디버깅용 충돌 박스 그리기
-        # draw_rectangle(*self.get_bb_offset(camera))
+        draw_rectangle(*self.get_bb_offset(camera))
 
     def get_bb(self):
         half_width = (self.width * self.scale) / 2
@@ -126,17 +139,23 @@ class Mushroom(GameObject):
 
     def handle_collision(self, group, other, hit_position):
         if self.state == 'moving_right':
-            if group in ['mushroom:grass', 'mushroom:brick', 'mushroom:mushroom_box']:
-                # 오른쪽으로 이동 중 충돌 발생 시 떨어지기 시작
-                self.state = 'falling'
-                self.velocity_x = 0
+            if group.endswith('top'):
+                # 바닥(Brick, Mushroom_box, Grass) 위에 서 있음
                 self.velocity_y = 0
-                print("Mushroom이 이동 중 충돌하여 'falling' 상태로 변경되었습니다.")
+                self.state = 'moving_right'
+                self.is_on_ground = True
+                print(f"Mushroom이 {group} 위에 서 있습니다.")
+            elif group.endswith('left') or group.endswith('right') or group.endswith('bottom'):
+                # 벽이나 장애물과 충돌하여 떨어지기 시작
+                self.state = 'falling'
+                self.velocity_x = 0  # 충돌 시 수평 속도 정지
+                self.velocity_y = 0
+                print(f"Mushroom이 {group}과 충돌하여 'falling' 상태로 변경되었습니다.")
         elif self.state == 'falling':
-            if group == 'mushroom:ground':
-                # 바닥에 닿으면 정지
+            if group.endswith('top'):
+                # 바닥(Brick, Mushroom_box, Grass) 위에 착지
                 self.y = other.y + (other.height * other.scale) / 2 + (self.height * self.scale) / 2
                 self.velocity_y = 0
-                self.state = 'idle'
-                print("Mushroom이 바닥에 닿아 'idle' 상태로 변경되었습니다.")
-        # 적과의 충돌은 무시 (아무 작업도 하지 않음)
+                self.state = 'moving_right'
+                self.is_on_ground = True
+                print(f"Mushroom이 {group} 위에 착지하여 'moving_right' 상태로 변경되었습니다.")
