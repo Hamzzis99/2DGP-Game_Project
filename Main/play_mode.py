@@ -311,13 +311,13 @@ def init():
         Random_box(3436, 277),  # Random box 3층
 
         # Boss Area 2층
-        Random_box(6566, 140),  # Gun Box 대체 Randombox
-        Random_box(6634, 140),  # Gun Box 대체 Randombox
+        Random_box(6566, 130),  # Gun Box 대체 Randombox
+        Random_box(6634, 130),  # Gun Box 대체 Randombox
 
         # Boss Area 3층
-        Random_box(6572, 220),  # Gun Box 대체 Randombox
-        Random_box(6600, 220),  # Gun Box 대체 Randombox
-        Random_box(6628, 220),  # Gun Box 대체 Randombox
+        Random_box(6572, 210),  # Gun Box 대체 Randombox
+        Random_box(6600, 210),  # Gun Box 대체 Randombox
+        Random_box(6628, 210),  # Gun Box 대체 Randombox
     ]
     game_world.add_objects(random_boxes, 1)
 
