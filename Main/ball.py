@@ -19,7 +19,7 @@ class Ball(GameObject):
         print(f"Ball 객체 생성: 위치=({x}, {y}), 속도=({velocity_x}, {velocity_y})")
         if Ball.image is None:
             try:
-                Ball.image = load_image('ball21x21.png')  # 이미지 경로와 파일명 확인
+                Ball.image = load_image('img/ball21x21.png')  # 이미지 경로와 파일명 확인
                 #print("Ball 이미지 로드 성공")
             except Exception as e:
                 print(f"Ball 이미지 로드 실패: {e}")

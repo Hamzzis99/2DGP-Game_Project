@@ -324,13 +324,13 @@ def init():
     # Gun Box 추가
     gun_boxes = [
         # Turtle 영역
-        Gun_box(2206, 160),
+        #Gun_box(2206, 160), #Mushroom box 대체
 
         # FakeBrick 영역
         Gun_box(3268, 277),  # Gun Box 대체 Randombox
 
         #Boss Fight
-        Gun_box(5200, 130),  # Gun Box 대체 Randombox
+        #Gun_box(5200, 130),  # Gun Box 대체 Randombox Mushroom으로 다시 대체
         Gun_box(5228, 130),  # Gun Box 대체 Randombox
 
         #BOSS GUN BOX
@@ -375,6 +375,9 @@ def init():
     mushroom_boxes = [
         # Mushroom Box
         Mushroom_box(30, 130),
+        Mushroom_box(2206, 160),
+        Mushroom_box(5200, 130)
+        
     ]
     game_world.add_objects(mushroom_boxes, 1)
 
