@@ -5,8 +5,8 @@ from pico2d import *
 import game_framework
 import game_world
 from game_object import GameObject
-from utils.camera import Camera
-from utils.font import Font
+from debug.camera import Camera
+from debug.font import Font
 
 class ScoreText(GameObject):
     def __init__(self, x, y, text, duration=3.0, velocity_y=50):

@@ -1,7 +1,7 @@
 # utils/dashboard.py
 
 from pico2d import *
-from utils.font import Font  # font.py에 포함된 Font 클래스 임포트
+from debug.font import Font  # font.py에 포함된 Font 클래스 임포트
 from states import game_state  # game_state 임포트
 
 class Dashboard:
