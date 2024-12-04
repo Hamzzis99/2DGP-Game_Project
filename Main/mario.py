@@ -509,7 +509,11 @@ class Mario(GameObject):
         elif group == 'mario:mushroom':
             Mushroom.collect_sound.play()  # 수집 사운드 재생
             game_world.remove_object(other)  # Mushroom 객체 제거
-            print("머쉬룸을 수집했습니다!")
+            print(f"Mario가 독버섯을 먹었습니다. 남은 목숨: {game_state.lives}")
+            self.dead = True
+            self.state_machine.set_state(Dead())
+            
+
 
         else:
             pass

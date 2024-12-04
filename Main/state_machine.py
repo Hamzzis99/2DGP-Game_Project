@@ -148,7 +148,7 @@ class Dead:
         mario.image.clip_draw(
             frame_x, frame_y, frame_width, frame_height,
             mario.x, mario.y,
-            frame_width * 3, frame_height * 3  # 스케일 적용
+            frame_width * 2, frame_height * 2  # 스케일 적용
         )
 
     def draw_with_camera(self, mario, camera: Camera):
