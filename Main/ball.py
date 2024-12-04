@@ -47,7 +47,7 @@ class Ball(GameObject):
     def draw(self):
         if self.image:
             self.image.draw(self.x, self.y)
-            draw_rectangle(*self.get_bb())  # 충돌 박스 그리기
+            #draw_rectangle(*self.get_bb())  # 충돌 박스 그리기
         else:
             print("Ball 이미지가 로드되지 않아 그릴 수 없습니다.")
 
@@ -55,7 +55,7 @@ class Ball(GameObject):
         if self.image:
             screen_x, screen_y = camera.apply(self.x, self.y)
             self.image.draw(screen_x, screen_y)
-            draw_rectangle(*self.get_bb_offset(camera))
+            #draw_rectangle(*self.get_bb_offset(camera))
         else:
             print("Ball 이미지가 로드되지 않아 그릴 수 없습니다.")
 

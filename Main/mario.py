@@ -368,11 +368,11 @@ class Mario(GameObject):
             self.state_machine.draw()
         else:
             self.state_machine.draw()
-            draw_rectangle(*self.get_bb())
+            #draw_rectangle(*self.get_bb())
 
     def draw_with_camera(self, camera: Camera):
         self.state_machine.draw_with_camera(camera)
-        draw_rectangle(*self.get_bb_offset(camera))
+        #draw_rectangle(*self.get_bb_offset(camera))
 
     def get_bb(self):
         if self.gun_mode:

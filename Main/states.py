@@ -27,5 +27,3 @@ def reset_game():
 
 def game_over_reset():
     game_state.game_over_reset()
-
-debug_mode = False  # 디버그 모드 초기값은 False로 설정

@@ -53,11 +53,11 @@ class Mushroom_box(GameObject):
             self.x, self.y, self.width * self.scale, self.height * self.scale
         )
         # 충돌 박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb())
-        draw_rectangle(*self.get_top_bb())
-        draw_rectangle(*self.get_bottom_bb())
-        draw_rectangle(*self.get_left_bb())
-        draw_rectangle(*self.get_right_bb())
+        #draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_top_bb())
+        #draw_rectangle(*self.get_bottom_bb())
+        #draw_rectangle(*self.get_left_bb())
+        #draw_rectangle(*self.get_right_bb())
 
     def draw_with_camera(self, camera: Camera):
         adjusted_sprite_y = Mushroom_box.image.h - self.sprite_y - self.height
@@ -71,11 +71,11 @@ class Mushroom_box(GameObject):
             screen_x, screen_y, self.width * self.scale, self.height * self.scale
         )
         # 충돌 박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb_offset(camera))
-        draw_rectangle(*self.get_top_bb_offset(camera))
-        draw_rectangle(*self.get_bottom_bb_offset(camera))
-        draw_rectangle(*self.get_left_bb_offset(camera))
-        draw_rectangle(*self.get_right_bb_offset(camera))
+        #draw_rectangle(*self.get_bb_offset(camera))
+        #draw_rectangle(*self.get_top_bb_offset(camera))
+        #draw_rectangle(*self.get_bottom_bb_offset(camera))
+        #draw_rectangle(*self.get_left_bb_offset(camera))
+        #draw_rectangle(*self.get_right_bb_offset(camera))
 
     # 히트박스 메서드들
     def get_bb(self):

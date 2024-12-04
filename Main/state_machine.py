@@ -1,7 +1,6 @@
 # state_machine.py
 
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_s, SDLK_BACKQUOTE
-from utils.debug import toggle_show_collision_box  # 디버그 토글 함수 임포트
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_s
 from utils.camera import Camera  # Camera 클래스 임포트
 import game_framework
 
@@ -38,14 +37,6 @@ def a_down(e):
         e[1].key == SDLK_a
     )
 
-# 백틱 키 핸들링 함수 추가
-def backtick_down(e):
-    return (
-        isinstance(e, tuple) and
-        e[0] == 'INPUT' and
-        e[1].type == SDL_KEYDOWN and
-        e[1].key == SDLK_BACKQUOTE
-    )
 
 class StateMachine:
     def __init__(self, o):
@@ -82,9 +73,7 @@ class StateMachine:
         for event, next_state in self.transitions.get(self.cur_state, {}).items():
             if event(e):
                 handled = True
-                if event == backtick_down:
-                    toggle_show_collision_box()
-                elif next_state != self.cur_state:
+                if next_state != self.cur_state:
                     self.cur_state.exit(self.o, e)
                     self.cur_state = next_state
                     self.cur_state.enter(self.o, e)

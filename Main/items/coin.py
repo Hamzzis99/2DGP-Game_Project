@@ -66,7 +66,7 @@ class Coin(GameObject):
             self.x, self.y, self.width * self.scale, self.height * self.scale
         )
         # 충돌 박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def draw_with_camera(self, camera: Camera):
         screen_x, screen_y = camera.apply(self.x, self.y)  # 카메라 적용 위치 계산
@@ -79,7 +79,7 @@ class Coin(GameObject):
             screen_x, screen_y, self.width * self.scale, self.height * self.scale
         )
         # 충돌 박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb_offset(camera))
+        #draw_rectangle(*self.get_bb_offset(camera))
 
     def get_bb(self):
         half_width = (self.width * self.scale) / 2

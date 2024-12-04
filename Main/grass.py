@@ -20,7 +20,7 @@ class Grass(GameObject):
         # 원래 draw 메서드는 화면 중앙에 그립니다.
         self.image.draw(self.x, self.y, self.width, self.height)
         # 충돌 박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_bb())
 
     def draw_with_camera(self, camera: Camera):
         # Grass는 전체 바닥을 그려야 하므로, 월드 전체를 커버하도록 그립니다.
@@ -29,7 +29,7 @@ class Grass(GameObject):
         # 바닥 이미지를 화면에 맞게 그립니다.
         self.image.draw(screen_x, screen_y, self.width, self.height)
         # 충돌 박스 그리기 (디버깅용)
-        draw_rectangle(*self.get_bb_offset(camera))
+        #draw_rectangle(*self.get_bb_offset(camera))
 
     def get_bb(self):
         # 전체 Grass의 충돌 박스

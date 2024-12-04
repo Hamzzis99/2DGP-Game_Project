@@ -27,11 +27,11 @@ class Grass(GameObject):
     def draw_with_camera(self, camera=None):
         if self.image:
             self.image.draw(self.x, self.y, self.width, self.height)
-        else:
-            draw_rectangle(
-                self.x - self.width / 2, self.y - self.height / 2,
-                self.x + self.width / 2, self.y + self.height / 2
-            )
+        #else:
+            #draw_rectangle(
+                #self.x - self.width / 2, self.y - self.height / 2,
+                #self.x + self.width / 2, self.y + self.height / 2
+            #)
 
     def get_bb(self):
         return self.x - self.width / 2, self.y - self.height / 2, self.x + self.width / 2, self.y + self.height / 2

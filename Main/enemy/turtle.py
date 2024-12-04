@@ -133,15 +133,15 @@ class Turtle(GameObject):
             )
 
         # 히트박스 그리기 (디버깅용)
-        bb_offset = self.get_bb_offset(camera)
-        if bb_offset:
-            draw_rectangle(*bb_offset)
-        top_bb_offset = self.get_top_bb_offset(camera)
-        if top_bb_offset:
-            draw_rectangle(*top_bb_offset)
-        bottom_bb_offset = self.get_bottom_bb_offset(camera)
-        if bottom_bb_offset:
-            draw_rectangle(*bottom_bb_offset)
+        #bb_offset = self.get_bb_offset(camera)
+        #if bb_offset:
+            #draw_rectangle(*bb_offset)
+        #top_bb_offset = self.get_top_bb_offset(camera)
+        #if top_bb_offset:
+            #draw_rectangle(*top_bb_offset)
+        #bottom_bb_offset = self.get_bottom_bb_offset(camera)
+        #if bottom_bb_offset:
+            #draw_rectangle(*bottom_bb_offset)
 
     def get_bb(self):
         # Turtle는 stomped 상태가 없으므로 항상 정상적인 히트박스 반환

@@ -60,11 +60,11 @@ class Fake_brick(GameObject):
             )
 
         # 충돌 박스 그리기 (디버깅용, 항상 그려짐)
-        draw_rectangle(*self.get_bb())
-        draw_rectangle(*self.get_top_bb())
-        draw_rectangle(*self.get_bottom_bb())
-        draw_rectangle(*self.get_left_bb())
-        draw_rectangle(*self.get_right_bb())
+        #draw_rectangle(*self.get_bb())
+        #draw_rectangle(*self.get_top_bb())
+        #draw_rectangle(*self.get_bottom_bb())
+        #draw_rectangle(*self.get_left_bb())
+        #draw_rectangle(*self.get_right_bb())
 
     def draw_with_camera(self, camera: Camera):
         if self.changed:
@@ -81,11 +81,11 @@ class Fake_brick(GameObject):
             )
 
         # 충돌 박스 그리기 (디버깅용, 항상 그려짐)
-        draw_rectangle(*self.get_bb_offset(camera))
-        draw_rectangle(*self.get_top_bb_offset(camera))
-        draw_rectangle(*self.get_bottom_bb_offset(camera))
-        draw_rectangle(*self.get_left_bb_offset(camera))
-        draw_rectangle(*self.get_right_bb_offset(camera))
+        #draw_rectangle(*self.get_bb_offset(camera))
+        #draw_rectangle(*self.get_top_bb_offset(camera))
+        #draw_rectangle(*self.get_bottom_bb_offset(camera))
+        #draw_rectangle(*self.get_left_bb_offset(camera))
+        #draw_rectangle(*self.get_right_bb_offset(camera))
 
     # 히트박스 메서드들 (변경 없음)
     def get_bb(self):
