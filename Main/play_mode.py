@@ -169,8 +169,8 @@ def init():
         Koomba(2575, 70, 400),
 
         # Fake Brick 함정
-        Koomba(3268, 218, 200),
-        Koomba(3308, 218, 100),
+        Koomba(3268, 300, 1300),
+        Koomba(3308, 300, 100),
 
         # Boss Run 1
         Koomba(5530, 112, 0),

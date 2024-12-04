@@ -26,7 +26,7 @@ def finish():
 
 def update():
     global logo_start_time
-    if get_time() - logo_start_time >= 9.0:  # 원래는 10초였음
+    if get_time() - logo_start_time >= 8.0:  # 원래는 10초였음
         game_framework.change_mode(logo_mode)
 
 def draw():
